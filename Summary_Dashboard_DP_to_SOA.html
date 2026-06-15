@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Movement DP Cancel/Reject ke SOA Lain</title>
+<style>
+:root{
+  --bg:#F2F4F8;--panel:#FFF;--navy:#16243E;--navy2:#22365C;
+  --teal:#1A9E8C;--amber:#D49A2D;--red:#CC4550;--muted:#6B7785;
+  --border:#E0E5EE;--green:#1A9E8C;--tag-bg:#E9F5F3;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--navy);line-height:1.5;padding:24px 16px 60px;}
+.wrap{max-width:1100px;margin:0 auto;}
+.eyebrow{font-family:monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);font-weight:700;margin-bottom:6px;}
+h1{font-size:23px;font-weight:900;color:var(--navy);margin-bottom:4px;}
+.sub{color:var(--muted);font-size:13px;max-width:700px;margin-bottom:20px;}
+/* SOA FILTER */
+.soa-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;align-items:center;}
+.soa-lbl{font-size:12px;font-weight:700;color:var(--muted);margin-right:4px;}
+.soa-btn{padding:7px 14px;border-radius:20px;border:2px solid var(--border);background:var(--panel);font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .15s;}
+.soa-btn:hover{border-color:var(--teal);color:var(--teal);}
+.soa-btn.active{background:var(--navy2);border-color:var(--navy2);color:#fff;}
+/* KPIS */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:22px;}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-top:3px solid var(--navy2);}
+.kpi .lbl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.kpi .val{font-family:monospace;font-size:19px;font-weight:900;color:var(--navy);}
+.kpi .val.pos{color:var(--green);}
+.kpi .val.neg{color:var(--red);}
+.kpi .note{font-size:11px;color:var(--muted);margin-top:3px;}
+/* PANELS */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:700px){.row2{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+.panel h2{font-size:14px;font-weight:800;margin-bottom:3px;}
+.panel .desc{font-size:12px;color:var(--muted);margin-bottom:12px;}
+/* BAR CHART - month */
+.chart-wrap{overflow-x:auto;}
+.chart{display:flex;gap:8px;align-items:flex-end;height:180px;padding:4px 0 0;}
+.bar-col{flex:1;min-width:72px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;}
+.bar-stack{width:100%;max-width:52px;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;overflow:hidden;}
+.bar-seg{width:100%;transition:filter .15s;}
+.bar-col:hover .bar-seg{filter:brightness(1.1);}
+.bar-count{font-size:11px;color:var(--muted);margin-top:5px;font-family:monospace;font-weight:700;}
+.bar-month{font-size:12px;font-weight:800;margin-top:2px;}
+.bar-meta{font-size:10.5px;color:var(--muted);margin-top:2px;}
+.legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-top:10px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.swatch{width:10px;height:10px;border-radius:2px;display:inline-block;}
+/* HORIZ BARS - referral / category / gap */
+.hbar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.hbar-lbl{font-size:12px;width:200px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hbar-track{flex:1;background:#EEF0F5;border-radius:3px;height:20px;position:relative;}
+.hbar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:11px;font-weight:700;color:#fff;min-width:4px;transition:width .4s;}
+.hbar-val{font-size:11px;font-family:monospace;color:var(--muted);margin-left:6px;white-space:nowrap;flex-shrink:0;}
+/* GAP SECTION */
+.gap-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.gap-table th{text-align:left;padding:5px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+.gap-table td{padding:5px 8px;border-bottom:1px solid var(--border);}
+.gap-table td.num{font-family:monospace;text-align:right;}
+.flag{display:inline-block;padding:1px 7px;border-radius:8px;font-size:11px;font-weight:700;}
+.flag.r{background:#FBEBE9;color:var(--red);}
+.flag.g{background:#E8F5F2;color:var(--teal);}
+.flag.a{background:#FDF3E0;color:#A37020;}
+/* ACCORDION */
+.acc{margin-bottom:14px;}
+.acc-item{background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;overflow:hidden;}
+.acc-head{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;cursor:pointer;user-select:none;}
+.acc-head:hover{background:#FAFBFD;}
+.acc-title{display:flex;align-items:center;gap:10px;}
+.acc-tag{font-family:monospace;font-size:10px;font-weight:900;padding:2px 7px;border-radius:5px;}
+.acc-tag.n{background:var(--tag-bg);color:var(--teal);}
+.acc-tag.r{background:#FBEBE9;color:var(--red);}
+.acc-tag.a{background:#FDF3E0;color:#A37020;}
+.acc-h{font-size:13.5px;font-weight:800;}
+.acc-s{font-size:11.5px;color:var(--muted);margin-top:1px;}
+.chev{font-size:11px;color:var(--muted);transition:transform .2s;flex-shrink:0;}
+.acc-item.open .chev{transform:rotate(90deg);}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease;font-size:12.5px;color:#3A4658;}
+.acc-body-inner{padding:4px 16px 16px;}
+.acc-body table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px;}
+.acc-body th,.acc-body td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);}
+.acc-body th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;}
+.acc-body td.num{font-family:monospace;text-align:right;}
+.acc-body ul{margin:6px 0 6px 18px;}
+.acc-body li{margin-bottom:4px;}
+.callout{margin-top:12px;padding:10px 13px;background:#FBF3E3;border:1px solid #F0DDB6;border-radius:8px;font-size:12px;color:#7A5A14;}
+.callout.red{background:#FBE9E9;border-color:#EFC4C4;color:#8B2020;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Meeting Alignment — Collection · Risk · Audit · Business</div>
+  <h1>Movement Kontrak: DP Cancel/Reject → Go Live SOA Lain</h1>
+  <div class="sub">Dashboard interaktif seluruh temuan analisis. Klik SOA filter untuk switch view, klik tiap section untuk expand detail.</div>
+
+  <!-- SOA FILTER -->
+  <div class="soa-bar">
+    <span class="soa-lbl">Filter SOA:</span>
+    <button class="soa-btn active" data-soa="ALL">Semua SOA (1.783)</button>
+    <button class="soa-btn" data-soa="AGENCY - NON LEASING">Agency Non-Leasing (1.366)</button>
+    <button class="soa-btn" data-soa="DMTM - NON LEASING">DMTM Non-Leasing (209)</button>
+    <button class="soa-btn" data-soa="ENCO - NON LEASING">ENCO Non-Leasing (90)</button>
+    <button class="soa-btn" data-soa="DIGITAL CHANNEL">Digital Channel (61)</button>
+    <button class="soa-btn" data-soa="POS D2C">POS D2C (57)</button>
+  </div>
+
+  <!-- KPIS -->
+  <div class="kpis" id="kpis"></div>
+
+  <!-- MONTH CHART + GAP CHART SIDE BY SIDE -->
+  <div class="row2">
+    <div class="panel">
+      <h2>Go Live by Month</h2>
+      <div class="desc">Volume & NTF Diff per bulan. <span style="color:var(--red)">■</span> = kontrak NTF negatif. Label: NTF sum · DPD30+</div>
+      <div class="chart-wrap" id="month-chart-wrap"><div class="chart"></div></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:#22365C"></i>NTF Positif</span>
+        <span><i class="swatch" style="background:#CC4550"></i>NTF Negatif</span>
+      </div>
+      <div class="callout" id="vintage-note"></div>
+    </div>
+    <div class="panel">
+      <h2>Gap: Dp Created → Go Live</h2>
+      <div class="desc">Seberapa cepat kontrak yang di-reject/cancel di DP muncul kembali sebagai kontrak aktif di SOA lain.</div>
+      <table class="gap-table" id="gap-table"></table>
+      <div class="callout red" id="gap-callout"></div>
+    </div>
+  </div>
+
+  <!-- REFERRAL + DPD -->
+  <div class="row2">
+    <div class="panel">
+      <h2>Channel Referral (DP Asal)</h2>
+      <div class="desc">Berdasarkan jumlah kontrak. Hover bar untuk lihat NTF Diff.</div>
+      <div id="ref-chart"></div>
+    </div>
+    <div class="panel">
+      <h2>DPD Bucket</h2>
+      <div class="desc">Distribusi aging portofolio setelah go live di SOA baru.</div>
+      <div id="dpd-chart"></div>
+    </div>
+  </div>
+
+  <!-- TOP MI + KATEGORI NOTES -->
+  <div class="row2">
+    <div class="panel">
+      <h2>Top Marketing ID</h2>
+      <div class="desc">Berdasarkan volume kontrak dalam dataset ini.</div>
+      <div id="mi-chart"></div>
+    </div>
+    <div class="panel">
+      <h2>Kategori Notes (Alasan DP)</h2>
+      <div class="desc">Alasan cancel/reject di SOA DP. Hover bar untuk NTF Diff Sum.</div>
+      <div id="kn-chart"></div>
+    </div>
+  </div>
+
+  <!-- ACCORDION -->
+  <div id="accordion"></div>
+</div>
+
+<script>
+const DATA = {"ALL":{"n":1783,"ntf_total":8188178847,"osp_total":46731217430,"ntf_pos":10451892096,"ntf_neg":-2263713249,"cnt_pos":1422,"cnt_neg":361,"dpd30":62,"months":{"2026-01":{"count":211,"ntf":904772876,"osp":4145699266,"dpd30":21,"neg":30},"2026-02":{"count":339,"ntf":1167860355,"osp":8276016386,"dpd30":19,"neg":74},"2026-03":{"count":350,"ntf":1538175353,"osp":10885196341,"dpd30":18,"neg":72},"2026-04":{"count":411,"ntf":1918046873,"osp":10222741891,"dpd30":4,"neg":84},"2026-05":{"count":472,"ntf":2659323390,"osp":13201563545,"dpd30":0,"neg":101}},"refs":[{"name":"DP PT GOPAY 2W","count":968,"ntf":2705856433},{"name":"DP PT GOPAY 4W","count":214,"ntf":2918925265},{"name":"DP PT Shopee 2W","count":160,"ntf":184842404},{"name":"DP PT.AKULAKU NDF2W","count":115,"ntf":297225735},{"name":"DP PT GOTO 2W","count":91,"ntf":219945662},{"name":"DLS. BRAVO CUSTOMER APPS 2W","count":70,"ntf":126302293},{"name":"DP PT Shopee 4W","count":61,"ntf":143571500},{"name":"DP PT GOTO 4W","count":42,"ntf":1088286500}],"kns":[{"name":"Ditolak Sistem - Model/Scoring","count":306,"ntf":806114093},{"name":"Dibatalkan Sistem Otomatis","count":233,"ntf":1955646600},{"name":"Kadaluarsa (Expired)","count":219,"ntf":825133001},{"name":"Konsumen - Tidak Disetujui Keluarga","count":96,"ntf":271685089},{"name":"Lainnya","count":84,"ntf":571703460},{"name":"Konsumen - Hanya Coba/Tidak Butuh","count":83,"ntf":219535926},{"name":"Konsumen - Tidak Bisa Dihubungi","count":83,"ntf":341753330},{"name":"Konsumen - Sudah Dapat Dana Lain","count":70,"ntf":60983202}],"gap_data":[{"bucket":"0 - Same Day","count":6,"ntf":7388163,"dpd30":0},{"bucket":"1-7 hari","count":676,"ntf":1765173935,"dpd30":36},{"bucket":"8-14 hari","count":288,"ntf":1494972547,"dpd30":12},{"bucket":"15-30 hari","count":340,"ntf":1308495174,"dpd30":12},{"bucket":"31-60 hari","count":273,"ntf":1869917690,"dpd30":2},{"bucket":"61-90 hari","count":109,"ntf":1387564468,"dpd30":0},{"bucket":"91+ hari","count":91,"ntf":354666871,"dpd30":0}],"dpd_data":[{"bucket":"0 - Current","count":1433,"ntf":6816380913},{"bucket":"1-30","count":288,"ntf":1173872062},{"bucket":"31-60","count":43,"ntf":136079140},{"bucket":"61-90","count":7,"ntf":20847731},{"bucket":"91-120","count":7,"ntf":14147821}],"top_mi":[{"id":"cno2w999","count":59,"ntf":95492263},{"id":"996BA01930","count":25,"ntf":62817500},{"id":"996BA03720","count":15,"ntf":356930500},{"id":"cno4w999","count":14,"ntf":134730000},{"id":"sept8999","count":13,"ntf":14534010}],"gap_avg":24.0,"gap_median":12},"AGENCY - NON LEASING":{"n":1366,"ntf_total":6183256850,"osp_total":36966769942,"ntf_pos":8159972654,"ntf_neg":-1976715804,"cnt_pos":1088,"cnt_neg":278,"dpd30":50,"months":{"2026-01":{"count":170,"ntf":755127435,"osp":3357292358,"dpd30":20,"neg":21},"2026-02":{"count":270,"ntf":981416402,"osp":7120289350,"dpd30":14,"neg":63},"2026-03":{"count":258,"ntf":1021462871,"osp":8465951710,"dpd30":15,"neg":58},"2026-04":{"count":320,"ntf":1258280730,"osp":7534094076,"dpd30":1,"neg":58},"2026-05":{"count":348,"ntf":2166969412,"osp":10489142449,"dpd30":0,"neg":78}},"refs":[{"name":"DP PT GOPAY 2W","count":752,"ntf":2147515661},{"name":"DP PT GOPAY 4W","count":175,"ntf":2136095265},{"name":"DP PT Shopee 2W","count":131,"ntf":136295503},{"name":"DP PT.AKULAKU NDF2W","count":95,"ntf":237338540},{"name":"DP PT GOTO 2W","count":68,"ntf":162628890},{"name":"DP PT Shopee 4W","count":54,"ntf":222277500},{"name":"DP PT GOTO 4W","count":33,"ntf":818604000},{"name":"DLS. BRAVO CUSTOMER APPS 4W","count":18,"ntf":-67100000}],"kns":[{"name":"Ditolak Sistem - Model/Scoring","count":251,"ntf":712328866},{"name":"Kadaluarsa (Expired)","count":190,"ntf":780911043},{"name":"Dibatalkan Sistem Otomatis","count":154,"ntf":1228855397},{"name":"Konsumen - Tidak Disetujui Keluarga","count":81,"ntf":182055575},{"name":"Konsumen - Hanya Coba/Tidak Butuh","count":69,"ntf":194186559},{"name":"Lainnya","count":61,"ntf":403662397},{"name":"Konsumen - Tidak Bisa Dihubungi","count":57,"ntf":108145423},{"name":"Konsumen - Sudah Dapat Dana Lain","count":55,"ntf":61643946}],"gap_data":[{"bucket":"0 - Same Day","count":4,"ntf":4659082,"dpd30":0},{"bucket":"1-7 hari","count":523,"ntf":1331950745,"dpd30":28},{"bucket":"8-14 hari","count":251,"ntf":1331644060,"dpd30":12},{"bucket":"15-30 hari","count":255,"ntf":1125570071,"dpd30":9},{"bucket":"31-60 hari","count":199,"ntf":1488278465,"dpd30":1},{"bucket":"61-90 hari","count":71,"ntf":769575721,"dpd30":0},{"bucket":"91+ hari","count":63,"ntf":131578707,"dpd30":0}],"dpd_data":[{"bucket":"0 - Current","count":1083,"ntf":5131988809},{"bucket":"1-30","count":231,"ntf":879878320},{"bucket":"31-60","count":34,"ntf":121425489},{"bucket":"61-90","count":7,"ntf":20847731},{"bucket":"91-120","count":7,"ntf":14147821}],"top_mi":[{"id":"996BA01930","count":25,"ntf":62817500},{"id":"996BA03720","count":15,"ntf":356930500},{"id":"462BA12961","count":7,"ntf":22372860},{"id":"537BA15326","count":6,"ntf":40100279},{"id":"479BA06303","count":6,"ntf":12496824}],"gap_avg":22.6,"gap_median":11},"DMTM - NON LEASING":{"n":209,"ntf_total":1245935470,"osp_total":5230988303,"ntf_pos":1426720548,"ntf_neg":-180785078,"cnt_pos":177,"cnt_neg":32,"dpd30":4,"months":{"2026-01":{"count":13,"ntf":68743026,"osp":364649960,"dpd30":1,"neg":2},"2026-02":{"count":29,"ntf":99717071,"osp":515676491,"dpd30":1,"neg":1},"2026-03":{"count":52,"ntf":434760223,"osp":1707657198,"dpd30":1,"neg":7},"2026-04":{"count":44,"ntf":338683835,"osp":1192919350,"dpd30":1,"neg":13},"2026-05":{"count":71,"ntf":304031315,"osp":1450085305,"dpd30":0,"neg":9}},"refs":[{"name":"DP PT GOPAY 2W","count":105,"ntf":416302436},{"name":"DLS. BRAVO CUSTOMER APPS 2W","count":32,"ntf":86644292},{"name":"DP PT GOPAY 4W","count":23,"ntf":426645500},{"name":"DP PT.AKULAKU NDF2W","count":11,"ntf":23883632},{"name":"DP PT Shopee 2W","count":10,"ntf":26334681},{"name":"DP PT GOTO 2W","count":10,"ntf":26051430},{"name":"DLS. BRAVO CUSTOMER APPS 4W","count":8,"ntf":102970000},{"name":"DP PT Shopee 4W","count":5,"ntf":-77456000}],"kns":[{"name":"Dibatalkan Sistem Otomatis","count":55,"ntf":498862308},{"name":"Konsumen - Tidak Bisa Dihubungi","count":24,"ntf":231579282},{"name":"Dokumen - BPKB Bermasalah","count":14,"ntf":121957759},{"name":"Konsumen - Tanpa Alasan Jelas","count":14,"ntf":36763956},{"name":"Lainnya","count":14,"ntf":136425875},{"name":"Konsumen - Hanya Coba/Tidak Butuh","count":11,"ntf":20932122},{"name":"Konsumen - Tidak Setuju Nominal/Biaya","count":11,"ntf":25467696},{"name":"Konsumen - Sudah Dapat Dana Lain","count":10,"ntf":-14872151}],"gap_data":[{"bucket":"1-7 hari","count":47,"ntf":285145251,"dpd30":1},{"bucket":"8-14 hari","count":16,"ntf":48544977,"dpd30":0},{"bucket":"15-30 hari","count":52,"ntf":100611496,"dpd30":2},{"bucket":"31-60 hari","count":50,"ntf":334567948,"dpd30":1},{"bucket":"61-90 hari","count":25,"ntf":362732641,"dpd30":0},{"bucket":"91+ hari","count":19,"ntf":114333158,"dpd30":0}],"dpd_data":[{"bucket":"0 - Current","count":173,"ntf":983774065},{"bucket":"1-30","count":32,"ntf":244863577},{"bucket":"31-60","count":3,"ntf":5415328}],"top_mi":[{"id":"asih464","count":5,"ntf":11582389},{"id":"yunif999","count":5,"ntf":9049933},{"id":"nurfi442","count":5,"ntf":25701311},{"id":"mulia1999","count":4,"ntf":6685102},{"id":"dini2472","count":3,"ntf":5995082}],"gap_avg":36.2,"gap_median":28},"ENCO - NON LEASING":{"n":90,"ntf_total":545234749,"osp_total":2597520227,"ntf_pos":579949028,"ntf_neg":-34714279,"cnt_pos":71,"cnt_neg":19,"dpd30":2,"months":{"2026-01":{"count":11,"ntf":54850947,"osp":231915865,"dpd30":0,"neg":3},"2026-02":{"count":16,"ntf":44858400,"osp":344272316,"dpd30":2,"neg":4},"2026-03":{"count":19,"ntf":41785868,"osp":381523540,"dpd30":0,"neg":1},"2026-04":{"count":18,"ntf":253319437,"osp":714025483,"dpd30":0,"neg":7},"2026-05":{"count":26,"ntf":150420097,"osp":925783023,"dpd30":0,"neg":4}},"refs":[{"name":"DP PT GOPAY 2W","count":52,"ntf":75522551},{"name":"DP PT GOPAY 4W","count":13,"ntf":316445000},{"name":"DP PT Shopee 2W","count":8,"ntf":5837632},{"name":"DP PT GOTO 2W","count":6,"ntf":3926646},{"name":"DP PT.AKULAKU NDF2W","count":4,"ntf":24117798},{"name":"DLS. BRAVO CUSTOMER APPS 2W","count":2,"ntf":-120000},{"name":"DP PT Shopee 4W","count":1,"ntf":9357500},{"name":"DP PT GOTO 4W","count":1,"ntf":6493000}],"kns":[{"name":"Ditolak Sistem - Model/Scoring","count":21,"ntf":18818111},{"name":"Dibatalkan Sistem Otomatis","count":13,"ntf":227035979},{"name":"Kadaluarsa (Expired)","count":12,"ntf":34095577},{"name":"Konsumen - Tidak Disetujui Keluarga","count":6,"ntf":54331796},{"name":"Konsumen - Ganti Pengajuan/Kontrak","count":5,"ntf":18869894},{"name":"Lainnya","count":4,"ntf":14202514},{"name":"Konsumen - Sudah Dapat Dana Lain","count":3,"ntf":12114500},{"name":"Ditolak Sistem - Lainnya","count":3,"ntf":73484000}],"gap_data":[{"bucket":"0 - Same Day","count":2,"ntf":2729082,"dpd30":0},{"bucket":"1-7 hari","count":42,"ntf":47190654,"dpd30":2},{"bucket":"8-14 hari","count":12,"ntf":88179027,"dpd30":0},{"bucket":"15-30 hari","count":10,"ntf":38320982,"dpd30":0},{"bucket":"31-60 hari","count":13,"ntf":34321376,"dpd30":0},{"bucket":"61-90 hari","count":6,"ntf":237264327,"dpd30":0},{"bucket":"91+ hari","count":5,"ntf":97229303,"dpd30":0}],"dpd_data":[{"bucket":"0 - Current","count":77,"ntf":536896702},{"bucket":"1-30","count":11,"ntf":8483349},{"bucket":"31-60","count":2,"ntf":-145302}],"top_mi":[{"id":"cno2w999","count":50,"ntf":85812175},{"id":"cno4w999","count":12,"ntf":125705500},{"id":"faja462","count":6,"ntf":8404952},{"id":"alfr465","count":2,"ntf":6004051},{"id":"niko4441","count":2,"ntf":1160420}],"gap_avg":22.5,"gap_median":8},"DIGITAL CHANNEL":{"n":61,"ntf_total":178568831,"osp_total":1131219047,"ntf_pos":207976979,"ntf_neg":-29408149,"cnt_pos":49,"cnt_neg":12,"dpd30":4,"months":{"2026-01":{"count":9,"ntf":14229354,"osp":83876193,"dpd30":0,"neg":2},"2026-02":{"count":7,"ntf":14641064,"osp":122031558,"dpd30":0,"neg":2},"2026-03":{"count":16,"ntf":36654152,"osp":218606635,"dpd30":2,"neg":4},"2026-04":{"count":16,"ntf":73932705,"osp":534931738,"dpd30":2,"neg":1},"2026-05":{"count":13,"ntf":39111556,"osp":171772923,"dpd30":0,"neg":3}},"refs":[{"name":"DP PT GOPAY 2W","count":36,"ntf":41905190},{"name":"DP PT Shopee 2W","count":7,"ntf":11568055},{"name":"DP PT GOTO 2W","count":5,"ntf":23152320},{"name":"DP PT GOTO 4W","count":5,"ntf":61155500},{"name":"DP PT.AKULAKU NDF2W","count":4,"ntf":11655766},{"name":"DP PT GOPAY 4W","count":3,"ntf":39739500},{"name":"DP PT Shopee 4W","count":1,"ntf":-10607500}],"kns":[{"name":"Ditolak Sistem - Model/Scoring","count":20,"ntf":48022731},{"name":"Dokumen - Data/Unit Bermasalah","count":8,"ntf":42550095},{"name":"Kadaluarsa (Expired)","count":8,"ntf":17410675},{"name":"Konsumen - Menolak Survei","count":7,"ntf":7261403},{"name":"Dibatalkan Sistem Otomatis","count":3,"ntf":-709962},{"name":"Dokumen - Persyaratan Tidak Lengkap","count":2,"ntf":17565592},{"name":"Dibatalkan Sistem Otomatis - RAC Mismatch","count":2,"ntf":3669184},{"name":"Konsumen - Sudah Dapat Dana Lain","count":2,"ntf":2096907}],"gap_data":[{"bucket":"1-7 hari","count":24,"ntf":86688499,"dpd30":3},{"bucket":"8-14 hari","count":7,"ntf":23874687,"dpd30":0},{"bucket":"15-30 hari","count":15,"ntf":34306734,"dpd30":1},{"bucket":"31-60 hari","count":7,"ntf":9461143,"dpd30":0},{"bucket":"61-90 hari","count":6,"ntf":18623412,"dpd30":0},{"bucket":"91+ hari","count":2,"ntf":5614356,"dpd30":0}],"dpd_data":[{"bucket":"0 - Current","count":49,"ntf":139383316},{"bucket":"1-30","count":9,"ntf":29366174},{"bucket":"31-60","count":3,"ntf":9819340}],"top_mi":[{"id":"sept8999","count":13,"ntf":14534010},{"id":"abdu5999","count":12,"ntf":9326868},{"id":"nuru10999","count":9,"ntf":16422840},{"id":"dumar999","count":6,"ntf":22120811},{"id":"dede7999","count":5,"ntf":8760812}],"gap_avg":24.3,"gap_median":14},"POS D2C":{"n":57,"ntf_total":35182947,"osp_total":804719911,"ntf_pos":77272887,"ntf_neg":-42089940,"cnt_pos":37,"cnt_neg":20,"dpd30":2,"months":{"2026-01":{"count":8,"ntf":11822114,"osp":107964891,"dpd30":0,"neg":2},"2026-02":{"count":17,"ntf":27227417,"osp":173746671,"dpd30":2,"neg":4},"2026-03":{"count":5,"ntf":3512240,"osp":111457259,"dpd30":0,"neg":2},"2026-04":{"count":13,"ntf":-6169835,"osp":246771244,"dpd30":0,"neg":5},"2026-05":{"count":14,"ntf":-1208990,"osp":164779846,"dpd30":0,"neg":7}},"refs":[{"name":"DP PT GOPAY 2W","count":23,"ntf":24610595},{"name":"DLS. BRAVO CUSTOMER APPS 2W","count":19,"ntf":8072443},{"name":"DLS. BRAVO CUSTOMER APPS 4W","count":8,"ntf":-6723000},{"name":"DP PT Shopee 2W","count":4,"ntf":4806533},{"name":"DP PT GOTO 2W","count":2,"ntf":4186377},{"name":"DP PT.AKULAKU NDF2W","count":1,"ntf":230000}],"kns":[{"name":"Ditolak Sistem - Model/Scoring","count":8,"ntf":13278808},{"name":"Dibatalkan Sistem Otomatis","count":8,"ntf":1602878},{"name":"Operasional - Area/Cabang","count":6,"ntf":-15088590},{"name":"Konsumen - Tanpa Alasan Jelas","count":5,"ntf":6475860},{"name":"Konsumen - Berubah Pikiran/Situasi","count":5,"ntf":5206278},{"name":"Konsumen - Tidak Setuju Nominal/Biaya","count":4,"ntf":1483022},{"name":"Lainnya","count":4,"ntf":7338674},{"name":"Dokumen - Persyaratan Tidak Lengkap","count":3,"ntf":86007}],"gap_data":[{"bucket":"1-7 hari","count":40,"ntf":14198786,"dpd30":2},{"bucket":"8-14 hari","count":2,"ntf":2729796,"dpd30":0},{"bucket":"15-30 hari","count":8,"ntf":9685891,"dpd30":0},{"bucket":"31-60 hari","count":4,"ntf":3288759,"dpd30":0},{"bucket":"61-90 hari","count":1,"ntf":-631633,"dpd30":0},{"bucket":"91+ hari","count":2,"ntf":5911348,"dpd30":0}],"dpd_data":[{"bucket":"0 - Current","count":51,"ntf":24338020},{"bucket":"1-30","count":5,"ntf":11280641},{"bucket":"31-60","count":1,"ntf":-435714}],"top_mi":[{"id":"cno2w999","count":9,"ntf":9680089},{"id":"triu462","count":3,"ntf":688549},{"id":"fitr3462","count":3,"ntf":3195168},{"id":"nurf1478","count":2,"ntf":4831429},{"id":"cno4w999","count":2,"ntf":9024500}],"gap_avg":14.1,"gap_median":4}};
+
+const fmtM = n => {
+  const a = Math.abs(n);
+  if(a>=1e9) return (n<0?'-':'')+'Rp '+(a/1e9).toFixed(1)+' M';
+  if(a>=1e6) return (n<0?'-':'')+'Rp '+(a/1e6).toFixed(0)+' jt';
+  return (n<0?'-':'')+'Rp '+(a/1e3).toFixed(0)+' rb';
+};
+const fmtN = n => n.toLocaleString('id-ID');
+const MONTHS = ['2026-01','2026-02','2026-03','2026-04','2026-05'];
+const MLABEL = ['Jan','Feb','Mar','Apr','Mei'];
+let currentSOA = 'ALL';
+
+function render(soa){
+  const d = DATA[soa];
+  // KPIs
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="lbl">Total Kontrak</div><div class="val">${fmtN(d.n)}</div><div class="note">Go Live Jan–Mei 2026</div></div>
+    <div class="kpi"><div class="lbl">Total OSP</div><div class="val">${fmtM(d.osp_total)}</div><div class="note">Nilai pembiayaan</div></div>
+    <div class="kpi"><div class="lbl">NTF Diff Net</div><div class="val pos">${fmtM(d.ntf_total)}</div><div class="note">Kenaikan nilai pencairan</div></div>
+    <div class="kpi"><div class="lbl">NTF Positif</div><div class="val pos">${fmtN(d.cnt_pos)} (${(d.cnt_pos/d.n*100).toFixed(1)}%)</div><div class="note">${fmtM(d.ntf_pos)}</div></div>
+    <div class="kpi"><div class="lbl">NTF Negatif</div><div class="val neg">${fmtN(d.cnt_neg)} (${(d.cnt_neg/d.n*100).toFixed(1)}%)</div><div class="note">${fmtM(d.ntf_neg)}</div></div>
+    <div class="kpi"><div class="lbl">DPD ≥ 30</div><div class="val">${fmtN(d.dpd30)}</div><div class="note">${(d.dpd30/d.n*100).toFixed(1)}% dari kontrak</div></div>
+  `;
+  // Month chart
+  const maxC = Math.max(...MONTHS.map(m=>d.months[m]?.count||0));
+  let chartH = '<div class="chart">';
+  MONTHS.forEach((m,i)=>{
+    const md = d.months[m]||{count:0,ntf:0,dpd30:0,neg:0};
+    const h = maxC>0 ? Math.round(md.count/maxC*150) : 0;
+    const negH = md.count>0 ? Math.round(md.neg/md.count*h) : 0;
+    const posH = h-negH;
+    chartH += `<div class="bar-col">
+      <div class="bar-stack" style="height:${h}px">
+        <div class="bar-seg" style="height:${negH}px;background:#CC4550;"></div>
+        <div class="bar-seg" style="height:${posH}px;background:#22365C;"></div>
+      </div>
+      <div class="bar-count">${md.count}</div>
+      <div class="bar-month">${MLABEL[i]}</div>
+      <div class="bar-meta">${fmtM(md.ntf)} · DPD30+: ${md.dpd30}</div>
+    </div>`;
+  });
+  chartH += '</div>';
+  document.getElementById('month-chart-wrap').innerHTML = chartH;
+  document.getElementById('vintage-note').innerHTML = '<b>⚠ Vintage Bias:</b> DPD30+ menurun ke Mei bukan berarti kualitas makin baik — kontrak Mei belum cukup umur. Jangan dibaca sebagai tren positif tanpa normalisasi by vintage age.';
+
+  // Gap table
+  const fast17 = d.gap_data.filter(g=>['0 - Same Day','1-7 hari'].includes(g.bucket)).reduce((a,b)=>a+b.dpd30,0);
+  const total_dpd30_gap = d.gap_data.reduce((a,b)=>a+b.dpd30,0);
+  let gapHtml = `<thead><tr><th>Gap Bucket</th><th class="num">Kontrak</th><th class="num">%</th><th class="num">NTF Diff</th><th class="num">DPD30+</th></tr></thead><tbody>`;
+  d.gap_data.forEach(g=>{
+    const isHigh = ['0 - Same Day','1-7 hari'].includes(g.bucket) && g.dpd30>0;
+    gapHtml += `<tr${isHigh?' style="background:#FFF8F8"':''}>
+      <td>${g.bucket}${isHigh?` <span class="flag r">⚠ high risk</span>`:''}</td>
+      <td class="num">${fmtN(g.count)}</td>
+      <td class="num">${(g.count/d.n*100).toFixed(1)}%</td>
+      <td class="num">${fmtM(g.ntf)}</td>
+      <td class="num">${g.dpd30>0?`<b style="color:#CC4550">${g.dpd30}</b>`:g.dpd30}</td>
+    </tr>`;
+  });
+  gapHtml += `<tr style="background:#EEF0F5;font-weight:700"><td>Avg gap: ${d.gap_avg} hr · Median: ${d.gap_median} hr</td><td class="num">${fmtN(d.n)}</td><td class="num">100%</td><td class="num">${fmtM(d.ntf_total)}</td><td class="num">${total_dpd30_gap}</td></tr></tbody>`;
+  document.getElementById('gap-table').innerHTML = gapHtml;
+  document.getElementById('gap-callout').innerHTML = `<b>🚨 Temuan Kunci:</b> Kontrak "Fast Mover" (≤7 hari dari reject/cancel DP → Go Live SOA lain) menyumbang <b>${fast17} dari ${total_dpd30_gap} kasus DPD30+</b> (${total_dpd30_gap>0?(fast17/total_dpd30_gap*100).toFixed(0):0}%). Kontrak yang pindah SOA <b>lebih cepat justru lebih berisiko aging</b> — semakin lama gap, nol kasus DPD30+ di bucket 61 hari ke atas.`;
+
+  // Referral hbars
+  const maxRef = Math.max(...d.refs.map(r=>r.count));
+  let refH = '';
+  d.refs.forEach(r=>{
+    const pct = (r.count/d.n*100).toFixed(1);
+    const w = (r.count/maxRef*100).toFixed(0);
+    const col = r.ntf<0?'#CC4550':'#1A9E8C';
+    refH += `<div class="hbar-row" title="NTF Diff: ${fmtM(r.ntf)}">
+      <div class="hbar-lbl" title="${r.name}">${r.name.replace('DP PT ','').replace('DLS. ','')}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${w}%;background:${col}">${pct}%</div></div>
+      <div class="hbar-val">${fmtN(r.count)}</div>
+    </div>`;
+  });
+  document.getElementById('ref-chart').innerHTML = refH;
+
+  // DPD hbars
+  const maxDpd = Math.max(...d.dpd_data.map(r=>r.count));
+  const DPD_COLORS = {'0 - Current':'#1A9E8C','1-30':'#D49A2D','31-60':'#CC4550','61-90':'#9B2020','91-120':'#5C0E0E','121-150':'#3A0808','151+':'#1A0000'};
+  let dpdH = '';
+  d.dpd_data.forEach(r=>{
+    const pct = (r.count/d.n*100).toFixed(1);
+    const w = (r.count/maxDpd*100).toFixed(0);
+    const col = DPD_COLORS[r.bucket]||'#888';
+    dpdH += `<div class="hbar-row">
+      <div class="hbar-lbl">${r.bucket}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${w}%;background:${col}">${pct}%</div></div>
+      <div class="hbar-val">${fmtN(r.count)}</div>
+    </div>`;
+  });
+  document.getElementById('dpd-chart').innerHTML = dpdH;
+
+  // Top MI
+  const maxMI = Math.max(...d.top_mi.map(r=>r.count));
+  let miH = '';
+  d.top_mi.forEach((r,i)=>{
+    const w=(r.count/maxMI*100).toFixed(0);
+    const isCno = r.id.includes('cno')||r.id.includes('999');
+    miH += `<div class="hbar-row" title="NTF Diff: ${fmtM(r.ntf)}">
+      <div class="hbar-lbl">${r.id}${isCno?` <span class="flag a">ID generik?</span>`:''}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${w}%;background:#22365C">${r.count}</div></div>
+      <div class="hbar-val">${fmtM(r.ntf)}</div>
+    </div>`;
+  });
+  document.getElementById('mi-chart').innerHTML = miH;
+
+  // Kategori Notes
+  const maxKN = Math.max(...d.kns.map(r=>r.count));
+  let knH = '';
+  d.kns.forEach(r=>{
+    const w=(r.count/maxKN*100).toFixed(0);
+    const col = r.ntf<0?'#CC4550':'#556785';
+    const hiRisk = ['Konsumen - Tidak Disetujui Keluarga','Dokumen - Data/Unit Bermasalah','Konsumen - Sudah Dapat Dana Lain'].includes(r.name);
+    knH += `<div class="hbar-row" title="NTF Diff: ${fmtM(r.ntf)}">
+      <div class="hbar-lbl" title="${r.name}">${r.name.replace('Konsumen - ','').replace('Ditolak Sistem - ','Sistem: ').replace('Dibatalkan ','Batal: ')}${hiRisk?` <span class="flag r">⚠</span>`:''}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${w}%;background:${col}">${r.count}</div></div>
+      <div class="hbar-val">${fmtM(r.ntf)}</div>
+    </div>`;
+  });
+  document.getElementById('kn-chart').innerHTML = knH;
+}
+
+// SOA buttons
+document.querySelectorAll('.soa-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.soa-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSOA = btn.dataset.soa;
+    render(currentSOA);
+  });
+});
+
+// Accordion
+const sections = [
+  {tag:'01',cls:'n',title:'Temuan: Gap Waktu & Risiko DPD',
+   sum:'Fast movers (≤7 hari dari reject → Go Live) menyumbang mayoritas DPD30+. Semakin cepat pindah SOA, semakin tinggi risiko.',
+   body:`<p>Seluruh 1.783 kontrak memiliki pola <b>Dp Created ≤ Go Live</b> — tidak ada kasus Go Live sebelum DP dibuat, artinya urutan proses sudah sesuai. Yang menjadi temuan adalah <b>kecepatan</b>-nya:</p>
+   <ul><li><b>6 kontrak (0,3%) Same Day</b>: DP reject/cancel dan Go Live di SOA lain <b>pada hari yang sama</b> — 5 dari 6 dari GOPAY 2W, termasuk satu kasus dengan alasan "Ditolak Sistem - Anti Fraud". Ini adalah anomali paling mencolok.</li>
+   <li><b>676 kontrak (37,9%) dalam 1-7 hari</b>: Fast movers ini menyumbang 58% (36/62) dari seluruh kasus DPD30+ di seluruh dataset.</li>
+   <li><b>Bucket 31 hari ke atas: nol DPD30+</b> (di luar DMTM yang punya 1 kasus di 15-30 hari dan 1 di 31-60 hari) — korelasi negatif yang sangat jelas antara gap dan risiko aging.</li></ul>
+   <p><b>Implikasi</b>: gap waktu bisa dijadikan proxy risiko — kontrak yang muncul kembali di SOA lain dalam ≤7 hari sejak DP reject/cancel layak mendapat enhanced due diligence atau dimasukkan ke watch list collection sejak awal.</p>
+   <p>Avg gap per SOA: Agency 22,6 hr · DMTM 36,2 hr · ENCO 22,5 hr · Digital 24,3 hr · POS D2C 14,1 hr — POS D2C paling "cepat" (median 4 hari), DMTM paling lambat (median 28 hari).</p>`},
+  {tag:'02',cls:'r',title:'Anomali: Same Day & ID Generik',
+   sum:'6 kontrak reject → Go Live hari yang sama (semua GOPAY 2W). ID "cno2w999" & "cno4w999" muncul sebagai top marketing ID di SOA non-Agency — format mencurigakan.',
+   body:`<ul>
+   <li><b>Same-day cases</b>: dari 6 kasus, 5 dari GOPAY 2W — termasuk satu dengan alasan DP "Ditolak Sistem - Anti Fraud" yang langsung Go Live di ENCO Non-Leasing. Ini bertanya apakah kontrol anti-fraud di DP benar-benar memblokir atau hanya rerouting ke channel lain.</li>
+   <li><b>Marketing ID "cno2w999"</b>: 59 kontrak, tersebar di ENCO (50) dan POS D2C (9). Format ID ini berbeda total dari pola ID standar — lebih mirip kode channel otomatis/sistem. Di scope All-SOA, ini adalah Marketing ID dengan volume terbanyak, tapi tidak ada satu pun kasus yang masuk Agency. Perlu dikonfirmasi apakah ini ID valid individu atau ID default sistem.</li>
+   <li><b>Marketing ID "cno4w999"</b>: 14 kontrak, semua di ENCO. Pola serupa dengan cno2w999 — kemungkinan merupakan pasangan "channel non-organic 4W".</li>
+   </ul>
+   <p>Jika cno2w999 dan cno4w999 adalah ID generik/sistem, maka data ENCO dan sebagian POS D2C perlu dianalisis lebih lanjut untuk mengidentifikasi agen/channel riil yang bersembunyi di balik ID ini.</p>`},
+  {tag:'03',cls:'n',title:'Konsentrasi Channel: GOPAY Dominan di Semua SOA',
+   sum:'GOPAY 2W = 54,3% volume all-SOA. GOPAY 4W meski volume kecil punya NTF Diff total terbesar (Rp 2,9 M). GOTO 4W avg NTF/kontrak tertinggi (~Rp 25,9 jt).',
+   body:`<table><tr><th>Channel</th><th class="num">All-SOA</th><th class="num">Agency</th><th class="num">NTF Diff (All)</th></tr>
+   <tr><td>GOPAY 2W</td><td class="num">968</td><td class="num">752</td><td class="num">+Rp 2,71 M</td></tr>
+   <tr><td>GOPAY 4W</td><td class="num">214</td><td class="num">175</td><td class="num"><b>+Rp 2,92 M</b></td></tr>
+   <tr><td>Shopee 2W</td><td class="num">160</td><td class="num">131</td><td class="num">+Rp 185 jt</td></tr>
+   <tr><td>AKULAKU NDF2W</td><td class="num">115</td><td class="num">95</td><td class="num">+Rp 297 jt</td></tr>
+   <tr><td>GOTO 4W (42 kontrak)</td><td class="num">42</td><td class="num">33</td><td class="num"><b>+Rp 1,09 M</b></td></tr>
+   <tr><td>BRAVO 4W</td><td class="num">—</td><td class="num">18</td><td class="num" style="color:#CC4550">-Rp 67 jt</td></tr>
+   </table>
+   <p>GOTO 4W dengan hanya 42 kontrak menghasilkan NTF Diff total Rp 1,09 M — avg ~Rp 25,9 jt/kontrak, tertinggi dari semua channel. Satu kasus bermasalah di sini punya dampak finansial jauh lebih besar dari GOPAY 2W yang meski volumenya 23x lebih besar.</p>`},
+  {tag:'04',cls:'r',title:'Leading Indicator Fraud: Alasan DP → Temuan Collection',
+   sum:'"Tidak Disetujui Keluarga" & "Dokumen Bermasalah" → 60-80% berakhir Unit/Konsumen Tidak Ada. Contoh: NTF +Rp 11,3 jt dengan remarks "Pinjam Unit".',
+   body:`<table><tr><th>Alasan DP (Kategori Notes)</th><th class="num">% → Unit/Konsumen Tdk Ada</th><th class="num">Risiko</th></tr>
+   <tr><td>Ditolak Sistem - Model/Scoring</td><td class="num">17%</td><td><span class="flag g">Rendah</span></td></tr>
+   <tr><td>Dibatalkan Sistem Otomatis</td><td class="num">29%</td><td><span class="flag a">Sedang</span></td></tr>
+   <tr><td>Konsumen - Sudah Dapat Dana Lain</td><td class="num">60%</td><td><span class="flag r">Tinggi</span></td></tr>
+   <tr><td>Dokumen - Data/Unit Bermasalah</td><td class="num">80%</td><td><span class="flag r">Tinggi</span></td></tr>
+   <tr><td>Konsumen - Tidak Disetujui Keluarga</td><td class="num">80%</td><td><span class="flag r">Tinggi</span></td></tr>
+   <tr><td>Kadaluarsa (Expired)</td><td class="num">75%</td><td><span class="flag r">Tinggi</span></td></tr>
+   </table>
+   <p>Rekomendasi: gunakan kombinasi <b>channel GOPAY 2W + alasan DP ketiga kategori "tinggi" di atas + gap ≤7 hari</b> sebagai filter prioritas audit lapangan — tiga faktor ini secara konsisten berkorelasi dengan risiko DPD30+ dan indikasi fraud (Pinjam Nama/Unit).</p>
+   <p>7 kasus dengan remarks fraud signal ditemukan — 6/7 dari GOPAY 2W, nilai NTF Diff terbesar +Rp 11,3 jt ("Pinjam Unit" + "Dokumen Data/Unit Bermasalah").</p>`},
+  {tag:'05',cls:'n',title:'Profil Per SOA di Luar Agency',
+   sum:'DMTM: avg gap terpanjang (36 hr), "Dibatalkan Sistem Otomatis" dominan. ENCO: cno2w999 kuasai 56% volume. Digital Channel: DPD30+ muncul di Mar–Apr. POS D2C: NTF Net paling kecil (Rp 35 jt).',
+   body:`<ul>
+   <li><b>DMTM Non-Leasing (209 kontrak)</b>: "Dibatalkan Sistem Otomatis" mendominasi dengan NTF Diff sum +Rp 499 jt — proporsi tertinggi dibanding SOA lain. Avg gap 36,2 hari (terpanjang), tapi masih ada 4 kasus DPD30+. BRAVO CUSTOMER APPS mulai dominan sebagai channel kedua setelah GOPAY 2W.</li>
+   <li><b>ENCO Non-Leasing (90 kontrak)</b>: Marketing ID cno2w999 (50 kontrak) mendominasi 56% volume, diikuti cno4w999 (12 kontrak) = 68% hanya dari 2 ID generik. Perlu investigasi lebih lanjut.</li>
+   <li><b>Digital Channel (61 kontrak)</b>: satu-satunya SOA di mana "Dokumen - Data/Unit Bermasalah" masuk top-2 kategori notes (8 kasus, NTF +Rp 42 jt). DPD30+ terkonsentrasi di bulan Mar–Apr.</li>
+   <li><b>POS D2C (57 kontrak)</b>: NTF Diff net paling kecil (Rp 35 jt) dengan 20 kontrak NTF negatif (35%) — rasio negatif tertinggi dari semua SOA. Apr–Mei bahkan NTF net negatif. "Operasional - Area/Cabang" muncul sebagai kategori unik yang tidak ada di SOA lain, dengan NTF -Rp 15 jt.</li>
+   </ul>`},
+];
+
+const acc = document.getElementById('accordion');
+sections.forEach(s=>{
+  const item = document.createElement('div');
+  item.className='acc-item';
+  item.innerHTML=`<div class="acc-head"><div class="acc-title"><span class="acc-tag ${s.cls}">${s.tag}</span><div><div class="acc-h">${s.title}</div><div class="acc-s">${s.sum}</div></div></div><div class="chev">▶</div></div><div class="acc-body"><div class="acc-body-inner">${s.body}</div></div>`;
+  item.querySelector('.acc-head').addEventListener('click',()=>{
+    const body=item.querySelector('.acc-body');
+    if(item.classList.contains('open')){item.classList.remove('open');body.style.maxHeight=null;}
+    else{item.classList.add('open');body.style.maxHeight=body.scrollHeight+30+'px';}
+  });
+  acc.appendChild(item);
+});
+
+render('ALL');
+</script>
+</body>
+</html>
