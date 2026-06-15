@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<title>FID to WO — Analysis Highlight</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, sans-serif; font-size: 11px; background:#f4f6f9; color:#1a2332; }
+
+  .page {
+    width: 297mm; min-height: 210mm;
+    margin: 0 auto; background: #fff;
+    padding: 14mm 14mm 10mm 14mm;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 8px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display:flex; justify-content:space-between; align-items:center;
+    border-bottom: 3px solid #1d4ed8; padding-bottom:6px; margin-bottom:2px;
+  }
+  .header h1 { font-size:15px; font-weight:700; color:#1d4ed8; letter-spacing:.5px; }
+  .header .meta { font-size:9.5px; color:#64748b; text-align:right; line-height:1.6; }
+  .header .meta b { color:#1a2332; }
+
+  /* ── CORRECTION BAR ── */
+  .correction-bar {
+    background:#fef3c7; border-left:4px solid #f59e0b;
+    border-radius:4px; padding:6px 10px;
+    font-size:10px; color:#78350f;
+    display:flex; gap:12px; flex-wrap:wrap;
+  }
+  .correction-bar strong { display:block; font-size:10px; color:#92400e; margin-bottom:2px; }
+  .cb-item { flex:1; min-width:180px; }
+
+  /* ── PRODUCT GRID ── */
+  .product-grid {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:8px;
+  }
+
+  .product-card {
+    border:1px solid #e2e8f0; border-radius:6px; overflow:hidden;
+  }
+  .card-header {
+    padding:5px 10px; font-weight:700; font-size:11px; color:#fff;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ndf  .card-header { background:#1d4ed8; }
+  .dfn  .card-header { background:#0891b2; }
+  .dfu  .card-header { background:#7c3aed; }
+  .card-header .sub { font-size:9px; font-weight:400; opacity:.85; }
+
+  .card-body { padding:7px 10px; display:flex; flex-direction:column; gap:6px; }
+
+  /* funnel row */
+  .funnel {
+    background:#f8fafc; border-radius:4px; padding:5px 7px;
+  }
+  .funnel-title { font-size:9px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
+  .funnel-row { display:flex; gap:3px; align-items:center; margin-bottom:2px; }
+  .fbar { height:14px; border-radius:2px; display:flex; align-items:center;
+          padding:0 4px; font-size:9px; font-weight:700; color:#fff; min-width:28px; white-space:nowrap; }
+  .fbar.green  { background:#16a34a; }
+  .fbar.amber  { background:#d97706; }
+  .fbar.red    { background:#dc2626; }
+  .fbar.gray   { background:#94a3b8; }
+  .fbar.lightg { background:#86efac; color:#14532d; }
+  .f-label { font-size:9px; color:#475569; margin-left:2px; }
+  .f-note  { font-size:8.5px; color:#64748b; margin-top:1px; font-style:italic; }
+
+  /* bucket strip */
+  .bucket-strip {
+    display:flex; gap:3px;
+  }
+  .bk { flex:1; border-radius:3px; padding:4px 5px; text-align:center; }
+  .bk .bk-val { font-size:12px; font-weight:700; }
+  .bk .bk-lbl { font-size:8px; color:#64748b; }
+  .bk.cur  { background:#dcfce7; } .bk.cur .bk-val { color:#15803d; }
+  .bk.b130 { background:#fef9c3; } .bk.b130 .bk-val { color:#a16207; }
+  .bk.b30p { background:#fee2e2; } .bk.b30p .bk-val { color:#b91c1c; }
+
+  /* insight rows */
+  .insight-block { display:flex; flex-direction:column; gap:3px; }
+  .tag { display:inline-block; border-radius:3px; padding:1px 5px;
+         font-size:8.5px; font-weight:700; color:#fff; margin-right:3px; }
+  .tag.strength { background:#16a34a; }
+  .tag.concern  { background:#dc2626; }
+  .tag.info     { background:#2563eb; }
+  .tag.watch    { background:#d97706; }
+  .insight-line { font-size:9.5px; line-height:1.4; color:#1a2332; }
+
+  .channel-row {
+    background:#eff6ff; border-radius:3px; padding:4px 7px;
+    display:flex; gap:8px;
+  }
+  .ch-item { font-size:9px; }
+  .ch-item b { color:#1d4ed8; }
+
+  /* ── BOTTOM ROW ── */
+  .bottom-row { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+
+  .summary-box {
+    border:1px solid #e2e8f0; border-radius:6px; overflow:hidden;
+  }
+  .box-header {
+    padding:4px 10px; font-size:10px; font-weight:700; color:#fff;
+  }
+  .box-header.strength-h { background:#16a34a; }
+  .box-header.concern-h  { background:#dc2626; }
+  .box-body { padding:6px 10px; display:flex; flex-direction:column; gap:3px; }
+  .box-line { font-size:9.5px; padding-left:10px; position:relative; line-height:1.4; }
+  .box-line::before {
+    content:''; position:absolute; left:0; top:6px;
+    width:5px; height:5px; border-radius:50%;
+  }
+  .strength-h ~ .box-body .box-line::before { background:#16a34a; }
+  .concern-h  ~ .box-body .box-line::before { background:#dc2626; }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top:1px solid #e2e8f0; padding-top:5px;
+    display:flex; justify-content:space-between;
+    font-size:8.5px; color:#94a3b8;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>📊 FID → WO Analysis — Key Highlights &amp; Revised View</h1>
+    <div class="meta">
+      <b>Periode Observasi:</b> Jan 2025 – May 2026 (NDF CAR) / Jan–Oct 2025 (DF NEW &amp; USED)<br>
+      Scope: Angsuran 1–6 &nbsp;|&nbsp; Produk: NDF CAR · DF NEW · DF USED
+    </div>
+  </div>
+
+  <!-- PRODUCT GRID -->
+  <div class="product-grid">
+
+    <!-- NDF CAR -->
+    <div class="product-card ndf">
+      <div class="card-header">
+        NDF CAR
+        <span class="sub">12.805 ctr new roll · Jan 2025 – May 2026</span>
+      </div>
+      <div class="card-body">
+
+        <div class="bucket-strip">
+          <div class="bk cur"><div class="bk-val">85%</div><div class="bk-lbl">Current</div></div>
+          <div class="bk b130"><div class="bk-val">12%</div><div class="bk-lbl">Bucket 1-30</div></div>
+          <div class="bk b30p"><div class="bk-val">2.53%</div><div class="bk-lbl">Bucket 30+</div></div>
+        </div>
+
+        <div class="funnel">
+          <div class="funnel-title">Funnel FID → NPL → WO (base: 12.805 ctr)</div>
+          <div class="funnel-row">
+            <div class="fbar green" style="width:77%">76.78%</div>
+            <span class="f-label">Never NPL → selesai / maintained ✓</span>
+          </div>
+          <div class="funnel-row">
+            <div class="fbar amber" style="width:23%">23.22%</div>
+            <span class="f-label">Ever NPL (~2.974 ctr)</span>
+          </div>
+          <div class="funnel-row" style="padding-left:12px">
+            <div class="fbar lightg" style="width:44%">43.84%</div>
+            <span class="f-label">Belum WO · 52% lunas ✓</span>
+          </div>
+          <div class="funnel-row" style="padding-left:12px">
+            <div class="fbar red" style="width:56%">56.16%</div>
+            <span class="f-label">WO → 98.44% straight to WO</span>
+          </div>
+          <div class="f-note">FID straight WO: 10.18% dari total base</div>
+        </div>
+
+        <div class="insight-block">
+          <div class="insight-line"><span class="tag strength">STRENGTH</span>YoY May: Current naik, bucket 1-30 &amp; 30+ turun di angsuran 1, 2, 6</div>
+          <div class="insight-line"><span class="tag watch">WATCH</span>Roll 31 Ever NDF CAR naik terus-menerus sepanjang 2026</div>
+          <div class="insight-line"><span class="tag concern">CONCERN</span>NPL-to-WO 56.16% · hampir zero recovery (98.44% straight WO)</div>
+        </div>
+
+        <div class="channel-row">
+          <div class="ch-item"><b>Tele</b><br>dominan handle Never 31</div>
+          <div class="ch-item"><b>Field</b><br>dominan handle Ever 31</div>
+          <div class="ch-item" style="color:#dc2626;font-size:9px;">Ever 31 Field ↑ di 2026</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DF NEW -->
+    <div class="product-card dfn">
+      <div class="card-header">
+        DF NEW
+        <span class="sub">65 ctr new roll · Jan – Oct 2025 ⚠️ Sample kecil</span>
+      </div>
+      <div class="card-body">
+
+        <div class="bucket-strip">
+          <div class="bk cur"><div class="bk-val">88.27%</div><div class="bk-lbl">Current</div></div>
+          <div class="bk b130"><div class="bk-val">9.19%</div><div class="bk-lbl">Bucket 1-30</div></div>
+          <div class="bk b30p"><div class="bk-val">2.54%</div><div class="bk-lbl">Bucket 30+</div></div>
+        </div>
+
+        <div class="funnel">
+          <div class="funnel-title">Funnel FID → NPL → WO (base: 65 ctr)</div>
+          <div class="funnel-row">
+            <div class="fbar green" style="width:85%">84.62%</div>
+            <span class="f-label">Never NPL → selesai / maintained ✓</span>
+          </div>
+          <div class="funnel-row">
+            <div class="fbar amber" style="width:15%">15.38%</div>
+            <span class="f-label">Ever NPL (~10 ctr)</span>
+          </div>
+          <div class="funnel-row" style="padding-left:12px">
+            <div class="fbar lightg" style="width:50%">50.00%</div>
+            <span class="f-label">Belum WO (~5 ctr) ✓</span>
+          </div>
+          <div class="funnel-row" style="padding-left:12px">
+            <div class="fbar red" style="width:50%">50.00%</div>
+            <span class="f-label">WO → 100% straight to WO</span>
+          </div>
+          <div class="f-note">FID straight WO: 7.69% · Obs. Jan–Oct 2025 saja</div>
+        </div>
+
+        <div class="insight-block">
+          <div class="insight-line"><span class="tag strength">STRENGTH</span>NPL entry rate terendah (15.38%) &amp; Never NPL terbesar (84.62%)</div>
+          <div class="insight-line"><span class="tag watch">ANOMALI</span>Bucket 30+ didominasi angsuran 6 (&gt;90%) — pola tidak lazim, perlu investigasi</div>
+          <div class="insight-line"><span class="tag concern">CONCERN</span>Sample 65 ctr: semua angka % sangat volatile — jangan buat keputusan besar</div>
+        </div>
+
+        <div class="channel-row">
+          <div class="ch-item"><b>Tele</b><br>dominan handle Never 31</div>
+          <div class="ch-item"><b>Field</b><br>dominan handle Ever 31</div>
+          <div class="ch-item" style="color:#64748b;font-size:9px;">Pola sama, sample terlalu kecil</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DF USED -->
+    <div class="product-card dfu">
+      <div class="card-header">
+        DF USED
+        <span class="sub">935 ctr new roll · Jan – Oct 2025</span>
+      </div>
+      <div class="card-body">
+
+        <div class="bucket-strip">
+          <div class="bk cur"><div class="bk-val">91.31%</div><div class="bk-lbl">Current</div></div>
+          <div class="bk b130"><div class="bk-val">6.55%</div><div class="bk-lbl">Bucket 1-30</div></div>
+          <div class="bk b30p"><div class="bk-val">2.14%</div><div class="bk-lbl">Bucket 30+</div></div>
+        </div>
+
+        <div class="funnel">
+          <div class="funnel-title">Funnel FID → NPL → WO (base: 935 ctr)</div>
+          <div class="funnel-row">
+            <div class="fbar green" style="width:67%">67.17%</div>
+            <span class="f-label">Never NPL → selesai / maintained ✓</span>
+          </div>
+          <div class="funnel-row">
+            <div class="fbar amber" style="width:33%">32.83%</div>
+            <span class="f-label">Ever NPL (~307 ctr)</span>
+          </div>
+          <div class="funnel-row" style="padding-left:12px">
+            <div class="fbar lightg" style="width:19%">18.57%</div>
+            <span class="f-label">Belum WO (~57 ctr) ✓</span>
+          </div>
+          <div class="funnel-row" style="padding-left:12px">
+            <div class="fbar red" style="width:81%">81.43%</div>
+            <span class="f-label">WO → 99.19% straight to WO 🔴</span>
+          </div>
+          <div class="f-note">FID straight WO: 6.10% · NPL-to-WO tertinggi di antara semua produk</div>
+        </div>
+
+        <div class="insight-block">
+          <div class="insight-line"><span class="tag strength">STRENGTH</span>Current ratio tertinggi (91.31%) &amp; Ever 31 rate terendah (13.44%)</div>
+          <div class="insight-line"><span class="tag watch">PARADOKS</span>Portfolio terbaik di permukaan, tapi begitu NPL → 81% langsung WO</div>
+          <div class="insight-line"><span class="tag concern">CONCERN 🔴</span>NPL-to-WO 81.43% adalah yang tertinggi · window rescue sangat sempit</div>
+        </div>
+
+        <div class="channel-row">
+          <div class="ch-item"><b>Tele</b><br>dominan handle Never 31</div>
+          <div class="ch-item"><b>Field</b><br>dominan handle Ever 31</div>
+          <div class="ch-item" style="color:#dc2626;font-size:9px;">Tele Never 31 ↓ di 2026 — waspadai gap</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM: STRENGTH vs CONCERN -->
+  <div class="bottom-row">
+
+    <div class="summary-box">
+      <div class="box-header strength-h">✅ STRENGTHS — Yang Sudah Berjalan Baik</div>
+      <div class="box-body">
+        <div class="box-line">Mayoritas kontrak FID selesai/maintained tanpa menyentuh NPL: NDF CAR 76.78% · DF NEW 84.62% · DF USED 67.17%</div>
+        <div class="box-line">Di antara yang NPL, ada porsi yang tidak WO: NDF CAR 43.84% (52% lunas) · DF NEW 50% · DF USED 18.57%</div>
+        <div class="box-line">DF NEW memiliki NPL entry rate terbaik (15.38%) — profil kendaraan baru + DP lebih terjaga</div>
+        <div class="box-line">DF USED: current ratio terbaik (91.31%) &amp; Ever 31 rate terendah (13.44%) — repeat delinquency paling rendah</div>
+        <div class="box-line">NDF CAR YoY May membaik: bucket 1-30 &amp; 30+ turun, Current naik</div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="box-header concern-h">🔴 CONCERNS — Yang Perlu Segera Dikerjakan</div>
+      <div class="box-body">
+        <div class="box-line"><b>[Prioritas 1 – DF USED]</b> NPL-to-WO 81.43% dengan 99.19% straight WO. Window rescue sangat sempit — perlu strategi NPL Recovery khusus segera</div>
+        <div class="box-line"><b>[Prioritas 2 – NDF CAR]</b> Roll 31 Ever terus naik sepanjang 2026. Kontrak Ever 31 yang ditangani Field perlu segmentasi treatment lebih agresif</div>
+        <div class="box-line"><b>[Cross-product]</b> Straight to WO hampir 100% di semua produk — begitu di NPL, rescue sangat jarang terjadi. Perlu evaluasi intensitas NPL stage</div>
+        <div class="box-line"><b>[NDF CAR Profil Risiko]</b> Nasabah butuh dana tunai (bukan aset kendaraan) — risiko moral hazard lebih tinggi. Bucket 1-30 tertinggi (12%) vs DF NEW &amp; USED</div>
+        <div class="box-line"><b>[DF NEW]</b> Anomali angsuran 6 di bucket 30+ perlu investigasi · Sample 65 ctr perlu diperluas</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>FID Analysis Highlight — Periode: Mei 2026 &nbsp;|&nbsp; Scope: Angsuran 1–6 · NDF CAR · DF NEW · DF USED</span>
+    <span>Catatan: "Apr-Mar 2026" di slide 4 &amp; 14 kemungkinan typo — slide 17 menyebutnya "semester 1 2026". Harap dikonfirmasi.</span>
+  </div>
+
+</div>
+</body>
+</html>
