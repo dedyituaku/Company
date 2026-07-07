@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asset Management Dashboard — Juni 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+body{background:#F4F6FA;color:#1A1A1A;font-size:14px;}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px 40px;}
+.nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #DDE3EC;}
+.nb{padding:8px 16px;border:1px solid #C5CFDD;border-radius:8px;font-size:13px;cursor:pointer;background:#fff;color:#555;transition:all .15s;}
+.nb.active{background:#0D1E50;color:#fff;border-color:#0D1E50;}
+.view{display:none;}.view.active{display:block;}
+.card{background:#fff;border:1px solid #DDE3EC;border-radius:12px;padding:16px;margin-bottom:12px;}
+.card-title{font-size:13.5px;font-weight:600;margin-bottom:12px;}
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:14px;}
+.metric{background:#F8FAFC;border-radius:8px;padding:11px 13px;}
+.ml{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.mv{font-size:20px;font-weight:500;}
+.ms{font-size:10px;color:#888;margin-top:2px;}
+.good{color:#3B6D11;}.bad{color:#A32D2D;}.amber{color:#854F0B;}.navy{color:#0D1E50;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:500;}
+.bg{background:#EAF3DE;color:#3B6D11;}.br{background:#FCEBEB;color:#A32D2D;}.ba{background:#FAEEDA;color:#854F0B;}.bb{background:#E6F1FB;color:#0C447C;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:5px 8px;border-bottom:1px solid #EEE;color:#888;font-size:11px;}
+td{padding:6px 8px;border-bottom:1px solid #F5F5F5;vertical-align:middle;}
+tr:hover td{background:#FAFAFA;}
+.sig{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:8px;margin-bottom:8px;}
+.sig-red{background:#FCEBEB;}.sig-green{background:#EAF3DE;}.sig-amber{background:#FAEEDA;}
+.sii{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.sir{background:#F7CCCC;color:#A32D2D;}.sig2{background:#C6DDB2;color:#3B6D11;}.sia{background:#FAD6A0;color:#854F0B;}
+.st{font-size:12.5px;line-height:1.55;}
+.di{display:flex;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:8px;}
+.dir{background:#FCEBEB;border:1px solid #F7CCCC;}.dia{background:#FAEEDA;border:1px solid #FAC775;}
+.dig{background:#EAF3DE;border:1px solid #C0DD97;}.dib{background:#E6F1FB;border:1px solid #B5D4F4;}
+.din{background:#E0E6F0;border:1px solid #A0B4CC;}
+.dic{font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.dict-red{color:#A32D2D;}.dict-amber{color:#854F0B;}.dict-green{color:#3B6D11;}.dict-blue{color:#0C447C;}
+.db{font-size:12.5px;line-height:1.55;}
+.db strong{font-weight:600;display:block;margin-bottom:3px;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:500px){.two{grid-template-columns:1fr;}}
+.step{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #EEE;}
+.step:last-child{border-bottom:none;}
+.snum{width:26px;height:26px;border-radius:50%;background:#0D1E50;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sbody{font-size:12.5px;line-height:1.55;}
+.sbody strong{font-weight:600;display:block;margin-bottom:2px;}
+.kbox{background:#F4F6FA;border-left:4px solid #0D1E50;border-radius:8px;padding:14px;font-size:12.5px;line-height:1.7;margin-top:10px;}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.prog-label{width:40px;font-size:11px;color:#888;}
+.prog-track{flex:1;height:8px;background:#EEE;border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:4px;}
+.vbar-container{display:flex;align-items:flex-end;gap:4px;margin-top:8px;}
+.vbar{border-radius:2px 2px 0 0;min-width:28px;}
+.vbar-label{font-size:9px;text-align:center;color:#888;margin-top:3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div style="background:#0D1E50;border-radius:14px;padding:18px 22px;margin-bottom:20px;color:#fff;">
+  <div style="font-size:11px;opacity:.65;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">BFI Finance — Asset Management Division</div>
+  <div style="font-size:20px;font-weight:600;">Performance Dashboard — Juni 2026</div>
+  <div style="font-size:13px;opacity:.8;margin-top:4px;">Analisa mendalam sebagai Direktur Asset Management (Collection) — 4 Views</div>
+</div>
+
+<div class="nav">
+  <button class="nb active" onclick="show('detail')">📊 Detail View</button>
+  <button class="nb" onclick="show('highlight')">🔍 Highlight View</button>
+  <button class="nb" onclick="show('board')">🎯 High-Level (Board)</button>
+  <button class="nb" onclick="show('team')">📋 Summary (Tim)</button>
+</div>
+
+<!-- ════ DETAIL ════ -->
+<div id="detail" class="view active">
+
+<div class="card">
+<div class="card-title">📊 Delinquency — Data Detail Juni 2026</div>
+<div class="mg">
+  <div class="metric"><div class="ml">0+ ALL</div><div class="mv good">20.53%</div><div class="ms">↓ dari 20.90% Mei — membaik 0.37%</div></div>
+  <div class="metric"><div class="ml">30+ ALL</div><div class="mv good">3.98%</div><div class="ms">GAP +0.18% | IMP +4.23% vs LM</div></div>
+  <div class="metric"><div class="ml">90+ ALL</div><div class="mv good">1.56%</div><div class="ms">Reversal pertama 2026! IMP +5.47%</div></div>
+  <div class="metric"><div class="ml">Tren 90+ Jan→Jun</div><div class="mv navy" style="font-size:14px;">1.45→1.56</div><div class="ms">5 bln naik, akhirnya reversal Jun</div></div>
+</div>
+
+<div style="overflow-x:auto;margin-bottom:14px;">
+<table>
+<thead><tr><th>Product</th><th>30+ Mei</th><th>30+ Jun</th><th>Gap 30+</th><th>90+ Mei</th><th>90+ Jun</th><th>Gap 90+</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td><strong>CAR</strong></td><td style="color:#888">4.07%</td><td class="good"><strong>3.78%</strong></td><td class="good">+0.29%</td><td style="color:#888">1.65%</td><td class="good"><strong>1.50%</strong></td><td class="good">+0.15%</td><td><span class="badge bg">✓ Achieve Target</span></td></tr>
+<tr><td><strong>MCY</strong></td><td style="color:#888">5.95%</td><td class="amber"><strong>5.69%</strong></td><td class="good">+0.26%</td><td style="color:#888">2.58%</td><td class="amber"><strong>2.40%</strong></td><td class="good">+0.18%</td><td><span class="badge ba">Membaik, belum target</span></td></tr>
+<tr><td><strong>LS</strong></td><td style="color:#888">3.43%</td><td class="bad"><strong>3.63%</strong></td><td class="bad">(0.20%)</td><td style="color:#888">1.02%</td><td class="bad"><strong>1.13%</strong></td><td class="bad">(0.11%)</td><td><span class="badge br">30+ Memburuk</span></td></tr>
+<tr><td><strong>PBF</strong></td><td style="color:#888">4.72%</td><td class="bad">4.94%</td><td class="bad">(0.22%)</td><td style="color:#888">2.15%</td><td class="bad">2.26%</td><td class="bad">(0.11%)</td><td><span class="badge bg">5 Bln Achieve 30+</span></td></tr>
+</tbody></table></div>
+
+<div class="two">
+<div>
+<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">30+ Terburuk</div>
+<table><thead><tr><th>Resort</th><th>Rate</th></tr></thead><tbody>
+<tr><td>Kalbagtim</td><td class="bad"><strong>8.21%</strong></td></tr>
+<tr><td>Yogyakarta</td><td class="bad"><strong>5.86%</strong></td></tr>
+<tr><td>Surabaya 2</td><td class="amber"><strong>5.18%</strong></td></tr>
+<tr><td>Bogor</td><td>3.29%</td></tr><tr><td>Jakarta</td><td>2.94%</td></tr>
+</tbody></table></div>
+<div>
+<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">90+ Terburuk</div>
+<table><thead><tr><th>Resort</th><th>Rate</th></tr></thead><tbody>
+<tr><td>Kalbagtim</td><td class="bad"><strong>3.24%</strong></td></tr>
+<tr><td>Yogyakarta</td><td class="bad"><strong>3.02%</strong></td></tr>
+<tr><td>Cirebon</td><td class="amber"><strong>2.10%</strong></td></tr>
+<tr><td>Sumbagteng</td><td>0.91%</td></tr><tr><td>Makassar</td><td>0.89%</td></tr>
+</tbody></table></div></div></div>
+
+<div class="card">
+<div class="card-title">📉 CWO & WO In — Data Detail Juni 2026</div>
+<div class="mg">
+  <div class="metric"><div class="ml">WO In Jun Amount</div><div class="mv good">72.8 Bio</div><div class="ms">GAP +5.6 Bio | IMP +7.13%</div></div>
+  <div class="metric"><div class="ml">%WO In</div><div class="mv good">86.12%</div><div class="ms">GAP +7.73% vs LM</div></div>
+  <div class="metric"><div class="ml">⚠ CWO Juli</div><div class="mv bad">+13.7 Bio</div><div class="ms">Kenaikan terbesar — alarm Agustus</div></div>
+  <div class="metric"><div class="ml">WO In IMP vs LM</div><div class="mv good">+7.13%</div><div class="ms">Membaik vs Mei</div></div>
+</div>
+<div style="overflow-x:auto;margin-bottom:14px;">
+<table><thead><tr><th>Product</th><th>CWO Jun</th><th>WO In Jun</th><th>%WO In</th><th>vs LY %</th><th>vs LY Amt</th></tr></thead>
+<tbody>
+<tr><td><strong>CAR</strong></td><td>62.8 Bio</td><td>55.3 Bio</td><td class="amber">90.84%</td><td class="good">Improve</td><td style="color:#888">—</td></tr>
+<tr><td><strong>MCY</strong></td><td>13.8 Bio</td><td>12.9 Bio</td><td class="amber">93.42%</td><td style="color:#888">—</td><td style="color:#888">—</td></tr>
+<tr><td><strong>LS</strong></td><td>4.8 Bio</td><td>4.6 Bio</td><td class="amber">52.90%</td><td style="color:#888">—</td><td style="color:#888">—</td></tr>
+<tr><td><strong>PBF</strong></td><td>1.0 Bio</td><td>1.9 Bio</td><td class="good">54.01%</td><td class="good">Improve</td><td class="good">Improve</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:6px;">WO In Tertinggi</div>
+<table><thead><tr><th>Resort</th><th>Amount</th></tr></thead><tbody>
+<tr><td>Sumbagut</td><td class="bad"><strong>7,487</strong></td></tr>
+<tr><td>Kalbagtim</td><td class="bad"><strong>7,245</strong></td></tr>
+<tr><td>Surabaya 1</td><td class="amber"><strong>6,847</strong></td></tr>
+<tr><td>Cirebon</td><td>1,871</td></tr><tr><td>Bandung</td><td>1,623</td></tr>
+</tbody></table></div>
+<div><div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:6px;">CWO Tertinggi</div>
+<table><thead><tr><th>Resort</th><th>Amount</th></tr></thead><tbody>
+<tr><td>Kalbagtim</td><td class="bad"><strong>8,327</strong></td></tr>
+<tr><td>Sumbagut</td><td class="bad"><strong>7,288</strong></td></tr>
+<tr><td>Jakarta</td><td class="bad"><strong>7,268</strong></td></tr>
+<tr><td>Kalbagbar</td><td>2,824</td></tr><tr><td>Makassar</td><td>2,570</td></tr>
+</tbody></table></div></div></div>
+
+<div class="card">
+<div class="card-title">💰 WO Recovery & Payment — Data Detail Juni 2026</div>
+<div class="mg">
+  <div class="metric"><div class="ml">WO Rec GAP vs LM</div><div class="mv good">+7.0 Bio</div><div class="ms">Membaik signifikan</div></div>
+  <div class="metric"><div class="ml">WO Pay GAP vs LM</div><div class="mv good">+7.1 Bio</div><div class="ms">Membaik signifikan</div></div>
+  <div class="metric"><div class="ml">%Pay to Target</div><div class="mv good">92.09%</div><div class="ms">GAP +22.93% — terbaik 2026</div></div>
+  <div class="metric"><div class="ml">PBF Pay Rate</div><div class="mv good">127.82%</div><div class="ms">Overachieve luar biasa</div></div>
+</div>
+<div style="overflow-x:auto;margin-bottom:14px;">
+<table><thead><tr><th>Product</th><th>WO Rec Mei</th><th>WO Rec Jun</th><th>WO Pay Rate Jun</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td><strong>CAR</strong></td><td style="color:#888">14,570</td><td class="good"><strong>19,910</strong></td><td class="good"><strong>92.85%</strong></td><td><span class="badge bg">Improvement Kuat</span></td></tr>
+<tr><td><strong>MCY</strong></td><td style="color:#888">2,499</td><td class="good"><strong>2,980</strong></td><td class="good"><strong>93.42%</strong></td><td><span class="badge bg">Improve</span></td></tr>
+<tr><td><strong>LS</strong></td><td style="color:#888">1,238</td><td class="good">1,266</td><td class="amber">81.73%</td><td><span class="badge ba">Mixed</span></td></tr>
+<tr><td><strong>PBF</strong></td><td style="color:#888">228</td><td class="good"><strong>546</strong></td><td class="good"><strong>127.82%</strong></td><td><span class="badge bg">Outstanding</span></td></tr>
+</tbody></table></div>
+<div class="two">
+<div><div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:6px;">WO Rec Terbaik</div>
+<table><thead><tr><th>Resort</th><th>Amount</th></tr></thead><tbody>
+<tr><td>Sumbagut</td><td class="good"><strong>2,308</strong></td></tr>
+<tr><td>Kalbagbar</td><td class="good"><strong>2,148</strong></td></tr>
+<tr><td>Sumbagsel</td><td class="good"><strong>1,799</strong></td></tr>
+</tbody></table></div>
+<div><div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:6px;">WO Pay Concern</div>
+<table><thead><tr><th>Resort</th><th>Amount</th></tr></thead><tbody>
+<tr><td>Surabaya 2</td><td class="bad"><strong>824</strong></td></tr>
+<tr><td>Jakarta</td><td class="bad"><strong>718</strong></td></tr>
+<tr><td>Ambon</td><td class="amber"><strong>625</strong></td></tr>
+</tbody></table></div></div></div>
+
+<div class="card">
+<div class="card-title">📦 Inventory — Data Detail Juni 2026</div>
+<div class="mg">
+  <div class="metric"><div class="ml">Stock AMT</div><div class="mv bad">304,461</div><div class="ms">↑ dari 243,615 — naik 25%</div></div>
+  <div class="metric"><div class="ml">Stock Unit</div><div class="mv bad">2,672</div><div class="ms">↑ dari 2,523 Mei</div></div>
+  <div class="metric"><div class="ml">IRA</div><div class="mv bad">1.17%</div><div class="ms">↑ dari 0.93% — memburuk</div></div>
+  <div class="metric"><div class="ml">TOR AMT</div><div class="mv bad">66.04%</div><div class="ms">↓ dari 110.03% — IMP (39.98%)</div></div>
+  <div class="metric"><div class="ml">TOR Unit</div><div class="mv bad">92.76%</div><div class="ms">↓ dari 99.73% — IMP (6.99%)</div></div>
+  <div class="metric"><div class="ml">LOR%</div><div class="mv good">7.42%</div><div class="ms">↓ dari 7.78% — GAP (0.36%) ✓</div></div>
+  <div class="metric"><div class="ml">LOR AMT</div><div class="mv good">8,776</div><div class="ms">↓ 642 Mio dari 9,418 Mei ✓</div></div>
+</div></div>
+</div>
+
+<!-- ════ HIGHLIGHT ════ -->
+<div id="highlight" class="view">
+<div class="card">
+<div class="card-title" style="color:#A32D2D">🔴 Sinyal Merah — Perlu Aksi Segera</div>
+<div class="sig sig-red"><div class="sii sir">⚠</div><div class="st"><strong>CWO Juli +13.7 Bio — alarm terbesar untuk Agustus.</strong> Kenaikan terbesar dalam tren CWO 2026. Debitur CWO Juli = WO baru Agustus jika tidak diintervensi sekarang. Kalbagtim (8,327), Sumbagut (7,288), Jakarta (7,268) diprioritaskan hari ini.</div></div>
+<div class="sig sig-red"><div class="sii sir">📦</div><div class="st"><strong>Stock melonjak 25% dalam 1 bulan — IRA 1.17%.</strong> Stock AMT naik 60K+, TOR turun 40%. Kombinasi berbahaya: lebih banyak unit, lebih lama tidak terjual. Aging unit >90 hari adalah prioritas disposal segera.</div></div>
+<div class="sig sig-red"><div class="sii sir">📉</div><div class="st"><strong>TOR turun drastis dari 110% ke 66%.</strong> Kecepatan disposal melambat hampir 40%. Jika berlanjut ke Juli, IRA semakin memburuk dan LOR yang baru membaik akan terancam kembali.</div></div>
+<div class="sig sig-red"><div class="sii sir">🏢</div><div class="st"><strong>Kalbagtim dominasi 4 metrik negatif sekaligus.</strong> 30+ tertinggi (8.21%), 90+ tertinggi (3.24%), CWO tertinggi (8,327), WO In top-2 (7,245). Ini darurat struktural — bukan sekadar underperform.</div></div>
+<div class="sig sig-red"><div class="sii sir">💳</div><div class="st"><strong>WO Pay gap: Surabaya 2 (824), Jakarta (718), Ambon (625).</strong> Recovery ada tapi payment rendah. Debitur ditemukan tapi tidak membayar. Masalah strategi negosiasi, bukan intensitas.</div></div>
+</div>
+
+<div class="card">
+<div class="card-title" style="color:#3B6D11">🟢 Sinyal Hijau — Momentum yang Harus Dijaga</div>
+<div class="sig sig-green"><div class="sii sig2">🏆</div><div class="st"><strong>Semua bucket delinquency membaik serentak — pertama kali di 2026.</strong> 0+, 30+, dan 90+ semua turun di bulan yang sama. Dokumentasikan enabler Juni dan jadikan standar operasional Juli.</div></div>
+<div class="sig sig-green"><div class="sii sig2">🔄</div><div class="st"><strong>90+ reversal setelah 5 bulan naik berturut-turut.</strong> 1.65% → 1.56%. Teori NPL Recovery > New Comer terbukti. Pertahankan momentum — Roll 91 harus tetap terkontrol.</div></div>
+<div class="sig sig-green"><div class="sii sig2">⭐</div><div class="st"><strong>WO Recovery & Payment — bulan terbaik di 2026.</strong> GAP +7.0 Bio WO Rec, +7.1 Bio WO Pay, %Pay/Target 92.09% dengan GAP +22.93%. Semua product improve serentak.</div></div>
+<div class="sig sig-green"><div class="sii sig2">🎯</div><div class="st"><strong>PBF 5 bulan konsisten achieve 30+ dan CAR kembali achieve.</strong> PBF membuktikan sistem yang berjalan. CAR achieve setelah beberapa bulan miss — identifikasi apa yang berubah dan pertahankan.</div></div>
+<div class="sig sig-green"><div class="sii sig2">💰</div><div class="st"><strong>LOR membaik — 642 Mio lebih baik dari Mei.</strong> Di tengah Stock naik dan TOR turun, LOR justru membaik. Kualitas lelang meningkat — pertahankan pricing discipline ini.</div></div>
+</div>
+
+<div class="card">
+<div class="card-title" style="color:#854F0B">🟡 Sinyal Kuning — Monitor Ketat</div>
+<div class="sig sig-amber"><div class="sii sia">⚡</div><div class="st"><strong>WO In masih fluktuatif — perbaikan Juni belum terkonfirmasi.</strong> Membaik +5.6 Bio tapi tren 2026 naik-turun. Satu bulan positif bukan tren — konfirmasi Juli adalah kuncinya.</div></div>
+<div class="sig sig-amber"><div class="sii sia">📊</div><div class="st"><strong>MCY 30+ masih 5.69% — jauh dari target untuk Q3.</strong> Ada progress tapi level masih tinggi. Program khusus MCY harus lebih agresif di Q3.</div></div>
+<div class="sig sig-amber"><div class="sii sia">🏢</div><div class="st"><strong>Yogyakarta — pattern berulang di dua bucket.</strong> 30+ 5.86% dan 90+ 3.02%. Muncul di worst performer 3+ bulan berturut-turut. Harus ada action plan berbeda, bukan monitoring.</div></div>
+</div>
+</div>
+
+<!-- ════ BOARD ════ -->
+<div id="board" class="view">
+<div style="background:#0D1E50;border-radius:12px;padding:16px 20px;margin-bottom:14px;color:#fff;">
+<div style="font-size:10.5px;opacity:.65;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Board View — Asset Management Juni 2026</div>
+<div style="font-size:18px;font-weight:600;">Sinyal Positif Pertama 2026 — Tapi CWO Pipeline Mengancam S2</div>
+<div style="font-size:12.5px;opacity:.8;margin-top:4px;">Semester 1 ditutup dengan momentum positif. Tiga risiko besar harus dimitigasi untuk Semester 2.</div>
+</div>
+
+<div class="mg" style="grid-template-columns:repeat(4,1fr);">
+<div class="metric" style="border:1px solid #C0DD97;text-align:center;"><div class="ml">30+ ALL</div><div class="mv good">3.98%</div><div style="margin-top:4px;"><span class="badge bg">↑ +4.23%</span></div></div>
+<div class="metric" style="border:1px solid #C0DD97;text-align:center;"><div class="ml">90+ ALL</div><div class="mv good">1.56%</div><div style="margin-top:4px;"><span class="badge bg">Reversal pertama 2026</span></div></div>
+<div class="metric" style="border:1px solid #C0DD97;text-align:center;"><div class="ml">%WO Pay/Target</div><div class="mv good">92.09%</div><div style="margin-top:4px;"><span class="badge bg">+22.93%</span></div></div>
+<div class="metric" style="border:1px solid #F7CCCC;text-align:center;"><div class="ml">⚠ CWO Pipeline</div><div class="mv bad">+13.7 Bio</div><div style="margin-top:4px;"><span class="badge br">Alarm Agustus</span></div></div>
+</div>
+
+<div class="card">
+<div class="card-title">🎯 3 Poin Utama untuk Board</div>
+<div class="step"><div class="snum">1</div><div class="sbody"><strong>Juni adalah bulan terbaik 2026 — semua metrik utama positif bersamaan</strong>Untuk pertama kali di 2026, delinquency membaik di semua bucket (90+ reversal setelah 5 bulan naik), WO Recovery & Payment melonjak 92.09%, dan CAR kembali achieve target 30+. Ini konfirmasi awal bahwa strategi mulai menghasilkan — perlu satu kuartal konsistensi untuk memastikan ini bukan anomali.</div></div>
+<div class="step"><div class="snum">2</div><div class="sbody"><strong>CWO Juli +13.7 Bio adalah risiko terbesar yang harus dimitigasi sekarang</strong>Kenaikan CWO Juli terbesar dalam tren 2026. Jika tidak diintervensi, ini akan menjadi beban WO collection yang signifikan di Agustus — justru saat kita ingin mengkonfirmasi momentum positif Juni. Tiga resort (Kalbagtim, Sumbagut, Jakarta) sudah teridentifikasi dan harus menjadi prioritas intervensi minggu ini.</div></div>
+<div class="step"><div class="snum">3</div><div class="sbody"><strong>Inventory membutuhkan keputusan strategis Board — Stock naik 25% dalam satu bulan</strong>Stock AMT naik dari 243,615 ke 304,461 (+25%) dan IRA memburuk ke 1.17%. TOR turun 40%. Satu-satunya sinyal positif adalah LOR yang mulai membaik. Diperlukan keputusan strategis mengenai kapasitas disposal dan channel lelang untuk Semester 2.</div></div>
+</div>
+
+<div class="card">
+<div class="card-title">📊 Scorecard Produk — Posisi Strategis</div>
+<div class="prog-row"><div class="prog-label">PBF</div><div class="prog-track"><div class="prog-fill" style="width:90%;background:#639922;"></div></div><span class="badge bg">Outstanding — 5 bln konsisten</span></div>
+<div class="prog-row"><div class="prog-label">CAR</div><div class="prog-track"><div class="prog-fill" style="width:72%;background:#639922;"></div></div><span class="badge bg">Achieve — pertahankan</span></div>
+<div class="prog-row"><div class="prog-label">MCY</div><div class="prog-track"><div class="prog-fill" style="width:45%;background:#BA7517;"></div></div><span class="badge ba">Membaik, belum target</span></div>
+<div class="prog-row"><div class="prog-label">LS</div><div class="prog-track"><div class="prog-fill" style="width:35%;background:#E24B4A;"></div></div><span class="badge br">30+ memburuk — watch</span></div>
+</div>
+
+<div class="two">
+<div class="card" style="border-color:#C0DD97;background:#EAF3DE22;">
+<div class="card-title" style="color:#3B6D11">✅ Bright Spots Semester 1</div>
+<div style="font-size:12px;color:#375623;line-height:1.7;">
+★ 90+ reversal pertama kali setelah 5 bulan naik<br>
+★ WO Pay 92.09% — terbaik dalam 12 bulan terakhir<br>
+★ PBF 5 bulan konsisten — model collection terbukti<br>
+★ LOR membaik 642 Mio — kualitas disposal naik<br>
+★ CAR achieve target kembali setelah beberapa bulan miss
+</div></div>
+<div class="card" style="border-color:#F7CCCC;background:#FCEBEB22;">
+<div class="card-title" style="color:#A32D2D">⚠️ Risiko Utama S2 2026</div>
+<div style="font-size:12px;color:#A32D2D;line-height:1.7;">
+! CWO +13.7 Bio → beban WO Agustus sangat besar<br>
+! Stock IRA 1.17% → aging unit menumpuk<br>
+! Kalbagtim → 4 metrik negatif, darurat struktural<br>
+! TOR turun 40% → pipeline disposal terhambat<br>
+! Yogyakarta pattern berulang tidak diselesaikan
+</div></div></div>
+</div>
+
+<!-- ════ TEAM ════ -->
+<div id="team" class="view">
+<div style="background:#042C53;border-radius:12px;padding:14px 18px;margin-bottom:14px;color:#fff;">
+<div style="font-size:10.5px;opacity:.65;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Direction ke Tim — Juni 2026</div>
+<div style="font-size:15px;font-weight:600;">4 Prioritas Aksi Juli 2026 — Konfirmasi Momentum, Mitigasi Risiko</div>
+</div>
+
+<div class="card">
+<div class="card-title" style="color:#A32D2D">🔴 Immediate Action — Lakukan Minggu Pertama Juli</div>
+<div class="di dir"><div class="dic dict-red">1</div><div class="db"><strong>Buat daftar debitur CWO Juli hari ini — Kalbagtim, Sumbagut, Jakarta prioritas utama</strong>CWO Juli +13.7 Bio adalah ancaman terbesar untuk Agustus. Tim harus sudah memiliki daftar sekarang, dipilah per resort dan product. Koordinasikan dengan bisnis untuk opsi restrukturisasi atau settlement sebelum resmi write-off. <em>Window intervensi ada sekarang — bukan Agustus.</em></div></div>
+<div class="di dir"><div class="dic dict-red">2</div><div class="db"><strong>Kalbagtim — eskalasi ke Area Head, minta root cause analysis + action plan yang berbeda</strong>Satu resort mendominasi 4 metrik negatif: 30+ (8.21%), 90+ (3.24%), CWO (8,327), WO In (7,245). Ini darurat struktural. Deni dan Benny diminta menyajikan breakdown debitur per kategori dan action plan yang konkret — bukan monitoring yang sama seperti bulan-bulan sebelumnya.</div></div>
+<div class="di dir"><div class="dic dict-red">3</div><div class="db"><strong>Aging inventory >90 hari — buat jadwal lelang Juli sekarang, percepat eksekusi</strong>Stock naik 25%, IRA ke 1.17%. Unit aging >90 hari harus keluar di Juli. Pastikan jadwal lelang sudah confirmed, tidak ada bottleneck administratif. <em>LOR baru membaik — jangan biarkan stock menumpuk terlalu lama sampai merusak kualitas harga jual kembali.</em></div></div>
+</div>
+
+<div class="card">
+<div class="card-title" style="color:#854F0B">🟡 Short-Term — 2-4 Minggu ke Depan</div>
+<div class="di dia"><div class="dic dict-amber">→</div><div class="db"><strong>Dokumentasikan enabler Juni sebelum tim lupa apa yang berbeda</strong>Semua product improve serentak — pertama kali di 2026. Minta setiap Area/Resort head melaporkan apa yang spesifik dilakukan berbeda. Jadikan playbook tertulis untuk Juli — jangan biarkan pengetahuan ini hilang dari ingatan tim.</div></div>
+<div class="di dia"><div class="dic dict-amber">→</div><div class="db"><strong>Surabaya 2, Jakarta, Ambon — review strategi negosiasi WO Pay</strong>Recovery ada tapi payment rendah. Debitur ditemukan tapi tidak membayar. Review approach negosiasi — opsi settlement lebih fleksibel? <em>Ini bukan masalah effort, ini masalah pendekatan.</em></div></div>
+<div class="di dia"><div class="dic dict-amber">→</div><div class="db"><strong>Review TOR — identifikasi bottleneck disposal, pulihkan ke >100% di Juli</strong>TOR turun dari 110% ke 66%. Cek apakah ada bottleneck di proses lelang, volume unit tidak marketable, atau channel. Target TOR AMT Juli minimal kembali ke level Mei (>100%).</div></div>
+<div class="di dia"><div class="dic dict-amber">→</div><div class="db"><strong>MCY program khusus — 5.69% masih jauh dari target untuk Q3</strong>Ada progress tapi level masih tinggi. Q3 ini harus jadi fokus khusus MCY: review treatment model, rasio field visit vs contact center bucket 1-3, dan alignment dengan bisnis MCY.</div></div>
+</div>
+
+<div class="card">
+<div class="card-title" style="color:#3B6D11">🟢 Pertahankan & Scale — Yang Sudah Berjalan Baik</div>
+<div class="di dig"><div class="dic dict-green">✓</div><div class="db"><strong>CAR achieve — identifikasi perubahan dan pertahankan bulan depan</strong>CAR achieve 30+ target setelah miss beberapa bulan. Identifikasi apa yang berubah — coverage MPE, activity quality, koordinasi bisnis. <em>Ini harus dijaga, bukan dianggap selesai.</em></div></div>
+<div class="di dig"><div class="dic dict-green">✓</div><div class="db"><strong>Replikasi model PBF ke product lain — 5 bulan konsisten bukan keberuntungan</strong>Benchmark activity, treatment model, dan disiplin eksekusi PBF. Undang PIC Collection PBF untuk sharing ke tim CAR dan MCY. Apa yang membuat mereka konsisten saat product lain naik-turun?</div></div>
+<div class="di dig"><div class="dic dict-green">✓</div><div class="db"><strong>Pertahankan Roll 91 discipline — 90+ baru saja reversal, jangan longgarkan</strong>Sesuai arahan pak Arwin dan DepHead Late, daftar CNPL prioritas harus terus dijalankan. Jangan longgarkan hanya karena bulan ini membaik — momentum ini rapuh dan harus dikonfirmasi Juli.</div></div>
+<div class="di dib"><div class="dic dict-blue">★</div><div class="db"><strong>92.09% WO Pay adalah floor baru — target Juli minimal di level ini</strong>Untuk pertama kali kita mendekati target WO Payment secara serius. Target Juli bukan 92% — target Juli adalah membuktikan ini bisa diulang dan dipertahankan.</div></div>
+</div>
+
+<div class="kbox">
+<strong>Pesan Penutup untuk Tim:</strong><br><br>
+Juni membuktikan bahwa kita bisa. Semua metrik bergerak ke arah yang benar di waktu bersamaan — ini belum pernah terjadi di 2026. Tapi <strong>CWO Juli +13.7 Bio sedang menunggu</strong>, dan Stock sudah mulai menumpuk.<br><br>
+Juli adalah ujian apakah kita bisa <em>konsisten</em>. Tiga hal yang tidak boleh gagal: <strong>eksekusi CWO pipeline sebelum jadi WO baru, pertahankan momentum delinquency dan WO Recovery, dan pulihkan kecepatan disposal inventory.</strong><br><br>
+Kalbagtim harus diselesaikan secara struktural — bukan bulan ini monitor, bulan depan monitor lagi. <em>Sesuatu harus berubah di sana.</em>
+</div>
+</div>
+
+</div>
+<script>
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const map={detail:0,highlight:1,board:2,team:3};
+  document.querySelectorAll('.nb')[map[id]].classList.add('active');
+}
+</script>
+</body></html>
