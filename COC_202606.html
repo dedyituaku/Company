@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BFI Portfolio & Risk Dashboard — Cost of Credit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ============================================================
+   BAGIAN INI TIDAK PERLU DIUBAH SETIAP PERIODE.
+   Untuk update data bulanan, cari blok "===== DATA ====="
+   di bagian <script> paling bawah file ini.
+   ============================================================ */
+:root{
+  --navy-900:#0e2233; --navy-800:#16324a; --navy-600:#2c5a7a; --navy-100:#eef3f7;
+  --slate-900:#1b2430; --slate-700:#42505f; --slate-500:#6b7889; --slate-300:#c3ccd6; --slate-100:#f4f6f8; --slate-50:#fafbfc;
+  --teal-700:#0d6b57; --teal-600:#12886e; --teal-100:#e2f3ee;
+  --coral-700:#a13a1f; --coral-600:#c14b2a; --coral-100:#fbe9e3;
+  --amber-700:#8a5a08; --amber-600:#b07811; --amber-100:#fbf1de;
+  --border:#e2e6ea;
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--slate-50); color:var(--slate-900); font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:28px 24px 64px;}
+
+/* header */
+.masthead{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:24px; padding-bottom:20px; border-bottom:2px solid var(--navy-900);}
+.masthead h1{font-size:22px; font-weight:700; margin:0 0 4px; letter-spacing:-0.01em; color:var(--navy-900);}
+.masthead p{margin:0; font-size:13px; color:var(--slate-500);}
+.period-badge{font-family:var(--font-mono); font-size:12px; background:var(--navy-900); color:#fff; padding:6px 12px; border-radius:4px; letter-spacing:0.02em;}
+
+/* controls */
+.controls{display:flex; gap:10px; align-items:center; margin-bottom:22px; flex-wrap:wrap;}
+.controls label{font-size:12px; color:var(--slate-500); font-weight:600; text-transform:uppercase; letter-spacing:0.03em;}
+select{
+  font-family:var(--font-ui); font-size:14px; font-weight:500; color:var(--navy-900);
+  background:#fff; border:1.5px solid var(--slate-300); border-radius:6px; padding:8px 32px 8px 12px;
+  cursor:pointer; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2342505f'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center;
+}
+select:hover{border-color:var(--navy-600);}
+
+/* section labels */
+.section-label{font-size:13px; font-weight:600; color:var(--navy-800); margin:0 0 12px; text-transform:uppercase; letter-spacing:0.03em;}
+.section{margin-bottom:36px;}
+
+/* kpi cards */
+.kpi-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px;}
+.kpi-card{background:#fff; border:1px solid var(--border); border-left:4px solid var(--navy-600); border-radius:6px; padding:16px 18px;}
+.kpi-card .label{font-size:12px; color:var(--slate-500); font-weight:600; margin:0 0 6px;}
+.kpi-card .value{font-size:26px; font-weight:700; color:var(--navy-900); margin:0; font-family:var(--font-mono); letter-spacing:-0.01em;}
+.kpi-card .delta{font-size:12px; font-weight:600; margin:6px 0 0; display:flex; align-items:center; gap:4px;}
+.delta.good{color:var(--teal-700);} .delta.bad{color:var(--coral-700);} .delta.neutral{color:var(--slate-500);}
+
+/* chart cards */
+.chart-card{background:#fff; border:1px solid var(--border); border-radius:8px; padding:18px 20px 8px;}
+.chart-card .chart-title{font-size:13px; font-weight:600; color:var(--navy-800); margin:0 0 2px;}
+.chart-card .chart-sub{font-size:11.5px; color:var(--slate-500); margin:0 0 12px;}
+.chart-canvas-wrap{position:relative; width:100%;}
+
+.grid-2{display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+.grid-3-small{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px;}
+.legend-row{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--slate-500); margin-top:6px;}
+.legend-row .dot{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:-1px;}
+
+/* comparison table */
+table.summary{width:100%; border-collapse:collapse; font-size:13px;}
+table.summary th{
+  text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:var(--slate-500);
+  font-weight:600; padding:8px 10px; border-bottom:2px solid var(--navy-900);
+}
+table.summary td{padding:9px 10px; border-bottom:1px solid var(--border); color:var(--slate-900);}
+table.summary tr:hover td{background:var(--slate-100);}
+table.summary td.num{font-family:var(--font-mono); text-align:right;}
+.tag{display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px;}
+.tag.good{background:var(--teal-100); color:var(--teal-700);}
+.tag.bad{background:var(--coral-100); color:var(--coral-700);}
+.tag.watch{background:var(--amber-100); color:var(--amber-700);}
+.tag.na{background:var(--slate-100); color:var(--slate-500);}
+
+.footnote{
+  margin-top:36px; padding:16px 18px; background:var(--navy-100); border-radius:8px;
+  font-size:12.5px; color:var(--navy-800); line-height:1.6;
+}
+.footnote b{color:var(--navy-900);}
+.footnote code{background:#fff; padding:1px 5px; border-radius:3px; font-family:var(--font-mono); font-size:11.5px; border:1px solid var(--slate-300);}
+
+/* concern list */
+.concern-item{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 4px;
+  border-bottom:1px solid var(--border); font-size:13px; line-height:1.5;
+}
+.concern-item:last-child{border-bottom:none;}
+.concern-item .tag{flex-shrink:0; margin-top:1px;}
+.concern-empty{font-size:13px; color:var(--slate-500); padding:8px 4px;}
+
+@media (max-width:800px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .grid-2{grid-template-columns:1fr;}
+  .grid-3-small{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <h1>Portfolio & risk dashboard — Cost of Credit</h1>
+      <p>BFI Without FIT · Konsolidasi dan breakdown per core product</p>
+    </div>
+    <div class="period-badge" id="periodBadge">—</div>
+  </div>
+
+  <!-- Highlight & concern otomatis -->
+  <div class="section" id="execSummarySection">
+    <div class="kpi-grid" id="execHeadlineGrid" style="margin-bottom:16px;"></div>
+    <div class="chart-card" id="concernCard">
+      <p class="chart-title">Area of focus — otomatis dari data terbaru</p>
+      <p class="chart-sub">Diurutkan dari yang paling signifikan. Dihitung dari selisih vs budget, kenaikan MoM pada NPL/LLP, dan kecepatan disposal (TOR).</p>
+      <ul id="concernList" style="margin:8px 0 0; padding:0; list-style:none;"></ul>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label for="segmentSelect">Segmen</label>
+    <select id="segmentSelect"></select>
+  </div>
+
+  <!-- KPI cards untuk segmen terpilih -->
+  <div class="section">
+    <div class="kpi-grid" id="kpiGrid"></div>
+  </div>
+
+  <!-- Trend chart utama -->
+  <div class="section">
+    <p class="section-label" id="trendSectionLabel">Trend COC YTD%</p>
+    <div class="chart-card">
+      <p class="chart-title">COC YTD% per bulan — realisasi vs budget vs baseline tahun lalu</p>
+      <p class="chart-sub">Abu-abu putus-putus = budget · Kuning putus-putus = baseline bulan sama tahun lalu (konstan, sebagai acuan tahunan)</p>
+      <div class="chart-canvas-wrap" style="height:280px;">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+    <div class="grid-3-small">
+      <div class="chart-card">
+        <p class="chart-title">NPL 90+%</p>
+        <div class="chart-canvas-wrap" style="height:130px;"><canvas id="nplChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">TOR (%)</p>
+        <div class="chart-canvas-wrap" style="height:130px;"><canvas id="torChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">OS INV (Rp juta)</p>
+        <div class="chart-canvas-wrap" style="height:130px;"><canvas id="osinvChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aging bucket trend -->
+  <div class="section">
+    <p class="section-label">Trend bucket due (aging)</p>
+    <div class="chart-card" style="margin-bottom:12px;">
+      <p class="chart-title">Bucket 1-30 s/d 61-90 hari (% ENR)</p>
+      <p class="chart-sub">Bucket telat awal — pergerakan di sini biasanya jadi leading indicator sebelum masuk NPL</p>
+      <div class="chart-canvas-wrap" style="height:220px;">
+        <canvas id="agingMidChart"></canvas>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="chart-card">
+        <p class="chart-title">Bucket 0 hari / current (% ENR)</p>
+        <p class="chart-sub">Porsi piutang lancar tanpa keterlambatan</p>
+        <div class="chart-canvas-wrap" style="height:180px;">
+          <canvas id="agingCurrentChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">Bucket 91-270 hari / NPL (% ENR)</p>
+        <p class="chart-sub">Ditampilkan terpisah karena jadi dasar perhitungan NPL</p>
+        <div class="chart-canvas-wrap" style="height:180px;">
+          <canvas id="agingNplChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parameter risk & recovery tambahan -->
+  <div class="section">
+    <p class="section-label">Parameter risk & recovery lainnya</p>
+    <div class="chart-card" style="overflow-x:auto;">
+      <table class="summary" id="riskTable">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th style="text-align:right;">Realisasi</th>
+            <th style="text-align:right;">Budget</th>
+            <th style="text-align:right;">YoY baseline*</th>
+            <th>Status vs budget</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p class="chart-sub" style="margin-top:10px;">*Baseline tahunan = realisasi bulan yang sama tahun sebelumnya, ditampilkan tetap sebagai acuan (bukan tren bulanan)</p>
+    </div>
+  </div>
+
+  <!-- Perbandingan antar segmen -->
+  <div class="section">
+    <p class="section-label" id="compareSectionLabel">Perbandingan antar segmen</p>
+    <div class="grid-2">
+      <div class="chart-card">
+        <p class="chart-title">COC YTD% — realisasi vs budget</p>
+        <p class="chart-sub">Diurutkan dari yang paling di bawah budget</p>
+        <div class="chart-canvas-wrap" style="height:300px;"><canvas id="cocCompareChart"></canvas></div>
+        <div class="legend-row">
+          <span><span class="dot" style="background:#2a78d6"></span>Realisasi</span>
+          <span><span class="dot" style="background:#c3c2b7"></span>Budget</span>
+        </div>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">Kontribusi Δ LLP inventori YTD</p>
+        <p class="chart-sub">Segmen dengan kenaikan provisi terbesar ditandai merah</p>
+        <div class="chart-canvas-wrap" style="height:300px;"><canvas id="llpCompareChart"></canvas></div>
+        <div class="legend-row">
+          <span><span class="dot" style="background:#c14b2a"></span>Kontributor terbesar</span>
+          <span><span class="dot" style="background:#c3c2b7"></span>Segmen lain</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabel ringkasan seluruh segmen -->
+  <div class="section">
+    <p class="section-label">Ringkasan seluruh segmen — periode terakhir</p>
+    <div class="chart-card" style="overflow-x:auto;">
+      <table class="summary" id="summaryTable">
+        <thead>
+          <tr>
+            <th>Segmen</th>
+            <th style="text-align:right;">ENR (Rp jt)</th>
+            <th style="text-align:right;">COC YTD%</th>
+            <th style="text-align:right;">Budget</th>
+            <th style="text-align:right;">NPL 90+%</th>
+            <th style="text-align:right;">TOR</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footnote">
+    <b>Cara update tiap periode:</b> buka file ini dengan text editor, cari komentar <code>===== DATA =====</code>
+    di bagian bawah kode. Setiap segmen punya beberapa kelompok array bulanan — tambahkan satu angka baru di posisi
+    <b>akhir</b> setiap array sesuai urutan bulan pada <code>months</code>:<br><br>
+    • Metrik inti: <code>enr</code>, <code>cocYTD</code>, <code>cocMTD</code>, <code>npl90</code>, <code>tor</code>,
+    <code>osInv</code>, <code>llpInvYTD</code><br>
+    • Aging/bucket due (di dalam <code>aging</code>): <code>p0</code>, <code>p1_30</code>, <code>p31_60</code>,
+    <code>p61_90</code>, <code>p91_270</code><br>
+    • Parameter risk & recovery (di dalam <code>risk</code>): <code>woInYTD</code>, <code>nclYTD</code>,
+    <code>lorYTD</code>, <code>llpTotalYTD</code>, <code>recovery</code>, <code>salesYTD</code><br><br>
+    Lalu update <code>budget</code> (angka periode berjalan) dan <code>lastYear</code>/<code>agingLastYear</code>
+    (baseline bulan yang sama tahun sebelumnya — nilai ini sengaja ditampilkan konstan sebagai garis acuan tahunan,
+    bukan tren bulanan, karena pembandingnya adalah periode yang sama tahun lalu). Isi <code>null</code> jika data
+    tidak tersedia untuk segmen tertentu. Simpan file dan buka kembali di browser — seluruh chart, KPI, dan tabel
+    akan otomatis mengikuti data terbaru tanpa perlu mengubah kode lainnya.
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   ===== DATA =====
+   Edit HANYA bagian ini setiap periode.
+   - months: daftar label bulan, urut dari terlama ke terbaru
+   - Setiap key di "products" adalah satu segmen. Array metrik
+     harus punya jumlah elemen SAMA dengan panjang "months".
+   - budget & lastYear pakai nilai periode terbaru (Jun-26).
+     Isi null jika data budget tidak tersedia untuk segmen itu.
+   ============================================================ */
+const DATA = {
+  months: ["Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26"],
+  products: {
+    "BFI Without FIT": {
+      enr:       [26178299,26343010,26614918,26729626,26690457,26619321,26536099],
+      cocYTD:    [4.17,5.65,6.28,5.57,4.45,4.38,4.07],
+      cocMTD:    [2.30,5.65,6.92,4.14,1.11,4.12,2.52],
+      npl90:     [1.41,1.45,1.49,1.55,1.59,1.66,1.57],
+      tor:       [121,122,116,102,88,100,93],
+      osInv:     [278884,248281,224782,228099,254649,243615,304461],
+      llpInvYTD: [6517,-2939,-7722,-4893,-4983,-5020,24747],
+      aging: {
+        p0:      [80.44,80.24,78.42,78.31,79.77,79.10,79.47],
+        p1_30:   [16.18,16.03,17.23,17.22,16.14,16.74,16.55],
+        p31_60:  [1.23,1.46,1.96,1.96,1.64,1.73,1.61],
+        p61_90:  [0.74,0.83,0.90,0.96,0.86,0.78,0.81],
+        p91_270: [1.41,1.45,1.49,1.55,1.59,1.66,1.57]
+      },
+      agingLastYear: { p0:78.76, p1_30:17.08, p31_60:1.68, p61_90:0.88, p91_270:1.61 },
+      risk: {
+        woInYTD:    [3.19,3.73,3.41,3.46,3.36,3.40,3.38],
+        nclYTD:     [3.49,3.78,3.38,3.41,3.24,3.25,3.17],
+        lorYTD:     [0.94,0.53,0.51,0.49,0.45,0.44,0.43],
+        llpTotalYTD:[0.68,1.87,2.90,2.16,1.21,1.14,0.90],
+        recovery:   [87,93,92,90,94,93,94],
+        salesYTD:   [21921557,1860073,3740423,5528573,7302282,8943876,10698175]
+      },
+      budget:    { cocYTD:4.61, npl90:1.68, tor:100, woInYTD:3.50, nclYTD:3.45, lorYTD:0.75, llpTotalYTD:1.17, recovery:100, salesYTD:11915537 },
+      lastYear:  { cocYTD:4.49, npl90:1.61, tor:90, woInYTD:2.91, nclYTD:2.99, lorYTD:0.73, llpTotalYTD:1.51, recovery:90, salesYTD:10895442 }
+    },
+    "NDF Car": {
+      enr:       [13219296,13236834,13318830,13336297,13292032,13223273,13160150],
+      cocYTD:    [3.51,4.72,5.47,4.88,3.88,3.81,3.33],
+      cocMTD:    [1.95,4.72,6.24,3.70,0.87,3.53,0.89],
+      npl90:     [1.43,1.46,1.53,1.55,1.62,1.66,1.51],
+      tor:       [126,133,121,100,88,101,90],
+      osInv:     [128789,107800,97358,96106,107911,103460,111215],
+      llpInvYTD: [7069,-4066,-7231,-6298,-7956,-7114,-7914],
+      aging: {
+        p0:      [77.59,77.43,75.11,75.22,76.42,75.66,75.95],
+        p1_30:   [18.89,18.66,20.35,20.11,19.37,20.01,20.02],
+        p31_60:  [1.31,1.54,2.09,2.16,1.76,1.87,1.72],
+        p61_90:  [0.78,0.91,0.92,0.96,0.83,0.80,0.80],
+        p91_270: [1.43,1.46,1.53,1.55,1.62,1.66,1.51]
+      },
+      agingLastYear: { p0:76.07, p1_30:19.65, p31_60:1.73, p61_90:0.91, p91_270:1.64 },
+      risk: {
+        woInYTD:    [3.18,3.69,3.56,3.48,3.36,3.38,3.43],
+        nclYTD:     [3.14,3.47,3.24,3.20,2.99,2.96,2.93],
+        lorYTD:     [0.71,0.31,0.26,0.27,0.21,0.18,0.17],
+        llpTotalYTD:[0.37,1.25,2.23,1.68,0.89,0.85,0.40],
+        recovery:   [92,97,97,96,100,100,100],
+        salesYTD:   [11399502,895682,1825640,2713053,3595387,4415276,5283015]
+      },
+      budget:    { cocYTD:4.49, npl90:1.73, tor:100, woInYTD:3.71, nclYTD:3.49, lorYTD:0.62, llpTotalYTD:1.00, recovery:100, salesYTD:6041922 },
+      lastYear:  { cocYTD:3.67, npl90:1.64, tor:94, woInYTD:2.79, nclYTD:2.54, lorYTD:0.48, llpTotalYTD:1.13, recovery:93, salesYTD:6056619 }
+    },
+    "DF Car New": {
+      enr:       [565527,534149,508987,486187,461301,437373,411000],
+      cocYTD:    [6.30,4.02,2.76,3.49,4.85,5.82,4.79],
+      cocMTD:    [4.03,4.02,1.44,5.07,9.36,10.24,-1.27],
+      npl90:     [1.71,1.49,1.41,1.45,2.30,3.28,2.91],
+      tor:       [127,120,135,165,95,111,69],
+      osInv:     [14168,13529,12254,9278,9421,7916,10781],
+      llpInvYTD: [-9540,-858,-1412,-1920,-1767,-2213,-1208],
+      aging: {
+        p0:      [73.54,72.59,69.77,70.59,70.37,69.46,69.37],
+        p1_30:   [21.93,22.84,24.40,21.56,22.09,23.18,23.66],
+        p31_60:  [1.78,2.13,3.29,4.85,2.92,2.96,2.42],
+        p61_90:  [1.03,0.95,1.13,1.56,2.32,1.12,1.64],
+        p91_270: [1.71,1.49,1.41,1.45,2.30,3.28,2.91]
+      },
+      agingLastYear: { p0:73.55, p1_30:20.99, p31_60:2.55, p61_90:1.04, p91_270:1.87 },
+      risk: {
+        woInYTD:    [3.55,7.06,4.93,3.94,3.93,3.81,4.01],
+        nclYTD:     [8.96,10.48,7.65,6.59,6.54,6.86,6.59],
+        lorYTD:     [6.48,4.71,4.46,4.20,4.00,4.33,3.92],
+        llpTotalYTD:[-2.66,-6.45,-4.89,-3.10,-1.69,-1.04,-1.80],
+        recovery:   [73,72,68,75,65,60,81],
+        salesYTD:   [154083,0,0,0,0,0,0]
+      },
+      budget:    { cocYTD:5.50, npl90:2.30, tor:100, woInYTD:4.64, nclYTD:7.15, lorYTD:4.81, llpTotalYTD:-1.65, recovery:100, salesYTD:0 },
+      lastYear:  { cocYTD:7.83, npl90:1.87, tor:89, woInYTD:3.11, nclYTD:8.17, lorYTD:5.81, llpTotalYTD:-0.34, recovery:66, salesYTD:122024 }
+    },
+    "DF Car Used": {
+      enr:       [3970899,4059816,4147380,4219569,4219087,4205962,4216891],
+      cocYTD:    [6.39,6.64,8.45,6.72,4.83,4.66,4.10],
+      cocMTD:    [3.15,6.64,10.22,3.35,-0.72,3.98,1.36],
+      npl90:     [1.42,1.42,1.45,1.44,1.49,1.50,1.42],
+      tor:       [138,120,149,85,84,97,114],
+      osInv:     [43332,35656,29327,33125,37617,37982,30898],
+      llpInvYTD: [119,-2531,-3845,-3069,-2814,-2489,-3850],
+      aging: {
+        p0:      [84.95,85.10,83.29,83.76,84.31,84.26,84.29],
+        p1_30:   [12.18,11.83,13.05,12.65,12.58,12.54,12.69],
+        p31_60:  [0.87,1.05,1.54,1.40,1.04,1.20,1.02],
+        p61_90:  [0.57,0.60,0.68,0.76,0.57,0.49,0.58],
+        p91_270: [1.42,1.42,1.45,1.44,1.49,1.50,1.42]
+      },
+      agingLastYear: { p0:82.99, p1_30:13.29, p31_60:1.32, p61_90:0.71, p91_270:1.69 },
+      risk: {
+        woInYTD:    [3.98,3.66,3.22,3.53,3.45,3.57,3.56],
+        nclYTD:     [5.13,4.86,4.21,4.22,4.04,4.12,4.08],
+        lorYTD:     [1.79,1.54,1.42,1.22,1.15,1.12,1.12],
+        llpTotalYTD:[1.26,1.78,4.24,2.50,0.78,0.54,0.02],
+        recovery:   [80,83,81,83,86,86,86],
+        salesYTD:   [2494445,228236,446336,660576,820123,959662,1120107]
+      },
+      budget:    { cocYTD:5.85, npl90:1.63, tor:100, woInYTD:3.28, nclYTD:3.96, lorYTD:1.31, llpTotalYTD:1.89, recovery:100, salesYTD:1253414 },
+      lastYear:  { cocYTD:7.56, npl90:1.69, tor:84, woInYTD:4.03, nclYTD:4.98, lorYTD:1.58, llpTotalYTD:2.58, recovery:84, salesYTD:1154189 }
+    },
+    "Motor": {
+      enr:       [2027213,2064215,2116442,2132493,2154625,2183514,2234809],
+      cocYTD:    [7.59,11.11,11.43,10.56,9.66,9.83,9.28],
+      cocMTD:    [8.65,11.11,11.75,8.83,7.04,10.49,6.67],
+      npl90:     [2.21,2.40,2.64,2.63,2.66,2.58,2.40],
+      tor:       [115,116,107,106,92,98,93],
+      osInv:     [11390,10609,9618,9216,10279,10433,11215],
+      llpInvYTD: [-118,-123,-413,-198,-464,-289,-381],
+      aging: {
+        p0:      [75.46,74.93,72.98,74.47,75.48,75.26,75.34],
+        p1_30:   [19.28,19.41,20.44,18.99,18.47,18.80,18.97],
+        p31_60:  [1.86,1.88,2.72,2.57,2.21,2.32,2.19],
+        p61_90:  [1.19,1.38,1.22,1.34,1.18,1.04,1.10],
+        p91_270: [2.21,2.40,2.64,2.63,2.66,2.58,2.40]
+      },
+      agingLastYear: { p0:75.48, p1_30:18.78, p31_60:2.06, p61_90:1.23, p91_270:2.46 },
+      risk: {
+        woInYTD:    [7.82,7.78,6.76,7.52,7.79,8.29,8.17],
+        nclYTD:     [6.65,6.92,5.99,6.81,7.01,7.42,7.21],
+        lorYTD:     [0.32,0.04,0.11,0.11,0.08,0.04,0.01],
+        llpTotalYTD:[0.94,4.19,5.43,3.75,2.65,2.41,2.07],
+        recovery:   [98,100,98,98,101,104,104],
+        salesYTD:   [2656550,246127,499398,733687,981138,1235100,1514933]
+      },
+      budget:    { cocYTD:8.37, npl90:2.36, tor:100, woInYTD:8.06, nclYTD:7.00, lorYTD:0.20, llpTotalYTD:1.37, recovery:100, salesYTD:1702039 },
+      lastYear:  { cocYTD:6.48, npl90:2.46, tor:90, woInYTD:7.54, nclYTD:6.46, lorYTD:0.41, llpTotalYTD:0.03, recovery:97, salesYTD:1224410 }
+    },
+    "HETO": {
+      enr:       [3235553,3260577,3299115,3311089,3302638,3286745,3199460],
+      cocYTD:    [1.85,3.53,4.77,5.51,3.41,3.59,4.94],
+      cocMTD:    [-0.07,3.53,5.99,6.96,-2.83,4.28,11.75],
+      npl90:     [0.77,0.72,0.80,1.17,0.94,0.99,1.13],
+      tor:       [25,350,1200,42,47,158,28],
+      osInv:     [42165,41047,36371,40762,44628,41998,102992],
+      llpInvYTD: [4950,1531,97,2772,1343,1744,33755],
+      aging: {
+        p0:      [87.20,87.26,85.12,81.62,86.57,84.61,85.76],
+        p1_30:   [10.79,10.21,11.30,14.83,10.01,12.15,10.67],
+        p31_60:  [0.90,1.45,1.84,1.46,1.53,1.36,1.61],
+        p61_90:  [0.34,0.36,0.94,0.91,0.95,0.89,0.83],
+        p91_270: [0.77,0.72,0.80,1.17,0.94,0.99,1.13]
+      },
+      agingLastYear: { p0:85.81, p1_30:10.83, p31_60:1.68, p61_90:0.68, p91_270:1.01 },
+      risk: {
+        woInYTD:    [0.66,1.03,1.13,1.34,1.11,1.04,1.01],
+        nclYTD:     [0.60,1.03,1.20,1.25,1.02,1.10,1.10],
+        lorYTD:     [0.15,0.14,0.18,0.15,0.21,0.30,0.35],
+        llpTotalYTD:[1.24,2.51,3.57,4.26,2.39,2.49,3.84],
+        recovery:   [56,85,93,91,74,81,73],
+        salesYTD:   [2520595,237125,469758,697535,931383,1128114,1328044]
+      },
+      budget:    { cocYTD:1.62, npl90:0.89, tor:100, woInYTD:1.22, nclYTD:1.07, lorYTD:0.37, llpTotalYTD:0.55, recovery:100, salesYTD:1303050 },
+      lastYear:  { cocYTD:2.47, npl90:1.01, tor:7, woInYTD:0.36, nclYTD:0.36, lorYTD:0.13, llpTotalYTD:2.11, recovery:75, salesYTD:1203827 }
+    },
+    "Machinery": {
+      enr:       [692718,713692,730285,732867,736926,732236,728933],
+      cocYTD:    [2.90,7.00,3.04,5.62,3.61,3.24,2.71],
+      cocMTD:    [-4.15,7.00,-0.81,10.61,-2.30,1.80,0.07],
+      npl90:     [0.33,0.35,0.14,0.79,0.57,1.18,1.21],
+      tor:       [0,0,null,300,0,117,100],
+      osInv:     [9820,10292,9884,7757,9543,9424,10081],
+      llpInvYTD: [740,2379,2764,1466,2195,675,1557],
+      aging: {
+        p0:      [93.57,93.18,88.82,87.83,89.07,89.62,89.65],
+        p1_30:   [5.42,5.67,9.80,8.97,7.79,5.94,6.24],
+        p31_60:  [0.31,0.78,0.57,1.99,1.52,2.66,1.53],
+        p61_90:  [0.38,0.04,0.67,0.43,1.05,0.60,1.37],
+        p91_270: [0.33,0.35,0.14,0.79,0.57,1.18,1.21]
+      },
+      agingLastYear: { p0:89.20, p1_30:7.94, p31_60:0.70, p61_90:1.13, p91_270:1.03 },
+      risk: {
+        woInYTD:    [1.46,1.81,1.34,0.90,0.76,0.61,0.51],
+        nclYTD:     [2.18,1.79,0.03,1.03,0.85,1.03,1.00],
+        lorYTD:     [0.91,0.00,0.14,1.19,0.89,1.13,1.12],
+        llpTotalYTD:[0.72,5.20,3.01,4.59,2.76,2.22,1.71],
+        recovery:   [null,null,61,20,null,49,33],
+        salesYTD:   [629045,68078,133323,183906,245012,287182,330562]
+      },
+      budget:    { cocYTD:2.34, npl90:1.03, tor:100, woInYTD:0.55, nclYTD:0.42, lorYTD:0.17, llpTotalYTD:1.92, recovery:100, salesYTD:343000 },
+      lastYear:  { cocYTD:4.42, npl90:1.03, tor:0, woInYTD:1.49, nclYTD:1.74, lorYTD:0.50, llpTotalYTD:2.68, recovery:null, salesYTD:292820 }
+    },
+    "PBF & PBF_PM": {
+      enr:       [1444722,1451389,null,1459591,1462267,1484127,1507236],
+      cocYTD:    [5.21,9.91,8.00,3.32,4.47,3.40,2.58],
+      cocMTD:    [-0.04,9.91,null,-5.99,7.88,-0.82,-1.41],
+      npl90:     [2.17,2.48,null,1.84,2.21,2.15,2.26],
+      tor:       [420,100,null,0,50,250,null],
+      osInv:     [21071,20983,null,26998,27336,25738,22235],
+      llpInvYTD: [2908,1365,null,3570,5549,5691,3995],
+      aging: {
+        p0:      [78.04,76.43,null,81.63,81.15,80.88,81.56],
+        p1_30:   [16.58,17.77,null,13.88,13.95,14.40,13.49],
+        p31_60:  [1.75,1.88,null,1.31,1.90,1.54,1.84],
+        p61_90:  [1.46,1.44,null,1.34,0.78,1.03,0.84],
+        p91_270: [2.17,2.48,null,1.84,2.21,2.15,2.26]
+      },
+      agingLastYear: { p0:76.88, p1_30:18.27, p31_60:2.13, p61_90:1.02, p91_270:1.71 },
+      risk: {
+        woInYTD:    [1.66,5.78,null,4.10,3.51,3.15,2.63],
+        nclYTD:     [2.69,5.06,null,3.76,3.15,2.49,1.88],
+        lorYTD:     [0.59,0.01,null,0.00,-0.01,-0.03,0.09],
+        llpTotalYTD:[2.52,4.85,null,-0.43,1.32,0.91,0.70],
+        recovery:   [65,99,null,null,112,108,75],
+        salesYTD:   [901524,63066,null,165285,216605,285862,356866]
+      },
+      budget:    { cocYTD:4.08, npl90:2.69, tor:100, woInYTD:2.46, nclYTD:1.90, lorYTD:0.54, llpTotalYTD:2.18, recovery:100, salesYTD:425675 },
+      lastYear:  { cocYTD:5.23, npl90:1.71, tor:600, woInYTD:1.34, nclYTD:1.17, lorYTD:0.14, llpTotalYTD:4.06, recovery:78, salesYTD:421779 }
+    },
+    "SSF": {
+      enr:       [154996,144191,160002,160358,172563,172481,182594],
+      cocYTD:    [5.17,5.91,5.27,6.02,5.25,4.97,4.26],
+      cocMTD:    [10.06,5.91,4.79,7.40,3.18,3.87,1.10],
+      npl90:     [0.76,1.88,2.01,2.22,1.96,1.58,1.21],
+      tor:       [25,200,700,null,0,400,null],
+      osInv:     [2591,2242,514,275,1273,741,120],
+      llpInvYTD: [739,-287,-675,-679,-600,-610,-713],
+      aging: {
+        p0:      [95.91,96.32,95.89,95.50,97.10,97.50,97.61],
+        p1_30:   [1.58,0.59,1.11,1.16,0.44,0.60,0.89],
+        p31_60:  [1.05,0.69,0.37,0.75,0.03,0.28,0.18],
+        p61_90:  [0.70,0.52,0.62,0.37,0.47,0.03,0.11],
+        p91_270: [0.76,1.88,2.01,2.22,1.96,1.58,1.21]
+      },
+      agingLastYear: { p0:99.66, p1_30:0.22, p31_60:0.12, p61_90:0.00, p91_270:0.00 },
+      risk: {
+        woInYTD:    [0.14,0.00,0.00,1.66,2.22,3.66,3.70],
+        nclYTD:     [0.46,0.03,1.17,2.57,3.05,4.61,4.53],
+        lorYTD:     [0.28,0.02,1.17,0.90,0.66,0.81,0.71],
+        llpTotalYTD:[4.70,5.88,4.09,3.45,2.20,0.36,-0.27],
+        recovery:   [57,101,85,79,null,73,94],
+        salesYTD:   [653744,77984,169268,253137,350691,433201,528305]
+      },
+      budget:    { cocYTD:5.14, npl90:0.47, tor:100, woInYTD:1.11, nclYTD:2.80, lorYTD:1.65, llpTotalYTD:2.35, recovery:100, salesYTD:554000 },
+      lastYear:  { cocYTD:6.02, npl90:0.00, tor:null, woInYTD:0.00, nclYTD:0.00, lorYTD:0.00, llpTotalYTD:6.02, recovery:null, salesYTD:178726 }
+    }
+  }
+};
+/* ============================================================
+   ===== AKHIR BAGIAN DATA =====
+   Kode di bawah ini generik — tidak perlu diubah.
+   ============================================================ */
+
+const LAST = DATA.months.length - 1;
+let charts = {};
+
+function fmtNum(v, digits=0){
+  if(v===null || v===undefined || Number.isNaN(v)) return "n/a";
+  return v.toLocaleString("id-ID", {maximumFractionDigits:digits, minimumFractionDigits:digits});
+}
+function fmtPct(v, digits=2){
+  if(v===null || v===undefined) return "n/a";
+  return v.toFixed(digits) + "%";
+}
+function destroy(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+function deltaTag(actual, ref, lowerIsBetter=true){
+  if(actual===null || ref===null || actual===undefined || ref===undefined) return {cls:"neutral", txt:"n/a", icon:""};
+  const d = actual - ref;
+  const good = lowerIsBetter ? d <= 0 : d >= 0;
+  return { cls: good ? "good" : "bad", d };
+}
+
+function populateSegmentSelect(){
+  const sel = document.getElementById("segmentSelect");
+  sel.innerHTML = "";
+  Object.keys(DATA.products).forEach(name=>{
+    const opt = document.createElement("option");
+    opt.value = name; opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  sel.value = "BFI Without FIT";
+  sel.addEventListener("change", ()=>renderSegment(sel.value));
+}
+
+function renderKPI(name){
+  const p = DATA.products[name];
+  const grid = document.getElementById("kpiGrid");
+  const cocNow = p.cocYTD[LAST];
+  const enrNow = p.enr[LAST];
+  const budgetCoc = p.budget ? p.budget.cocYTD : null;
+  const lyCoc = p.lastYear ? p.lastYear.cocYTD : null;
+  const dBudget = deltaTag(cocNow, budgetCoc, true);
+  const dLY = deltaTag(cocNow, lyCoc, true);
+
+  grid.innerHTML = `
+    <div class="kpi-card">
+      <p class="label">ENR — ${DATA.months[LAST]}</p>
+      <p class="value">${fmtNum(enrNow)}</p>
+      <p class="delta neutral">Rp juta</p>
+    </div>
+    <div class="kpi-card">
+      <p class="label">COC YTD%</p>
+      <p class="value">${fmtPct(cocNow)}</p>
+      <p class="delta neutral">Kumulatif tahun berjalan</p>
+    </div>
+    <div class="kpi-card">
+      <p class="label">vs Budget ${budgetCoc!==null ? "("+fmtPct(budgetCoc)+")" : ""}</p>
+      <p class="value" style="font-size:20px;">${dBudget.d!==undefined ? (dBudget.d>=0?"+":"")+dBudget.d.toFixed(2)+"pp" : "n/a"}</p>
+      <p class="delta ${dBudget.cls}">${dBudget.cls==="good" ? "Di bawah budget" : dBudget.cls==="bad" ? "Di atas budget" : "Tidak ada budget"}</p>
+    </div>
+    <div class="kpi-card">
+      <p class="label">vs ${DATA.months[LAST]} tahun lalu ${lyCoc!==null ? "("+fmtPct(lyCoc)+")" : ""}</p>
+      <p class="value" style="font-size:20px;">${dLY.d!==undefined ? (dLY.d>=0?"+":"")+dLY.d.toFixed(2)+"pp" : "n/a"}</p>
+      <p class="delta ${dLY.cls}">${dLY.cls==="good" ? "Membaik YoY" : dLY.cls==="bad" ? "Memburuk YoY" : "n/a"}</p>
+    </div>
+  `;
+}
+
+function renderTrendChart(name){
+  const p = DATA.products[name];
+  destroy("trend");
+  const budgetLine = p.budget ? DATA.months.map(()=>p.budget.cocYTD) : null;
+  const lyLine = (p.lastYear && p.lastYear.cocYTD!==null && p.lastYear.cocYTD!==undefined)
+    ? DATA.months.map(()=>p.lastYear.cocYTD) : null;
+
+  const datasets = [{
+    label: "COC YTD% realisasi",
+    data: p.cocYTD,
+    borderColor: "#185fa5",
+    backgroundColor: "rgba(24,95,165,0.08)",
+    borderWidth: 2, tension: 0.25, fill: true, pointRadius: 3, pointBackgroundColor:"#185fa5"
+  }];
+  if(budgetLine){
+    datasets.push({
+      label: "Budget",
+      data: budgetLine,
+      borderColor: "#9ca3af", borderDash:[5,4], borderWidth:1.5,
+      pointRadius:0, fill:false
+    });
+  }
+  if(lyLine){
+    datasets.push({
+      label: `${DATA.months[LAST]} tahun lalu (baseline YoY)`,
+      data: lyLine,
+      borderColor: "#b07811", borderDash:[2,3], borderWidth:1.5,
+      pointRadius:0, fill:false
+    });
+  }
+  charts.trend = new Chart(document.getElementById("trendChart"), {
+    type:"line",
+    data:{ labels: DATA.months, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:true, position:"top", align:"end", labels:{ boxWidth:10, font:{size:11}, color:"#42505f" } } },
+      scales:{
+        y:{ ticks:{ callback:v=>v+"%", color:"#6b7889", font:{size:11} }, grid:{ color:"#eef1f4" } },
+        x:{ ticks:{ color:"#6b7889", font:{size:11} }, grid:{ display:false } }
+      }
+    }
+  });
+}
+
+function renderMiniCharts(name){
+  const p = DATA.products[name];
+  ["nplChart","torChart","osinvChart"].forEach(destroy);
+
+  charts.nplChart = new Chart(document.getElementById("nplChart"), {
+    type:"line",
+    data:{ labels:DATA.months, datasets:[{ data:p.npl90, borderColor:"#c14b2a", backgroundColor:"rgba(193,75,42,0.08)", borderWidth:2, tension:0.25, fill:true, pointRadius:2 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ y:{ ticks:{ callback:v=>v+"%", color:"#6b7889", font:{size:10} }, grid:{color:"#eef1f4"} }, x:{ ticks:{color:"#6b7889", font:{size:9}}, grid:{display:false} } } }
+  });
+  charts.torChart = new Chart(document.getElementById("torChart"), {
+    type:"line",
+    data:{ labels:DATA.months, datasets:[{ data:p.tor, borderColor:"#12886e", backgroundColor:"rgba(18,136,110,0.08)", borderWidth:2, tension:0.25, fill:true, pointRadius:2, spanGaps:true }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ y:{ ticks:{ callback:v=>v+"%", color:"#6b7889", font:{size:10} }, grid:{color:"#eef1f4"} }, x:{ ticks:{color:"#6b7889", font:{size:9}}, grid:{display:false} } } }
+  });
+  charts.osinvChart = new Chart(document.getElementById("osinvChart"), {
+    type:"line",
+    data:{ labels:DATA.months, datasets:[{ data:p.osInv, borderColor:"#b07811", backgroundColor:"rgba(176,120,17,0.08)", borderWidth:2, tension:0.25, fill:true, pointRadius:2, spanGaps:true }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ y:{ ticks:{ color:"#6b7889", font:{size:10}, callback:v=>fmtNum(v) }, grid:{color:"#eef1f4"} }, x:{ ticks:{color:"#6b7889", font:{size:9}}, grid:{display:false} } } }
+  });
+}
+
+function renderAgingChart(name){
+  const p = DATA.products[name];
+  ["agingCurrent","agingMid","agingNpl"].forEach(destroy);
+  if(!p.aging){
+    return;
+  }
+
+  charts.agingCurrent = new Chart(document.getElementById("agingCurrentChart"), {
+    type:"line",
+    data:{ labels: DATA.months, datasets:[{
+      label:"0 hari",
+      data: p.aging.p0,
+      borderColor:"#12886e", backgroundColor:"rgba(18,136,110,0.08)",
+      borderWidth:2, tension:0.25, fill:true, pointRadius:2, spanGaps:true
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{
+        y:{ ticks:{ callback:v=>v+"%", color:"#6b7889", font:{size:10} }, grid:{color:"#eef1f4"} },
+        x:{ ticks:{color:"#6b7889", font:{size:9}}, grid:{display:false} }
+      }
+    }
+  });
+
+  const midDefs = [
+    { key:"p1_30",  label:"1-30 hari",  color:"#185fa5" },
+    { key:"p31_60", label:"31-60 hari", color:"#b07811" },
+    { key:"p61_90", label:"61-90 hari", color:"#c14b2a" }
+  ];
+  charts.agingMid = new Chart(document.getElementById("agingMidChart"), {
+    type:"line",
+    data:{ labels: DATA.months, datasets: midDefs.map(b=>({
+      label: b.label, data: p.aging[b.key], borderColor: b.color, backgroundColor:"transparent",
+      borderWidth:2, tension:0.25, pointRadius:2, spanGaps:true
+    })) },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:true, position:"top", align:"end", labels:{ boxWidth:10, font:{size:10.5}, color:"#42505f" } } },
+      scales:{
+        y:{ ticks:{ callback:v=>v+"%", color:"#6b7889", font:{size:11} }, grid:{ color:"#eef1f4" } },
+        x:{ ticks:{ color:"#6b7889", font:{size:11} }, grid:{ display:false } }
+      }
+    }
+  });
+
+  charts.agingNpl = new Chart(document.getElementById("agingNplChart"), {
+    type:"line",
+    data:{ labels: DATA.months, datasets:[{
+      label:"91-270 hari",
+      data: p.aging.p91_270,
+      borderColor:"#7f2020", backgroundColor:"rgba(127,32,32,0.08)",
+      borderWidth:2, tension:0.25, fill:true, pointRadius:2, spanGaps:true
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{
+        y:{ ticks:{ callback:v=>v+"%", color:"#6b7889", font:{size:10} }, grid:{color:"#eef1f4"} },
+        x:{ ticks:{color:"#6b7889", font:{size:9}}, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function riskRow(label, unitFn, actual, budget, ly, lowerIsBetter=true){
+  return `
+    <tr>
+      <td>${label}</td>
+      <td class="num">${unitFn(actual)}</td>
+      <td class="num">${budget!==null && budget!==undefined ? unitFn(budget) : "n/a"}</td>
+      <td class="num">${ly!==null && ly!==undefined ? unitFn(ly) : "n/a"}</td>
+      <td>${statusTag(actual, budget, lowerIsBetter)}</td>
+    </tr>
+  `;
+}
+
+function renderRiskTable(name){
+  const p = DATA.products[name];
+  const tbody = document.querySelector("#riskTable tbody");
+  if(!p.risk){ tbody.innerHTML = "<tr><td colspan='5'>Data tidak tersedia untuk segmen ini</td></tr>"; return; }
+  const r = p.risk, b = p.budget || {}, ly = p.lastYear || {};
+  const pctFn = v => fmtPct(v);
+  const ratioFn = v => (v===null||v===undefined) ? "n/a" : v+"%";
+  const rpFn = v => (v===null||v===undefined) ? "n/a" : "Rp "+fmtNum(v)+" jt";
+
+  tbody.innerHTML =
+    riskRow("WO In YTD%", pctFn, r.woInYTD[LAST], b.woInYTD, ly.woInYTD, true) +
+    riskRow("NCL YTD%", pctFn, r.nclYTD[LAST], b.nclYTD, ly.nclYTD, true) +
+    riskRow("LOR YTD%", pctFn, r.lorYTD[LAST], b.lorYTD, ly.lorYTD, true) +
+    riskRow("Δ LLP total YTD%", pctFn, r.llpTotalYTD[LAST], b.llpTotalYTD, ly.llpTotalYTD, true) +
+    riskRow("Inventory recovery ratio", ratioFn, r.recovery[LAST], b.recovery, ly.recovery, false) +
+    riskRow("Sales amount YTD", rpFn, r.salesYTD[LAST], b.salesYTD, ly.salesYTD, false);
+}
+
+function renderCompareCharts(){
+  const names = Object.keys(DATA.products).filter(n=>n!=="BFI Without FIT");
+  const rows = names.map(n=>{
+    const p = DATA.products[n];
+    return { name:n, actual:p.cocYTD[LAST], budget: p.budget ? p.budget.cocYTD : null };
+  }).sort((a,b)=>{
+    const da = a.budget!==null ? a.actual-a.budget : 999;
+    const db = b.budget!==null ? b.actual-b.budget : 999;
+    return da-db;
+  });
+
+  destroy("cocCompare");
+  charts.cocCompare = new Chart(document.getElementById("cocCompareChart"), {
+    type:"bar",
+    data:{
+      labels: rows.map(r=>r.name),
+      datasets:[
+        { label:"Realisasi", data: rows.map(r=>r.actual), backgroundColor:"#2a78d6", borderRadius:4, barThickness:13 },
+        { label:"Budget", data: rows.map(r=>r.budget), backgroundColor:"#c3c2b7", borderRadius:4, barThickness:13 }
+      ]
+    },
+    options:{
+      indexAxis:"y", responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>ctx.dataset.label+": "+(ctx.raw===null?"n/a":ctx.raw.toFixed(2)+"%") } } },
+      scales:{ x:{ beginAtZero:true, ticks:{ color:"#6b7889", callback:v=>v+"%" }, grid:{color:"#eef1f4"} }, y:{ ticks:{color:"#42505f", font:{size:11.5}}, grid:{display:false} } }
+    }
+  });
+
+  const llpRows = names.map(n=>({ name:n, val: DATA.products[n].llpInvYTD[LAST] }))
+    .filter(r=>r.val!==null && r.val!==undefined)
+    .sort((a,b)=>a.val-b.val);
+  const maxAbs = Math.max(...llpRows.map(r=>Math.abs(r.val)));
+  const colors = llpRows.map(r=> Math.abs(r.val)===maxAbs ? "#c14b2a" : "#c3c2b7");
+
+  destroy("llpCompare");
+  charts.llpCompare = new Chart(document.getElementById("llpCompareChart"), {
+    type:"bar",
+    data:{ labels: llpRows.map(r=>r.name), datasets:[{ data: llpRows.map(r=>r.val), backgroundColor: colors, borderRadius:4, barThickness:16 }] },
+    options:{
+      indexAxis:"y", responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>"Rp "+fmtNum(ctx.raw)+" juta" } } },
+      scales:{ x:{ ticks:{ color:"#6b7889", callback:v=>(v<0?"-":"")+"Rp"+Math.abs(v/1000).toFixed(0)+"M" }, grid:{color:"#eef1f4"} }, y:{ ticks:{color:"#42505f", font:{size:11.5}}, grid:{display:false} } }
+    }
+  });
+}
+
+function statusTag(actual, budget, lowerIsBetter=true){
+  if(actual===null || actual===undefined) return '<span class="tag na">n/a</span>';
+  if(budget===null || budget===undefined) return '<span class="tag na">no budget</span>';
+  const d = actual - budget;
+  const good = lowerIsBetter ? d<=0 : d>=0;
+  const watch = lowerIsBetter ? (d>0 && d<=0.5) : (d<0 && d>=-5);
+  if(good) return '<span class="tag good">on track</span>';
+  if(watch) return '<span class="tag watch">watch</span>';
+  return '<span class="tag bad">over budget</span>';
+}
+
+function renderTable(){
+  const tbody = document.querySelector("#summaryTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(DATA.products).forEach(([name,p])=>{
+    const budget = p.budget;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td class="num">${fmtNum(p.enr[LAST])}</td>
+      <td class="num">${fmtPct(p.cocYTD[LAST])}</td>
+      <td class="num">${budget ? fmtPct(budget.cocYTD) : "n/a"}</td>
+      <td class="num">${fmtPct(p.npl90[LAST])}</td>
+      <td class="num">${p.tor[LAST]!==null && p.tor[LAST]!==undefined ? p.tor[LAST]+"%" : "n/a"}</td>
+      <td>${statusTag(p.cocYTD[LAST], budget?budget.cocYTD:null, true)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderSegment(name){
+  document.getElementById("trendSectionLabel").textContent = `Trend — ${name}`;
+  renderKPI(name);
+  renderTrendChart(name);
+  renderMiniCharts(name);
+  renderAgingChart(name);
+  renderRiskTable(name);
+}
+
+function renderExecSummary(){
+  const cons = DATA.products["BFI Without FIT"];
+  const cocNow = cons.cocYTD[LAST];
+  const cocBudget = cons.budget ? cons.budget.cocYTD : null;
+  const cocLY = cons.lastYear ? cons.lastYear.cocYTD : null;
+  const dBudget = deltaTag(cocNow, cocBudget, true);
+  const dLY = deltaTag(cocNow, cocLY, true);
+
+  const names = Object.keys(DATA.products).filter(n=>n!=="BFI Without FIT");
+  const concerns = [];
+
+  names.forEach(name=>{
+    const p = DATA.products[name];
+    const last = LAST, prev = LAST-1;
+    const cocN = p.cocYTD[last];
+    const cocB = p.budget ? p.budget.cocYTD : null;
+    const overPP = (cocB!==null && cocB!==undefined) ? cocN-cocB : null;
+    const nplN = p.npl90[last], nplP = p.npl90[prev];
+    const nplDelta = (nplN!==null && nplN!==undefined && nplP!==null && nplP!==undefined) ? nplN-nplP : null;
+    const llpN = p.llpInvYTD[last], llpP = p.llpInvYTD[prev];
+    const llpDelta = (llpN!==null && llpN!==undefined && llpP!==null && llpP!==undefined) ? llpN-llpP : null;
+    const torN = p.tor[last];
+    const torGap = (torN!==null && torN!==undefined) ? torN-100 : null;
+
+    if(overPP!==null && overPP>0.3){
+      concerns.push({ tag:"bad", severity:overPP*10,
+        text:`<b>${name}</b> — COC YTD% ${fmtPct(cocN)}, ${overPP.toFixed(2)}pp di atas budget (${fmtPct(cocB)})` });
+    }
+    if(llpDelta!==null && llpDelta>5000){
+      concerns.push({ tag:"bad", severity:llpDelta/500,
+        text:`<b>${name}</b> — Δ LLP inventori naik Rp${fmtNum(llpDelta)} juta dalam sebulan (${DATA.months[prev]} → ${DATA.months[last]})` });
+    }
+    if(nplDelta!==null && nplDelta>0.1){
+      concerns.push({ tag:"watch", severity:nplDelta*15,
+        text:`<b>${name}</b> — NPL 90+ naik ${nplDelta.toFixed(2)}pp MoM, kini ${fmtPct(nplN)}` });
+    }
+    if(torGap!==null && torGap<-20){
+      concerns.push({ tag:"watch", severity:-torGap*0.5,
+        text:`<b>${name}</b> — TOR ${torN}% (target 100%), disposal aset melambat` });
+    }
+  });
+
+  concerns.sort((a,b)=>b.severity-a.severity);
+  const top = concerns.slice(0,6);
+
+  const list = document.getElementById("concernList");
+  if(top.length===0){
+    list.innerHTML = '<li class="concern-empty">Tidak ada concern signifikan terdeteksi dari data periode ini.</li>';
+  } else {
+    list.innerHTML = top.map(c=>`<li class="concern-item"><span class="tag ${c.tag}">${c.tag==="bad"?"perhatian":"watch"}</span><span>${c.text}</span></li>`).join("");
+  }
+
+  const grid = document.getElementById("execHeadlineGrid");
+  grid.innerHTML = `
+    <div class="kpi-card" style="border-left-color:${dBudget.cls==='good' ? 'var(--teal-600)' : 'var(--coral-600)'}">
+      <p class="label">COC YTD% konsolidasi</p>
+      <p class="value">${fmtPct(cocNow)}</p>
+      <p class="delta ${dBudget.cls}">${dBudget.cls==="good" ? "Achieve to budget" : "Belum achieve to budget"} (${dBudget.d>=0?"+":""}${dBudget.d!==undefined?dBudget.d.toFixed(2):"n/a"}pp)</p>
+    </div>
+    <div class="kpi-card" style="border-left-color:${dLY.cls==='good' ? 'var(--teal-600)' : 'var(--coral-600)'}">
+      <p class="label">Tren vs ${DATA.months[LAST]} tahun lalu</p>
+      <p class="value" style="font-size:20px;">${dLY.cls==="good" ? "Membaik" : "Memburuk"}</p>
+      <p class="delta ${dLY.cls}">${dLY.d>=0?"+":""}${dLY.d!==undefined?dLY.d.toFixed(2):"n/a"}pp vs baseline (${fmtPct(cocLY)})</p>
+    </div>
+    <div class="kpi-card" style="border-left-color:var(--amber-600)">
+      <p class="label">Segmen jadi area of focus</p>
+      <p class="value">${new Set(top.map(c=>c.text.match(/<b>(.*?)<\/b>/)[1])).size}</p>
+      <p class="delta neutral">Dari ${names.length} segmen produk</p>
+    </div>
+    <div class="kpi-card" style="border-left-color:var(--navy-600)">
+      <p class="label">Segmen on-track vs budget</p>
+      <p class="value">${names.filter(n=>{ const p=DATA.products[n]; return p.budget && p.cocYTD[LAST]<=p.budget.cocYTD; }).length} / ${names.filter(n=>DATA.products[n].budget).length}</p>
+      <p class="delta neutral">COC YTD% ≤ budget masing-masing</p>
+    </div>
+  `;
+}
+
+function init(){
+  document.getElementById("periodBadge").textContent = "Periode terakhir: " + DATA.months[LAST];
+  renderExecSummary();
+  populateSegmentSelect();
+  renderSegment("BFI Without FIT");
+  renderCompareCharts();
+  renderTable();
+}
+init();
+</script>
+</body>
+</html>
