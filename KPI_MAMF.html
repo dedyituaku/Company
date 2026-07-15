@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluasi KPI MAM Front End</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F5F8;
+    --surface:#FFFFFF;
+    --ink:#141C2E;
+    --ink-soft:#4B5468;
+    --line:#E1E5EC;
+    --navy:#16294D;
+    --navy-deep:#0D1830;
+    --blue:#2F6FED;
+    --blue-soft:#DCE7FE;
+    --rose:#E2574C;
+    --rose-soft:#FBE2DF;
+    --teal:#0FA98C;
+    --teal-soft:#D9F3EC;
+    --amber:#E3A012;
+    --amber-soft:#FCEACB;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(20,28,46,.04), 0 8px 24px -12px rgba(20,28,46,.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;}
+  body{padding-bottom:60px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+
+  /* ---- header ---- */
+  header{
+    background:linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 65%, #1C3564 100%);
+    color:#fff;
+    padding:34px clamp(20px,4vw,56px) 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(600px 240px at 85% -20%, rgba(47,111,237,.35), transparent 60%),
+      radial-gradient(400px 200px at 100% 100%, rgba(15,169,140,.18), transparent 60%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:#9FB3E0; font-weight:600; margin-bottom:10px;
+  }
+  .eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 3px rgba(15,169,140,.25);}
+  header h1{
+    font-size:clamp(24px,3.4vw,34px); font-weight:700; letter-spacing:-.02em; line-height:1.15;
+    max-width:820px; position:relative;
+  }
+  header p.sub{
+    margin-top:10px; color:#B7C4E3; font-size:14.5px; max-width:640px; line-height:1.55; position:relative;
+  }
+  .headline-stats{
+    display:flex; gap:28px; margin-top:24px; flex-wrap:wrap; position:relative;
+  }
+  .hstat{min-width:130px;}
+  .hstat .n{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; color:#fff;}
+  .hstat .l{font-size:11.5px; color:#8FA0C9; margin-top:2px; letter-spacing:.02em;}
+  .hstat .n.up{color:#FF9C8F;}
+  .hstat .n.down{color:#7EE6C6;}
+
+  /* ---- tabs ---- */
+  .tabbar{
+    position:sticky; top:0; z-index:40;
+    background:rgba(243,245,248,.92); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:0 clamp(20px,4vw,56px);
+    display:flex; gap:4px; overflow-x:auto;
+  }
+  .tab{
+    appearance:none; border:none; background:none; cursor:pointer;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; color:var(--ink-soft);
+    padding:15px 16px 13px; white-space:nowrap; position:relative;
+    border-bottom:2.5px solid transparent; transition:color .15s ease;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:var(--navy); border-bottom-color:var(--blue);}
+
+  main{max-width:1180px; margin:0 auto; padding:30px clamp(16px,4vw,40px) 0;}
+  section.view{display:none; animation:fade .35s ease;}
+  section.view.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  h2.section-title{
+    font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; letter-spacing:-.01em;
+    margin-bottom:4px; color:var(--navy);
+  }
+  p.section-note{color:var(--ink-soft); font-size:13.5px; margin-bottom:18px; max-width:780px; line-height:1.55;}
+
+  .grid{display:grid; gap:16px;}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-2{grid-template-columns:1.1fr .9fr;}
+  .grid.cols-2-even{grid-template-columns:1fr 1fr;}
+  @media (max-width:860px){.grid.cols-2-even{grid-template-columns:1fr;}}
+  @media (max-width:860px){.grid.cols-3{grid-template-columns:1fr;} .grid.cols-2{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 22px; box-shadow:var(--shadow);
+  }
+  .card h3{font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:600; margin-bottom:2px;}
+  .card .desc{font-size:12px; color:var(--ink-soft); margin-bottom:14px;}
+
+  /* stat cards */
+  .stat-card .big{font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; line-height:1;}
+  .stat-card .delta{font-size:12px; font-weight:600; margin-top:6px; display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:20px;}
+  .delta.bad{color:#B23A2E; background:var(--rose-soft);}
+  .delta.good{color:#0C8770; background:var(--teal-soft);}
+  .delta.flat{color:#7A5B0B; background:var(--amber-soft);}
+
+  /* range-bar visual */
+  .rangebar-row{margin-bottom:20px;}
+  .rangebar-row:last-child{margin-bottom:0;}
+  .rb-label{display:flex; justify-content:space-between; font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--ink);}
+  .rb-label span.w{font-family:'IBM Plex Mono',monospace; font-weight:500; color:var(--ink-soft); font-size:11.5px;}
+  .rb-track{position:relative; height:34px; border-radius:8px; background:#EEF1F6; overflow:hidden; border:1px solid var(--line);}
+  .rb-seg{position:absolute; top:0; bottom:0; transition:width 1s cubic-bezier(.65,0,.35,1), left 1s cubic-bezier(.65,0,.35,1);}
+  .rb-tick{position:absolute; top:0; bottom:0; width:1px; background:rgba(20,28,46,.14);}
+  .rb-ticklabel{position:absolute; top:-18px; font-size:10px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; transform:translateX(-50%);}
+
+  /* toggle switch */
+  .toggle-wrap{display:inline-flex; background:#EAEDF3; border-radius:20px; padding:3px; gap:2px;}
+  .toggle-wrap button{
+    border:none; background:none; padding:7px 15px; border-radius:16px; font-size:12.5px; font-weight:600;
+    color:var(--ink-soft); cursor:pointer; transition:.15s;
+  }
+  .toggle-wrap button.on{background:var(--navy); color:#fff;}
+
+  .flexrow{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th,td{padding:8px 10px; text-align:center; border-bottom:1px solid var(--line);}
+  th{font-weight:600; color:var(--ink-soft); font-size:11px; text-transform:uppercase; letter-spacing:.03em; background:#F7F8FB;}
+  td.mono, th.mono{font-family:'IBM Plex Mono',monospace;}
+  td:first-child, th:first-child{text-align:left; font-weight:600;}
+  tr.hi td{background:var(--blue-soft);}
+  td.chg-bad{background:var(--rose-soft); font-weight:600;}
+  td.chg-good{background:var(--teal-soft); font-weight:600;}
+  td.chg-neutral{background:var(--amber-soft); font-weight:600;}
+  .delta{font-size:10.5px; font-weight:600; margin-left:4px;}
+  .delta.up{color:#B23A2E;}
+  .delta.down{color:#0C8770;}
+
+  .legend{display:flex; gap:16px; align-items:center; flex-wrap:wrap; font-size:12px; color:var(--ink-soft);}
+  .legend .sw{width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:6px; vertical-align:-1px;}
+
+  canvas{max-width:100%;}
+
+  /* heatmap */
+  .heatmap-wrap{overflow-x:auto;}
+  .heatmap{border-collapse:collapse; font-size:12px; font-family:'IBM Plex Mono',monospace;}
+  .heatmap th, .heatmap td{padding:9px 12px; text-align:center; border:1px solid var(--line); min-width:44px;}
+  .heatmap th{background:#F7F8FB; font-family:'Inter',sans-serif; font-weight:600; color:var(--ink-soft); font-size:11px;}
+  .heatmap td.axis{background:var(--navy); color:#fff; font-family:'Inter',sans-serif; font-weight:600;}
+
+  .insight-list{list-style:none; display:flex; flex-direction:column; gap:14px;}
+  .insight-list li{
+    display:flex; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    box-shadow:var(--shadow);
+  }
+  .insight-list .mark{
+    flex:0 0 30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; color:#fff;
+  }
+  .insight-list p{font-size:13.5px; line-height:1.6; color:var(--ink);}
+  .insight-list b{color:var(--navy);}
+
+  footer{max-width:1180px; margin:36px auto 0; padding:0 clamp(16px,4vw,40px); color:var(--ink-soft); font-size:11.5px; border-top:1px solid var(--line); padding-top:16px;}
+
+  select{
+    font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; color:var(--navy);
+    border:1px solid var(--line); background:#fff; border-radius:8px; padding:7px 10px; cursor:pointer;
+  }
+
+  /* ---- access gate / bumper ---- */
+  #gate{
+    position:fixed; inset:0; z-index:1000;
+    background:radial-gradient(1200px 600px at 15% -10%, rgba(47,111,237,.35), transparent 55%),
+               radial-gradient(900px 500px at 100% 110%, rgba(15,169,140,.20), transparent 55%),
+               linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 60%, #1C3564 100%);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    transition:opacity .5s ease, visibility .5s ease;
+  }
+  #gate.hidden{opacity:0; visibility:hidden; pointer-events:none;}
+  #gate-card{
+    width:100%; max-width:360px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+    border-radius:18px; padding:34px 30px; text-align:center; backdrop-filter:blur(6px);
+    box-shadow:0 20px 60px -20px rgba(0,0,0,.5);
+  }
+  #gate-icon{
+    width:44px; height:44px; margin:0 auto 16px; border-radius:12px;
+    background:rgba(47,111,237,.25); display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(255,255,255,.18);
+  }
+  #gate-card h2{font-family:'Space Grotesk',sans-serif; color:#fff; font-size:18px; font-weight:600; margin-bottom:6px;}
+  #gate-card p{color:#AEBCE0; font-size:12.5px; margin-bottom:22px; line-height:1.5;}
+  #gate-input{
+    width:100%; text-align:center; letter-spacing:.35em; font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:600;
+    background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.22); color:#fff;
+    border-radius:10px; padding:12px 10px; outline:none; transition:border-color .15s;
+  }
+  #gate-input::placeholder{color:rgba(255,255,255,.35); letter-spacing:.35em;}
+  #gate-input:focus{border-color:var(--blue);}
+  #gate-input.shake{animation:shakeX .4s ease;}
+  @keyframes shakeX{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-5px);}
+    80%{transform:translateX(5px);}
+  }
+  #gate-btn{
+    margin-top:14px; width:100%; padding:12px; border:none; border-radius:10px; cursor:pointer;
+    background:var(--blue); color:#fff; font-family:'Inter',sans-serif; font-weight:700; font-size:13.5px;
+    transition:background .15s;
+  }
+  #gate-btn:hover{background:#2560D6;}
+  #gate-error{
+    margin-top:12px; font-size:12px; color:#FF9C8F; font-weight:600; min-height:16px;
+    opacity:0; transition:opacity .2s;
+  }
+  #gate-error.show{opacity:1;}
+  body.gate-locked{overflow:hidden;}
+</style>
+</head>
+<body class="gate-locked">
+
+<div id="gate">
+  <div id="gate-card">
+    <div id="gate-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="10" width="16" height="10" rx="2" stroke="#fff" stroke-width="1.6"/>
+        <path d="M7 10V7a5 5 0 0 1 10 0v3" stroke="#fff" stroke-width="1.6"/>
+      </svg>
+    </div>
+    <h2>Akses Dashboard</h2>
+    <p>Masukkan kode akses untuk membuka Evaluasi KPI MAM Front End.</p>
+    <input id="gate-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+    <button id="gate-btn">Buka Dashboard</button>
+    <div id="gate-error">Kode salah, coba lagi.</div>
+  </div>
+</div>
+
+<header>
+  <div class="eyebrow"><span class="dot"></span>MAM Front · Evaluasi Metodologi KPI</div>
+  <h1>Evaluasi KPI MAM Front End</h1>
+  <p class="sub">Existing Parameters &amp; Bobot, Adjustment pada Ranging penilaian</p>
+  <div class="headline-stats">
+    <div class="hstat"><div class="n" style="font-size:22px;">Periode Performance Jan – Mar 2026</div></div>
+  </div>
+</header>
+
+<nav class="tabbar" id="tabbar">
+  <button class="tab active" data-view="overview">Ringkasan</button>
+  <button class="tab" data-view="indicators">Distribusi per Indikator</button>
+  <button class="tab" data-view="final">KPI Final</button>
+  <button class="tab" data-view="decile">Analisis Decile</button>
+  <button class="tab" data-view="insight">Insight &amp; Rekomendasi</button>
+</nav>
+
+<main>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section class="view active" id="overview">
+    <h2 class="section-title">Mengapa Ranging Diubah</h2>
+    <p class="section-note">Skema lama graduated (1,01–1,99) untuk achievement 0,1%–80% pada tiap indikator sehingga bisa "mengorbankan" satu indikator jauh di bawah target namun tetap lolos KPI Final berkat partial credit di indikator lain. Skema baru meratakan seluruh area di bawah 80% menjadi flat 1.00 dan menjadikan 80% sebagai bare minimum toleransi pencapaian atas target yang diberikan sehingga celah ini tertutup.</p>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="flexrow">
+        <div>
+          <h3>Persebaran range KPI sebelum vs sesudah</h3>
+        </div>
+        <div class="toggle-wrap" id="rbToggle">
+          <button class="on" data-mode="before">Before</button>
+          <button data-mode="after">After</button>
+        </div>
+      </div>
+      <div id="rangebars"></div>
+      <div class="legend" style="margin-top:16px;">
+        <span><span class="sw" style="background:var(--rose)"></span>KPI 1 (&lt;80%)</span>
+        <span><span class="sw" style="background:var(--amber)"></span>KPI 2</span>
+        <span><span class="sw" style="background:var(--blue)"></span>KPI 3</span>
+        <span><span class="sw" style="background:var(--teal)"></span>KPI 4</span>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Bobot Indikator KPI</h3>
+        <div class="desc">Delinquency 20% · Roll Rate 31 OSP 40% · Roll Rate 91 OSP 40%</div>
+        <canvas id="chartBobotIndikator" height="190"></canvas>
+      </div>
+      <div class="card">
+        <h3>Bobot per Product</h3>
+        <div class="desc">Mix Product vs Focus Product</div>
+        <table>
+          <thead><tr><th>Skema</th><th>Product</th><th>Bobot</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2">Mix Product</td><td>Mobil</td><td class="mono">50%</td></tr>
+            <tr><td>Motor</td><td class="mono">50%</td></tr>
+            <tr><td>Focus Product</td><td>Mobil / Motor</td><td class="mono">100%</td></tr>
+          </tbody>
+        </table>
+        <h3 style="margin-top:20px;">Threshold Achievement per Skor</h3>
+        <table id="thresholdTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INDICATORS ================= -->
+  <section class="view" id="indicators">
+    <h2 class="section-title">Distribusi Skor per Indikator per Bulan</h2>
+    <p class="section-note">Jumlah PIC pada tiap skor KPI (1–4), dipecah per indikator, dibandingkan Before vs After skema baru diterapkan.</p>
+    <div class="flexrow">
+      <div class="toggle-wrap" id="indIndicatorToggle">
+        <button class="on" data-ind="delq">Delinquency 31-90</button>
+        <button data-ind="rr31">Roll Rate 31 OSP</button>
+        <button data-ind="rr91">Roll Rate 91 OSP</button>
+      </div>
+      <select id="indMonthSelect">
+        <option value="all">Semua Bulan</option>
+        <option value="Januari">Januari</option>
+        <option value="Februari">Februari</option>
+        <option value="Maret">Maret</option>
+      </select>
+    </div>
+    <div class="card">
+      <canvas id="chartIndikator" height="100"></canvas>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h3 id="indTableTitle">Tabel — Delinquency 31-90</h3>
+      <div id="indTableWrap"></div>
+    </div>
+  </section>
+
+  <!-- ================= FINAL ================= -->
+  <section class="view" id="final">
+    <h2 class="section-title">KPI Final — Sebaran Absolut</h2>
+    <p class="section-note">Gabungan ketiga indikator (weighted average) menjadi skor KPI Final per PIC per bulan. Catatan tim: kenaikan batas bawah KPI 2 ke 90% memindahkan banyak PIC ke KPI 1, sementara penurunan standar KPI 4 (120%→110%) hanya menambah sedikit PIC di kategori tersebut.</p>
+    <div class="grid cols-2-even">
+      <div class="card">
+        <h3>Before</h3>
+        <canvas id="chartFinalBefore" height="220"></canvas>
+      </div>
+      <div class="card">
+        <h3>After</h3>
+        <canvas id="chartFinalAfter" height="220"></canvas>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <div class="flexrow">
+        <h3 style="margin:0;">Tabel Skor KPI Final per Bulan</h3>
+      </div>
+      <div id="finalTableWrap"></div>
+    </div>
+  </section>
+
+  <!-- ================= DECILE ================= -->
+  <section class="view" id="decile">
+    <h2 class="section-title">Analisis Decile — Granularitas Skor</h2>
+    <p class="section-note">Pendekatan decile memetakan achievement secara kontinu (increment 0,1) ke skor KPI, membuat setiap perubahan achievement lebih proporsional terhadap skor — dibanding sistem 4-bucket diskrit.</p>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Mapping Achievement → Skor (Continuous)</h3>
+        <div class="desc">Before: 0%–120% · After: 80%–110% (band gradasi jauh lebih sempit)</div>
+        <canvas id="chartDecileMap" height="230"></canvas>
+      </div>
+      <div class="card">
+        <h3>Kontribusi "NEW = 1,00" per Indikator</h3>
+        <div class="desc">Dari total PIC bernilai NEW=1 pada tiap indikator, ini sebaran skor Before mereka — makin ke kiri (Before rendah), makin bukan gaming, melainkan under-perform struktural.</div>
+        <canvas id="chartDecileAttr" height="230"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3>Heatmap Transisi Skor KPI — Before → New (All Indicator)</h3>
+      <div class="desc">Baris = skor New, Kolom = skor Before. Warna lebih gelap = jumlah PIC lebih banyak pada transisi tersebut.</div>
+      <div class="heatmap-wrap" id="heatmapWrap"></div>
+    </div>
+  </section>
+
+  <!-- ================= INSIGHT ================= -->
+  <section class="view" id="insight">
+    <h2 class="section-title">Insight &amp; Rekomendasi</h2>
+    <p class="section-note">Ringkasan hasil diskusi evaluasi metodologi ranging KPI MAM Front.</p>
+    <ul class="insight-list">
+      <li><div class="mark" style="background:var(--rose)">1</div><p><b>Root cause:</b> skema lama memberi partial credit graduated dari 0,1%–80% achievement, sehingga PIC bisa secara rasional mengorbankan satu indikator sambil tetap mempertahankan KPI Final "cukup" untuk insentif.</p></li>
+      <li><div class="mark" style="background:var(--amber)">2</div><p><b>Temuan lapangan:</b> indikator yang paling sering dikorbankan bukan Delinquency (bobot 20%, "termurah" secara teori), melainkan <b>RR91</b> (bobot 40%) — karena kasus di atas 91 hari sudah berpindah kepemilikan operasional ke MAM Recovery serta mendapatkan credit tambahan pada achievement Delinquency 31-90.</p></li>
+      <li><div class="mark" style="background:var(--blue)">3</div><p><b>Efek adjustment:</b> mengompresi gradasi KPI 1→2 dari 80 point menjadi 10 point (80%–90%) sehingga berhasil menutup celah "main aman", terlihat dari pergeseran signifikan PIC ke KPI 1 dari sebelumnya 1,xx before 2.00 dimana KPI lebih merefleksikan achievement.</p></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>Dashboard disusun dari data KPI MAM Front (Januari–Maret) — visualisasi interaktif untuk keperluan presentasi internal.</footer>
+
+<script>
+/* ============ DATA ============ */
+const months = ["Januari","Februari","Maret"];
+
+const indicatorData = {
+  delq: {
+    label: "Delinquency 31-90",
+    color: "#2F6FED",
+    scores: {
+      4: {before:[2,0,2], after:[3,1,4]},
+      3: {before:[14,6,10], after:[10,3,6]},
+      2: {before:[24,15,27], after:[25,14,24]},
+      1: {before:[21,41,27], after:[23,44,32]}
+    }
+  },
+  rr31: {
+    label: "Roll Rate 31 OSP",
+    color: "#0FA98C",
+    scores: {
+      4: {before:[16,0,2], after:[16,0,3]},
+      3: {before:[10,4,12], after:[8,4,10]},
+      2: {before:[17,8,13], after:[19,6,10]},
+      1: {before:[18,50,39], after:[18,52,43]}
+    }
+  },
+  rr91: {
+    label: "Roll Rate 91 OSP",
+    color: "#E3A012",
+    scores: {
+      4: {before:[9,1,1], after:[10,2,3]},
+      3: {before:[2,3,5], after:[0,1,3]},
+      2: {before:[10,11,16], after:[10,11,14]},
+      1: {before:[40,47,44], after:[41,48,46]}
+    }
+  }
+};
+
+const finalData = {
+  before: {4:[0,0,1], 3:[4,1,3], 2:[32,8,17], 1:[25,53,45]},
+  after:  {4:[0,0,0], 3:[4,1,5], 2:[35,12,21], 1:[22,49,40]}
+};
+
+const thresholds = {
+  before: {4:"≥ 120%", 3:"100% – < 120%", 2:"80% – < 100%", 1:"< 80%"},
+  after:  {4:"≥ 110%", 3:"100% – < 110%", 2:"90% – < 100%", 1:"< 80%"}
+};
+
+// range bar zones as % width of a 0-120 scale (before) vs 0-120 scale (after, but band compressed)
+const rangeZones = {
+  before: [
+    {label:"KPI 1", from:0, to:80, color:"var(--rose)"},
+    {label:"KPI 2", from:80, to:100, color:"var(--amber)"},
+    {label:"KPI 3", from:100, to:120, color:"var(--blue)"},
+    {label:"KPI 4", from:120, to:130, color:"var(--teal)"}
+  ],
+  after: [
+    {label:"KPI 1", from:0, to:80, color:"var(--rose)"},
+    {label:"KPI 2", from:80, to:90, color:"var(--amber)"},
+    {label:"KPI 3", from:90, to:110, color:"var(--blue)"},
+    {label:"KPI 4", from:110, to:130, color:"var(--teal)"}
+  ]
+};
+
+const decileAttribution = {
+  labels: ["1.0","1.1","1.2","1.3","1.4","1.5","1.6","1.7","1.8","1.9","2.0"],
+  delq: [7,1,3,2,2,2,1,0,0,0,0],
+  rr31: [22,3,3,2,5,0,0,0,0,0,0],
+  rr91: [24,0,5,1,3,2,0,0,0,0,0]
+};
+
+const heatmap = {
+  cols: ["1","1.5","2","2.5","3","3.5","4"],
+  rows: ["1","1.5","2","2.5","3","3.5","4"],
+  matrix: [
+    [16,11,0,0,0,0,0],
+    [0,13,5,0,0,0,0],
+    [0,0,9,2,0,0,0],
+    [0,0,0,5,1,0,0],
+    [0,0,0,0,3,0,0],
+    [0,0,0,0,0,1,0],
+    [0,0,0,0,0,0,0]
+  ],
+  total: [16,24,14,7,4,1,0]
+};
+
+/* ============ TAB SWITCHING ============ */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+  });
+});
+
+/* ============ RANGE BARS (overview hero) — gradient model ============ */
+/* scale reference 0-130% width. Before: smooth gradient starting at 0%.
+   After: FLAT red 0-80%, gradient compressed into 80-90%, then blue 90-100, teal 100-110, flat teal after. */
+const RB_SCALE = 130;
+const RB_COLORS = { red:'#E2574C', amber:'#E3A012', blue:'#2F6FED', teal:'#0FA98C' };
+
+function pct(v){ return (v / RB_SCALE * 100).toFixed(2) + '%'; }
+
+function gradientCSS(mode){
+  if(mode === 'before'){
+    // smooth diagonal gradient the whole way: red -> amber -> blue -> teal
+    return `linear-gradient(90deg,
+      ${RB_COLORS.red} 0%,
+      ${RB_COLORS.amber} ${pct(80)},
+      ${RB_COLORS.blue} ${pct(100)},
+      ${RB_COLORS.teal} ${pct(120)},
+      ${RB_COLORS.teal} 100%)`;
+  }
+  // after: flat red 0-80, then compressed gradient 80-90-100-110, flat teal after
+  return `linear-gradient(90deg,
+    ${RB_COLORS.red} 0%,
+    ${RB_COLORS.red} ${pct(80)},
+    ${RB_COLORS.amber} ${pct(90)},
+    ${RB_COLORS.blue} ${pct(100)},
+    ${RB_COLORS.teal} ${pct(110)},
+    ${RB_COLORS.teal} 100%)`;
+}
+
+function renderRangeBars(mode){
+  const wrap = document.getElementById('rangebars');
+  wrap.innerHTML = '';
+  const ticks = mode === 'before' ? [0,80,100,120] : [0,80,90,100,110];
+  const flatNote = mode === 'before'
+    ? 'gradasi mulai dari 0%'
+    : 'flat 1,00 di 0–80%, gradasi baru mulai 80%';
+  ["Delinquency 31-90","Roll Rate 31 OSP","Roll Rate 91 OSP"].forEach(name=>{
+    const row = document.createElement('div');
+    row.className = 'rangebar-row';
+    row.innerHTML = `
+      <div class="rb-label">${name} <span class="w">${flatNote}</span></div>
+      <div class="rb-track" style="background:${gradientCSS(mode)};">
+        ${ticks.map(t=>`<div class="rb-tick" style="left:${pct(t)};"><span class="rb-ticklabel">${t}%</span></div>`).join('')}
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+renderRangeBars('before');
+document.querySelectorAll('#rbToggle button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#rbToggle button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    renderRangeBars(b.dataset.mode);
+  });
+});
+
+/* threshold table */
+function renderThresholdTable(){
+  const t = document.getElementById('thresholdTable');
+  let html = `<thead><tr><th>KPI</th><th>Before</th><th>After</th></tr></thead><tbody>`;
+  [4,3,2,1].forEach(k=>{
+    html += `<tr${k===2?' class="hi"':''}><td>KPI ${k}</td><td class="mono">${thresholds.before[k]}</td><td class="mono">${thresholds.after[k]}</td></tr>`;
+  });
+  html += '</tbody>';
+  t.innerHTML = html;
+}
+renderThresholdTable();
+
+/* bobot indikator chart */
+new Chart(document.getElementById('chartBobotIndikator'), {
+  type:'doughnut',
+  data:{
+    labels:['Delinquency 31-90','Roll Rate 31 OSP','Roll Rate 91 OSP'],
+    datasets:[{data:[20,40,40], backgroundColor:['#2F6FED','#0FA98C','#E3A012'], borderWidth:0}]
+  },
+  options:{
+    plugins:{legend:{position:'bottom', labels:{font:{family:'Inter',size:11.5}, boxWidth:10, padding:14}}},
+    cutout:'62%'
+  }
+});
+
+/* ============ INDICATOR TAB ============ */
+let currentInd = 'delq';
+let currentMonth = 'all';
+let chartIndikator;
+
+function buildIndicatorChartData(indKey, monthKey){
+  const d = indicatorData[indKey];
+  const scoreKeys = [4,3,2,1];
+  const scoreColors = {4:'#0FA98C',3:'#2F6FED',2:'#E3A012',1:'#E2574C'};
+  let labels, beforeData, afterData;
+  if(monthKey === 'all'){
+    labels = scoreKeys.map(k=>'KPI '+k);
+    beforeData = scoreKeys.map(k=> d.scores[k].before.reduce((a,b)=>a+b,0));
+    afterData = scoreKeys.map(k=> d.scores[k].after.reduce((a,b)=>a+b,0));
+  } else {
+    const mi = months.indexOf(monthKey);
+    labels = scoreKeys.map(k=>'KPI '+k);
+    beforeData = scoreKeys.map(k=> d.scores[k].before[mi]);
+    afterData = scoreKeys.map(k=> d.scores[k].after[mi]);
+  }
+  return {labels, beforeData, afterData};
+}
+
+function renderIndicatorChart(){
+  const {labels, beforeData, afterData} = buildIndicatorChartData(currentInd, currentMonth);
+  if(chartIndikator) chartIndikator.destroy();
+  chartIndikator = new Chart(document.getElementById('chartIndikator'), {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Before', data:beforeData, backgroundColor:'#B9C6E6', borderRadius:6, maxBarThickness:46},
+        {label:'After', data:afterData, backgroundColor:'#16294D', borderRadius:6, maxBarThickness:46}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'top', align:'end', labels:{font:{family:'Inter',size:12,weight:'600'}, boxWidth:12}}},
+      scales:{
+        y:{beginAtZero:true, grid:{color:'#EEF1F6'}, ticks:{font:{family:'IBM Plex Mono',size:11}}},
+        x:{grid:{display:false}, ticks:{font:{family:'Inter',size:12,weight:'600'}}}
+      }
+    }
+  });
+
+  document.getElementById('indTableTitle').textContent = 'Tabel — ' + indicatorData[currentInd].label;
+  const d = indicatorData[currentInd];
+  let html = '<table><thead><tr><th>Skor KPI</th>';
+  months.forEach(m=>{ html += `<th colspan="2">${m}</th>`; });
+  html += '</tr><tr><th></th>';
+  months.forEach(()=>{ html += '<th class="mono">Before</th><th class="mono">After</th>'; });
+  html += '</tr></thead><tbody>';
+  [4,3,2,1].forEach(k=>{
+    html += `<tr><td>KPI ${k}</td>`;
+    for(let i=0;i<3;i++){
+      html += `<td class="mono">${d.scores[k].before[i]}</td><td class="mono">${d.scores[k].after[i]}</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('indTableWrap').innerHTML = html;
+}
+renderIndicatorChart();
+
+document.querySelectorAll('#indIndicatorToggle button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#indIndicatorToggle button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    currentInd = b.dataset.ind;
+    renderIndicatorChart();
+  });
+});
+document.getElementById('indMonthSelect').addEventListener('change', e=>{
+  currentMonth = e.target.value;
+  renderIndicatorChart();
+});
+
+/* ============ FINAL TAB ============ */
+function finalChart(canvasId, dataset){
+  new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{
+      labels: months.map(m=>m.slice(0,3)+'-26'),
+      datasets:[4,3,2,1].map(k=>({
+        label:'KPI '+k,
+        data: dataset[k],
+        backgroundColor: {4:'#0FA98C',3:'#B9C6E6',2:'#2F6FED',1:'#16294D'}[k],
+        borderRadius:5, maxBarThickness:40
+      }))
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'top', align:'end', labels:{font:{family:'Inter',size:11.5,weight:'600'}, boxWidth:11}}},
+      scales:{
+        y:{beginAtZero:true, max:60, grid:{color:'#EEF1F6'}, ticks:{font:{family:'IBM Plex Mono',size:11}}},
+        x:{grid:{display:false}, ticks:{font:{family:'Inter',size:12,weight:'600'}}}
+      }
+    }
+  });
+}
+finalChart('chartFinalBefore', finalData.before);
+finalChart('chartFinalAfter', finalData.after);
+
+function renderFinalTable(){
+  // semantic direction per row: how to color an increase in count
+  // KPI4 (best): more PIC here = good. KPI1 (worst): more PIC here = bad.
+  // KPI2/KPI3 (transition zone): direction is ambiguous (could mean PIC moving up OR down), so neutral.
+  const rowSemantic = {4:'good-up', 3:'neutral', 2:'neutral', 1:'bad-up'};
+
+  function cellClass(rowKey, diff){
+    if(diff === 0) return '';
+    const sem = rowSemantic[rowKey];
+    if(sem === 'neutral') return 'chg-neutral';
+    const isIncrease = diff > 0;
+    const goodWhenUp = sem === 'good-up';
+    const isGood = (isIncrease && goodWhenUp) || (!isIncrease && !goodWhenUp);
+    return isGood ? 'chg-good' : 'chg-bad';
+  }
+
+  let html = '<table><thead><tr><th>Skor KPI</th>';
+  months.forEach(m=>{ html += `<th colspan="2">${m}</th>`; });
+  html += '</tr><tr><th></th>';
+  months.forEach(()=>{ html += '<th class="mono">Before</th><th class="mono">After</th>'; });
+  html += '</tr></thead><tbody>';
+  [4,3,2,1].forEach(k=>{
+    html += `<tr><td>KPI ${k} <span class="mono" style="color:var(--ink-soft); font-size:10.5px;">(${thresholds.after[k]})</span></td>`;
+    for(let i=0;i<3;i++){
+      const b = finalData.before[k][i];
+      const a = finalData.after[k][i];
+      const diff = a - b;
+      const cls = cellClass(k, diff);
+      const arrow = diff === 0 ? '' : `<span class="delta ${diff>0?'up':'down'}">${diff>0?'▲':'▼'}${Math.abs(diff)}</span>`;
+      html += `<td class="mono">${b}</td><td class="mono ${cls}">${a}${arrow}</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('finalTableWrap').innerHTML = html;
+
+  // legend
+  const legendEl = document.createElement('div');
+  legendEl.className = 'legend';
+  legendEl.style.marginTop = '12px';
+  legendEl.innerHTML = `
+    <span><span class="sw" style="background:var(--teal)"></span>Perubahan positif</span>
+    <span><span class="sw" style="background:var(--rose)"></span>Perubahan negatif</span>
+    <span><span class="sw" style="background:var(--amber)"></span>Zona transisi (arah ambigu)</span>`;
+  document.getElementById('finalTableWrap').appendChild(legendEl);
+}
+renderFinalTable();
+
+/* ============ DECILE TAB ============ */
+new Chart(document.getElementById('chartDecileMap'), {
+  type:'line',
+  data:{
+    labels: Array.from({length:16},(_,i)=>(i*8)+'%'),
+    datasets:[
+      {
+        label:'Before (0–120%)',
+        data:[1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.5,3.0,3.5,4.0,4.0],
+        borderColor:'#B9C6E6', backgroundColor:'transparent', tension:.2, borderWidth:2.5, pointRadius:2
+      },
+      {
+        label:'After (80–110% band gradasi)',
+        data:[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,2.0,3.0,4.0,4.0,4.0],
+        borderColor:'#16294D', backgroundColor:'transparent', tension:0, borderWidth:2.5, pointRadius:2, stepped:true
+      }
+    ]
+  },
+  options:{
+    plugins:{legend:{position:'top', labels:{font:{family:'Inter',size:11.5,weight:'600'}, boxWidth:12}}},
+    scales:{
+      y:{title:{display:true,text:'Skor KPI', font:{family:'Inter',size:11}}, min:0, max:4.2, grid:{color:'#EEF1F6'}},
+      x:{title:{display:true,text:'Achievement (%)', font:{family:'Inter',size:11}}, grid:{display:false}}
+    }
+  }
+});
+
+new Chart(document.getElementById('chartDecileAttr'), {
+  type:'bar',
+  data:{
+    labels: decileAttribution.labels,
+    datasets:[
+      {label:'Delinquency 31-90', data:decileAttribution.delq, backgroundColor:'#2F6FED', borderRadius:4},
+      {label:'Roll Rate 31 OSP', data:decileAttribution.rr31, backgroundColor:'#0FA98C', borderRadius:4},
+      {label:'Roll Rate 91 OSP', data:decileAttribution.rr91, backgroundColor:'#E3A012', borderRadius:4}
+    ]
+  },
+  options:{
+    plugins:{legend:{position:'top', labels:{font:{family:'Inter',size:11}, boxWidth:10}}},
+    scales:{
+      y:{title:{display:true,text:'Jumlah PIC (skor Before)', font:{family:'Inter',size:11}}, beginAtZero:true, grid:{color:'#EEF1F6'}},
+      x:{title:{display:true,text:'Skor Before', font:{family:'Inter',size:11}}, grid:{display:false}}
+    }
+  }
+});
+
+/* heatmap render */
+function renderHeatmap(){
+  const max = Math.max(...heatmap.matrix.flat());
+  let html = '<table class="heatmap"><thead><tr><td class="axis">New \\ Before</td>';
+  heatmap.cols.forEach(c=>{ html += `<th>${c}</th>`; });
+  html += '<th>Total</th></tr></thead><tbody>';
+  heatmap.rows.forEach((r,ri)=>{
+    html += `<tr><td class="axis">${r}</td>`;
+    let rowTotal = 0;
+    heatmap.matrix[ri].forEach(v=>{
+      rowTotal += v;
+      const alpha = v===0 ? 0 : 0.12 + (v/max)*0.78;
+      const bg = v===0 ? '#fff' : `rgba(226,87,76,${alpha.toFixed(2)})`;
+      const color = alpha > 0.5 ? '#fff' : 'var(--ink)';
+      html += `<td style="background:${bg}; color:${color}; font-weight:${v?600:400};">${v}</td>`;
+    });
+    html += `<td style="font-weight:700; background:#F7F8FB;">${rowTotal}</td></tr>`;
+  });
+  html += `<tr><td class="axis">Total</td>`;
+  heatmap.total.forEach(t=>{ html += `<td style="font-weight:700; background:#F7F8FB;">${t}</td>`; });
+  html += `<td style="font-weight:700; background:#EEF1F6;">${heatmap.total.reduce((a,b)=>a+b,0)}</td></tr>`;
+  html += '</tbody></table>';
+  document.getElementById('heatmapWrap').innerHTML = html;
+}
+renderHeatmap();
+
+/* ============ ACCESS GATE ============ */
+(function(){
+  const ACCESS_CODE = "000999";
+  const gate = document.getElementById('gate');
+  const input = document.getElementById('gate-input');
+  const btn = document.getElementById('gate-btn');
+  const err = document.getElementById('gate-error');
+
+  function tryUnlock(){
+    if(input.value.trim() === ACCESS_CODE){
+      gate.classList.add('hidden');
+      document.body.classList.remove('gate-locked');
+    } else {
+      err.classList.add('show');
+      input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
+      input.value = '';
+      input.focus();
+    }
+  }
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', e=>{ if(e.key === 'Enter') tryUnlock(); });
+  input.addEventListener('input', ()=> err.classList.remove('show'));
+  setTimeout(()=> input.focus(), 300);
+})();
+</script>
+</body>
+</html>
