@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cost of Credit — Periode Juli 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ============================================================
+   TEMPLATE — bagian ini tidak perlu diubah tiap periode.
+   Untuk update data bulanan, cari blok "===== DATA =====" di
+   bagian <script> paling bawah file ini. Struktur (grup, sub-
+   segmen) diatur lewat DATA.groups — menambah/menghapus segmen
+   baru tidak perlu mengubah kode, cukup edit objek DATA.
+   ============================================================ */
+:root{
+  --navy-900:#0e2233; --navy-800:#16324a; --navy-600:#2c5a7a; --navy-100:#eef3f7;
+  --slate-900:#1b2430; --slate-700:#42505f; --slate-500:#6b7889; --slate-300:#c3ccd6; --slate-100:#f4f6f8; --slate-50:#fafbfc;
+  --teal-700:#0d6b57; --teal-600:#12886e; --teal-100:#e2f3ee;
+  --coral-700:#a13a1f; --coral-600:#c14b2a; --coral-100:#fbe9e3;
+  --amber-700:#8a5a08; --amber-600:#b07811; --amber-100:#fbf1de;
+  --border:#e2e6ea;
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--slate-50); color:var(--slate-900); font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:28px 24px 64px;}
+
+/* header */
+.masthead{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:24px; padding-bottom:20px; border-bottom:2px solid var(--navy-900);}
+.masthead h1{font-size:22px; font-weight:700; margin:0 0 4px; letter-spacing:-0.01em; color:var(--navy-900);}
+.masthead p{margin:0; font-size:13px; color:var(--slate-500);}
+.period-badge{font-family:var(--font-mono); font-size:12px; background:var(--navy-900); color:#fff; padding:6px 12px; border-radius:4px; letter-spacing:0.02em;}
+
+/* section labels */
+.section-label{font-size:13px; font-weight:600; color:var(--navy-800); margin:0 0 12px; text-transform:uppercase; letter-spacing:0.03em;}
+.section{margin-bottom:36px;}
+.big-divider{border:none; border-top:2px solid var(--navy-900); margin:40px 0 28px;}
+.eyebrow{font-family:var(--font-mono); font-size:11px; color:var(--slate-500); text-transform:uppercase; letter-spacing:0.06em; margin:0 0 6px;}
+
+/* kpi cards */
+.kpi-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px;}
+.kpi-card{background:#fff; border:1px solid var(--border); border-left:4px solid var(--navy-600); border-radius:6px; padding:16px 18px;}
+.kpi-card .label{font-size:12px; color:var(--slate-500); font-weight:600; margin:0 0 6px;}
+.kpi-card .value{font-size:26px; font-weight:700; color:var(--navy-900); margin:0; font-family:var(--font-mono); letter-spacing:-0.01em;}
+.kpi-card .delta{font-size:12px; font-weight:600; margin:6px 0 0; display:flex; align-items:center; gap:4px;}
+.delta.good{color:var(--teal-700);} .delta.bad{color:var(--coral-700);} .delta.neutral{color:var(--slate-500);}
+
+/* chart cards */
+.chart-card{background:#fff; border:1px solid var(--border); border-radius:8px; padding:18px 20px 8px;}
+.chart-card .chart-title{font-size:13px; font-weight:600; color:var(--navy-800); margin:0 0 2px;}
+.chart-card .chart-sub{font-size:11.5px; color:var(--slate-500); margin:0 0 12px;}
+.chart-canvas-wrap{position:relative; width:100%;}
+
+.grid-2{display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+.grid-3-small{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px;}
+.grid-auto-small{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px;}
+.legend-row{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--slate-500); margin-top:6px;}
+.legend-row .dot{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:-1px;}
+
+/* comparison table */
+table.summary{width:100%; border-collapse:collapse; font-size:13px;}
+table.summary th{
+  text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:var(--slate-500);
+  font-weight:600; padding:8px 10px; border-bottom:2px solid var(--navy-900);
+}
+table.summary td{padding:9px 10px; border-bottom:1px solid var(--border); color:var(--slate-900);}
+table.summary tr:hover td{background:var(--slate-100);}
+table.summary td.num{font-family:var(--font-mono); text-align:right;}
+table.summary td.group-row{background:var(--navy-100); font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:var(--navy-800);}
+.tag{display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px;}
+.tag.good{background:var(--teal-100); color:var(--teal-700);}
+.tag.bad{background:var(--coral-100); color:var(--coral-700);}
+.tag.watch{background:var(--amber-100); color:var(--amber-700);}
+.tag.na{background:var(--slate-100); color:var(--slate-500);}
+
+/* concern list */
+.concern-item{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 4px;
+  border-bottom:1px solid var(--border); font-size:13px; line-height:1.5;
+}
+.concern-item:last-child{border-bottom:none;}
+.concern-item .tag{flex-shrink:0; margin-top:1px;}
+.concern-empty{font-size:13px; color:var(--slate-500); padding:8px 4px;}
+
+/* tab navigation (product group) */
+.tab-nav{display:flex; gap:6px; border-bottom:2px solid var(--navy-900); margin-bottom:20px; flex-wrap:wrap;}
+.tab-btn{
+  font-family:var(--font-ui); font-size:13.5px; font-weight:600; color:var(--slate-500);
+  background:transparent; border:none; padding:10px 18px; cursor:pointer; border-radius:6px 6px 0 0;
+  position:relative; top:2px;
+}
+.tab-btn:hover{color:var(--navy-800); background:var(--slate-100);}
+.tab-btn.active{color:#fff; background:var(--navy-900);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* segment pills within a tab */
+.segment-pills{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+.segment-pill{
+  font-family:var(--font-ui); font-size:12.5px; font-weight:600; color:var(--navy-800);
+  background:#fff; border:1.5px solid var(--slate-300); padding:7px 14px; border-radius:20px; cursor:pointer;
+}
+.segment-pill:hover{border-color:var(--navy-600);}
+.segment-pill.active{background:var(--navy-800); border-color:var(--navy-800); color:#fff;}
+.segment-pill .pill-note{opacity:0.7; font-weight:500;}
+
+.group-agg-strip{
+  display:flex; gap:20px; flex-wrap:wrap; align-items:baseline; background:var(--navy-900); color:#fff;
+  border-radius:8px; padding:16px 20px; margin-bottom:20px;
+}
+.group-agg-strip .agg-item{display:flex; flex-direction:column; gap:2px;}
+.group-agg-strip .agg-label{font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; opacity:0.65;}
+.group-agg-strip .agg-value{font-family:var(--font-mono); font-size:19px; font-weight:700;}
+.group-agg-strip .agg-value.good{color:#7fd9c0;}
+.group-agg-strip .agg-value.bad{color:#f0a68c;}
+
+.no-portfolio{
+  background:var(--slate-100); border:1px dashed var(--slate-300); border-radius:8px;
+  padding:24px; text-align:center; color:var(--slate-500); font-size:13px; margin-bottom:20px;
+}
+
+/* gate / bumper page */
+#gateOverlay{
+  position:fixed; inset:0; background:var(--navy-900); display:flex; align-items:center; justify-content:center;
+  z-index:999; padding:20px;
+}
+.gate-card{
+  background:#fff; border-radius:12px; padding:36px 32px; width:100%; max-width:360px; text-align:center;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.06);
+}
+.gate-card .gate-icon{
+  width:44px; height:44px; border-radius:50%; background:var(--navy-100); color:var(--navy-800);
+  display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:20px;
+}
+.gate-card h2{font-size:17px; font-weight:600; color:var(--navy-900); margin:0 0 4px;}
+.gate-card p{font-size:13px; color:var(--slate-500); margin:0 0 20px;}
+#gateInput{
+  width:100%; font-family:var(--font-mono); font-size:22px; letter-spacing:10px; text-align:center;
+  padding:12px 8px 12px 18px; border:1.5px solid var(--slate-300); border-radius:8px; color:var(--navy-900);
+  margin-bottom:14px;
+}
+#gateInput:focus{outline:none; border-color:var(--navy-600);}
+#gateInput.shake{animation:gateShake 0.35s;}
+@keyframes gateShake{
+  0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(8px);}
+  60%{transform:translateX(-6px);} 80%{transform:translateX(6px);}
+}
+#gateBtn{
+  width:100%; background:var(--navy-900); color:#fff; border:none; border-radius:8px; padding:11px;
+  font-family:var(--font-ui); font-size:14px; font-weight:600; cursor:pointer;
+}
+#gateBtn:hover{background:var(--navy-800);}
+#gateError{font-size:12.5px; color:var(--coral-700); margin:12px 0 0; min-height:16px;}
+.hidden-app{display:none;}
+
+@media (max-width:800px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .grid-2{grid-template-columns:1fr;}
+  .grid-3-small{grid-template-columns:1fr;}
+  .group-agg-strip{gap:14px;}
+}
+</style>
+</head>
+<body>
+
+<div id="gateOverlay">
+  <div class="gate-card">
+    <div class="gate-icon">🔒</div>
+    <h2>Akses dashboard</h2>
+    <p>Masukkan kode akses 6 digit untuk melanjutkan</p>
+    <input id="gateInput" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••••">
+    <button id="gateBtn">Masuk</button>
+    <p id="gateError"></p>
+  </div>
+</div>
+
+<div class="wrap hidden-app" id="mainApp">
+
+  <div class="masthead">
+    <div>
+      <h1 id="mastheadTitle">Cost of Credit</h1>
+      <p>BFI Without FIT · Summary konsolidasi dan breakdown per grup produk</p>
+    </div>
+    <div class="period-badge" id="periodBadge">—</div>
+  </div>
+
+  <!-- ============================================================
+       TAB NAVIGATION — Summary, Car, Mcy, Leasing, PBF
+       ============================================================ -->
+  <div class="tab-nav" id="tabNav"></div>
+  <div id="tabPanels"></div>
+
+</div>
+
+<script>
+/* ============================================================
+   ===== KODE AKSES =====
+   Ganti angka di bawah ini untuk mengubah kode akses dashboard.
+   Ini proteksi ringan sisi client saja — bukan pengganti keamanan
+   sesungguhnya (kode tetap terlihat lewat "view page source").
+   ============================================================ */
+const ACCESS_CODE = "000999";
+
+(function setupGate(){
+  const overlay = document.getElementById("gateOverlay");
+  const app = document.getElementById("mainApp");
+  const input = document.getElementById("gateInput");
+  const btn = document.getElementById("gateBtn");
+  const err = document.getElementById("gateError");
+
+  function unlock(){
+    overlay.style.display = "none";
+    app.classList.remove("hidden-app");
+    try{ sessionStorage.setItem("bfiDashUnlocked", "1"); }catch(e){}
+  }
+  function tryUnlock(){
+    if(input.value === ACCESS_CODE){ unlock(); }
+    else {
+      err.textContent = "Kode salah, coba lagi.";
+      input.classList.remove("shake"); void input.offsetWidth; input.classList.add("shake");
+      input.value = ""; input.focus();
+    }
+  }
+  try{ if(sessionStorage.getItem("bfiDashUnlocked") === "1"){ unlock(); } }catch(e){}
+  btn.addEventListener("click", tryUnlock);
+  input.addEventListener("keydown", e=>{ if(e.key === "Enter") tryUnlock(); });
+  input.addEventListener("input", ()=>{ input.value = input.value.replace(/[^0-9]/g,"").slice(0,6); });
+  if(overlay.style.display !== "none") setTimeout(()=>input.focus(), 50);
+})();
+
+/* ============================================================
+   ===== DATA =====
+   Edit HANYA bagian ini setiap periode. Struktur:
+   - months: label bulan, terlama -> terbaru
+   - summary: objek data konsolidasi (BFI Without FIT)
+   - groupOrder: urutan tab produk
+   - groups.<NamaGrup>.aggregate: data total grup (dari sheet gabungan)
+   - groups.<NamaGrup>.segmentOrder + .segments: sub-segmen di grup itu
+   Setiap "objek data" (summary / aggregate / segment) punya bentuk sama:
+     enr, cocYTD, cocMTD, npl90, tor, osInv, llpInvYTD, aging{...},
+     agingLastYear{...}, risk{...}, budget{...}, lastYear{...}
+   Menambah/menghapus grup atau sub-segmen baru TIDAK perlu ubah kode
+   di bawah — cukup tambah/hapus entri di objek DATA ini.
+   ============================================================ */
+const DATA = {
+  months: ["Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26","Jul-26"],
+  summary:   {
+    enr:       [26178299,26343010,26614918,26729626,26690457,26619321,26536099,26554665],
+    cocYTD:    [4.17,5.65,6.28,5.57,4.45,4.38,4.07,3.96],
+    cocMTD:    [2.3,5.65,6.92,4.14,1.11,4.12,2.52,3.28],
+    npl90:     [1.41,1.45,1.49,1.55,1.59,1.66,1.57,1.45],
+    tor:       [121,122,116,102,88,100,93,99],
+    osInv:     [278884,248281,224782,228099,254649,243615,304461,290806],
+    llpInvYTD: [6517,-2939,-7722,-4893,-4983,-5020,24747,23992],
+    aging: {
+      p0:      [80.44,80.24,78.42,78.31,79.77,79.1,79.47,80.67],
+      p1_30:   [16.18,16.03,17.23,17.22,16.14,16.74,16.55,15.64],
+      p31_60:  [1.23,1.46,1.96,1.96,1.64,1.73,1.61,1.54],
+      p61_90:  [0.74,0.83,0.9,0.96,0.86,0.78,0.81,0.72],
+      p91_270: [1.41,1.45,1.49,1.55,1.59,1.66,1.57,1.45]
+    },
+    agingLastYear: { p0:80.05, p1_30:16.13, p31_60:1.39, p61_90:0.81, p91_270:1.62 },
+    delq: {
+      d0:  [19.56,19.76,21.58,21.69,20.23,20.9,20.53,19.33],
+      d30: [3.38,3.73,4.35,4.47,4.09,4.16,3.99,3.7],
+      d90: [1.41,1.45,1.49,1.55,1.59,1.66,1.57,1.45]
+    },
+    delqBudget:   { d0:21.43, d30:4.07, d90:1.66 },
+    delqLastYear: { d0:19.95, d30:3.82, d90:1.62 },
+    risk: {
+      woInYTD:    [3.19,3.73,3.41,3.46,3.36,3.4,3.38,3.49],
+      woRecYTD:   [0.92,0.67,0.71,0.73,0.76,0.79,0.85,0.92],
+      nclYTD:     [3.49,3.78,3.38,3.41,3.24,3.25,3.17,3.22],
+      lorYTD:     [0.94,0.53,0.51,0.49,0.45,0.44,0.43,0.43],
+      llpTotalYTD:[0.68,1.87,2.9,2.16,1.21,1.14,0.9,0.74],
+      recovery:   [87,93,92,90,94,93,94,94],
+      salesYTD:   [21921557,1860073,3740423,5528573,7302282,8943876,10698175,12536407]
+    },
+    budget:    { cocYTD:4.42, npl90:1.66, tor:100, woInYTD:3.5, woRecYTD:1.11, nclYTD:3.46, lorYTD:0.76, llpTotalYTD:0.97, recovery:100, salesYTD:14109872 },
+    lastYear:  { cocYTD:4.37, npl90:1.62, tor:104, woInYTD:2.97, woRecYTD:0.84, nclYTD:3.14, lorYTD:0.82, llpTotalYTD:1.23, recovery:85, salesYTD:12835817 }
+  },
+  summaryScopeNote: "Summary & konsolidasi memakai cakupan BFI Without FIT.",
+  groupOrder: ["Car","Mcy","Leasing","PBF"],
+  groups: {
+    "Car": {
+      aggregate:       {
+        enr:       [17910718,17974991,18135199,18202411,18144983,18039089,17970635,17975634],
+        cocYTD:    [4.21,5.14,6.06,5.27,4.13,4.07,3.55,3.61],
+        cocMTD:    [2.35,5.14,6.99,3.69,0.74,3.8,0.95,3.99],
+        npl90:     [1.44,1.45,1.51,1.53,1.61,1.66,1.52,1.46],
+        tor:       [127,130,127,99,86,101,94,110],
+        osInv:     [188879,159228,139454,138784,156221,150099,153014,143860],
+        llpInvYTD: [-1613,-7742,-13164,-11966,-13136,-12426,-13686,-15725],
+        aging: {
+          p0:      [79.23,79.15,76.99,77.23,78.27,77.7,77.95,79.25],
+          p1_30:   [17.37,17.12,18.65,18.28,17.7,18.18,18.21,17.12],
+          p31_60:  [1.23,1.44,1.98,2.04,1.61,1.73,1.56,1.53],
+          p61_90:  [0.74,0.84,0.87,0.93,0.8,0.73,0.76,0.64],
+          p91_270: [1.44,1.45,1.51,1.53,1.61,1.66,1.52,1.46]
+        },
+        agingLastYear: { p0:78.72, p1_30:17.48, p31_60:1.39, p61_90:0.82, p91_270:1.6 },
+        delq: {
+          d0:  [20.77,20.85,23.01,22.77,21.73,22.3,22.05,20.75],
+          d30: [3.4,3.73,4.36,4.49,4.03,4.12,3.83,3.63],
+          d90: [1.44,1.45,1.51,1.53,1.61,1.66,1.52,1.46]
+        },
+        delqBudget:   { d0:22.18, d30:3.98, d90:1.65 },
+        delqLastYear: { d0:21.28, d30:3.81, d90:1.6 },
+        risk: {
+          woInYTD:    [3.34,3.76,3.49,3.49,3.39,3.44,3.48,3.52],
+          woRecYTD:   [1.02,0.73,0.78,0.8,0.84,0.86,0.93,0.97],
+          nclYTD:     [3.76,3.97,3.57,3.53,3.33,3.35,3.31,3.3],
+          lorYTD:     [1.16,0.72,0.66,0.6,0.54,0.52,0.49,0.47],
+          llpTotalYTD:[0.45,1.17,2.49,1.74,0.8,0.72,0.25,0.32],
+          recovery:   [88,92,92,92,95,94,95,96],
+          salesYTD:   [14701774,1201902,2441244,3626765,4766201,5808139,6931428,8141182]
+        },
+        budget:    { cocYTD:4.63, npl90:1.65, tor:100, woInYTD:3.57, woRecYTD:1.17, nclYTD:3.7, lorYTD:0.92, llpTotalYTD:0.93, recovery:100, salesYTD:9626754 },
+        lastYear:  { cocYTD:4.43, npl90:1.6, tor:110, woInYTD:3.11, woRecYTD:0.94, nclYTD:3.46, lorYTD:1.04, llpTotalYTD:0.98, recovery:84, salesYTD:8797076 }
+      },
+      aggNote: "Agregat Semua Car memakai sheet Car (NDF Car + DF Car New + DF Car Used + SSF) agar Budget & YoY tersedia — Syariah dihitung terpisah dan tidak masuk agregat ini.",
+      segmentOrder: ["NDF Car","DF Car Used","DF Car New","Syariah","SSF"],
+      outOfScope: [],
+      segments: {
+        "NDF Car":         {
+          enr:       [13219296,13236834,13318830,13336297,13292032,13223273,13160150,13144788],
+          cocYTD:    [3.51,4.72,5.47,4.88,3.88,3.81,3.33,3.44],
+          cocMTD:    [1.95,4.72,6.24,3.7,0.87,3.53,0.89,4.15],
+          npl90:     [1.43,1.46,1.53,1.55,1.62,1.66,1.51,1.46],
+          tor:       [126,133,121,100,88,101,90,114],
+          osInv:     [128789,107800,97358,96106,107911,103460,111215,102969],
+          llpInvYTD: [7069,-4066,-7231,-6298,-7956,-7114,-7914,-9186],
+          aging: {
+            p0:      [77.59,77.43,75.11,75.22,76.42,75.66,75.95,77.31],
+            p1_30:   [18.89,18.66,20.35,20.11,19.37,20.01,20.02,18.89],
+            p31_60:  [1.31,1.54,2.09,2.16,1.76,1.87,1.72,1.67],
+            p61_90:  [0.78,0.91,0.92,0.96,0.83,0.8,0.8,0.68],
+            p91_270: [1.43,1.46,1.53,1.55,1.62,1.66,1.51,1.46]
+          },
+          agingLastYear: { p0:77.4, p1_30:18.67, p31_60:1.49, p61_90:0.83, p91_270:1.6 },
+          delq: {
+            d0:  [22.41,22.57,24.89,24.78,23.58,24.34,24.05,22.69],
+            d30: [3.52,3.9,4.54,4.66,4.21,4.33,4.02,3.81],
+            d90: [1.43,1.46,1.53,1.55,1.62,1.66,1.51,1.46]
+          },
+          delqBudget:   { d0:24.38, d30:4.25, d90:1.69 },
+          delqLastYear: { d0:22.6, d30:3.93, d90:1.6 },
+          risk: {
+            woInYTD:    [3.18,3.69,3.56,3.48,3.36,3.38,3.43,3.47],
+            woRecYTD:   [1.07,0.77,0.81,0.82,0.88,0.91,0.99,1.05],
+            nclYTD:     [3.14,3.47,3.24,3.2,2.99,2.96,2.93,2.91],
+            lorYTD:     [0.71,0.31,0.26,0.27,0.21,0.18,0.17,0.15],
+            llpTotalYTD:[0.37,1.25,2.23,1.68,0.89,0.85,0.4,0.53],
+            recovery:   [92,97,97,96,100,100,100,100],
+            salesYTD:   [11399502,895682,1825640,2713053,3595387,4415276,5283015,6194874]
+          },
+          budget:    { cocYTD:4.3, npl90:1.69, tor:100, woInYTD:3.73, woRecYTD:1.27, nclYTD:3.51, lorYTD:0.63, llpTotalYTD:0.78, recovery:100, salesYTD:7144390 },
+          lastYear:  { cocYTD:3.57, npl90:1.6, tor:109, woInYTD:2.89, woRecYTD:1.0, nclYTD:2.76, lorYTD:0.59, llpTotalYTD:0.81, recovery:89, salesYTD:7023355 }
+        },
+        "DF Car Used":         {
+          enr:       [3970899,4059816,4147380,4219569,4219087,4205962,4216891,4247530],
+          cocYTD:    [6.39,6.64,8.45,6.72,4.83,4.66,4.1,3.97],
+          cocMTD:    [3.15,6.64,10.22,3.35,-0.72,3.98,1.36,3.17],
+          npl90:     [1.42,1.42,1.45,1.44,1.49,1.5,1.42,1.35],
+          tor:       [138,120,149,85,84,97,114,99],
+          osInv:     [43332,35656,29327,33125,37617,37982,30898,30911],
+          llpInvYTD: [119,-2531,-3845,-3069,-2814,-2489,-3850,-4137],
+          aging: {
+            p0:      [84.95,85.1,83.29,83.76,84.31,84.26,84.29,85.38],
+            p1_30:   [12.18,11.83,13.05,12.65,12.58,12.54,12.69,11.79],
+            p31_60:  [0.87,1.05,1.54,1.4,1.04,1.2,1.02,0.96],
+            p61_90:  [0.57,0.6,0.68,0.76,0.57,0.49,0.58,0.52],
+            p91_270: [1.42,1.42,1.45,1.44,1.49,1.5,1.42,1.35]
+          },
+          agingLastYear: { p0:83.79, p1_30:12.76, p31_60:1.01, p61_90:0.74, p91_270:1.7 },
+          delq: {
+            d0:  [15.05,14.9,16.71,16.24,15.69,15.74,15.71,14.62],
+            d30: [2.87,3.07,3.67,3.59,3.11,3.2,3.02,2.83],
+            d90: [1.42,1.42,1.45,1.44,1.49,1.5,1.42,1.35]
+          },
+          delqBudget:   { d0:16.89, d30:3.43, d90:1.64 },
+          delqLastYear: { d0:16.21, d30:3.45, d90:1.7 },
+          risk: {
+            woInYTD:    [3.98,3.66,3.22,3.53,3.45,3.57,3.56,3.61],
+            woRecYTD:   [0.84,0.54,0.57,0.66,0.68,0.7,0.73,0.73],
+            nclYTD:     [5.13,4.86,4.21,4.22,4.04,4.12,4.08,4.1],
+            lorYTD:     [1.79,1.54,1.42,1.22,1.15,1.12,1.12,1.09],
+            llpTotalYTD:[1.26,1.78,4.24,2.5,0.78,0.54,0.02,-0.14],
+            recovery:   [80,83,81,83,86,86,86,87],
+            salesYTD:   [2494445,228236,446336,660576,820123,959662,1120107,1307266]
+          },
+          budget:    { cocYTD:5.65, npl90:1.64, tor:100, woInYTD:3.27, woRecYTD:0.93, nclYTD:3.98, lorYTD:1.32, llpTotalYTD:1.68, recovery:100, salesYTD:1472624 },
+          lastYear:  { cocYTD:7.22, npl90:1.7, tor:109, woInYTD:3.97, woRecYTD:0.78, nclYTD:5.02, lorYTD:1.68, llpTotalYTD:2.2, recovery:78, salesYTD:1379542 }
+        },
+        "DF Car New":         {
+          enr:       [565527,534149,508987,486187,461301,437373,411000,388461],
+          cocYTD:    [6.3,4.02,2.76,3.49,4.85,5.82,4.79,5.2],
+          cocMTD:    [4.03,4.02,1.44,5.07,9.36,10.24,-1.27,8.18],
+          npl90:     [1.71,1.49,1.41,1.45,2.3,3.28,2.91,3.16],
+          tor:       [127,120,135,165,95,111,69,124],
+          osInv:     [14168,13529,12254,9278,9421,7916,10781,9534],
+          llpInvYTD: [-9540,-858,-1412,-1920,-1767,-2213,-1208,-1735],
+          aging: {
+            p0:      [73.54,72.59,69.77,70.59,70.37,69.46,69.37,69.95],
+            p1_30:   [21.93,22.84,24.4,21.56,22.09,23.18,23.66,22.59],
+            p31_60:  [1.78,2.13,3.29,4.85,2.92,2.96,2.42,3.41],
+            p61_90:  [1.03,0.95,1.13,1.56,2.32,1.12,1.64,0.89],
+            p91_270: [1.71,1.49,1.41,1.45,2.3,3.28,2.91,3.16]
+          },
+          agingLastYear: { p0:74.3, p1_30:21.63, p31_60:1.52, p61_90:1.1, p91_270:1.45 },
+          delq: {
+            d0:  [26.46,27.41,30.23,29.41,29.63,30.54,30.63,30.05],
+            d30: [4.53,4.57,5.83,7.86,7.54,7.37,6.97,7.46],
+            d90: [1.71,1.49,1.41,1.45,2.3,3.28,2.91,3.16]
+          },
+          delqBudget:   { d0:29.76, d30:5.75, d90:2.29 },
+          delqLastYear: { d0:25.7, d30:4.07, d90:1.45 },
+          risk: {
+            woInYTD:    [3.55,7.06,4.93,3.94,3.93,3.81,4.01,4.04],
+            woRecYTD:   [1.06,1.39,1.82,1.61,1.45,1.33,1.38,1.37],
+            nclYTD:     [8.96,10.48,7.65,6.59,6.54,6.86,6.59,6.48],
+            lorYTD:     [6.48,4.71,4.46,4.2,4.0,4.33,3.92,3.77],
+            llpTotalYTD:[-2.66,-6.45,-4.89,-3.1,-1.69,-1.04,-1.8,-1.28],
+            recovery:   [73,72,68,75,65,60,81,79],
+            salesYTD:   [154083,0,0,0,0,0,0,0]
+          },
+          budget:    { cocYTD:5.31, npl90:2.29, tor:100, woInYTD:4.72, woRecYTD:2.36, nclYTD:7.26, lorYTD:4.87, llpTotalYTD:-1.95, recovery:100, salesYTD:0 },
+          lastYear:  { cocYTD:7.28, npl90:1.45, tor:145, woInYTD:3.49, woRecYTD:0.67, nclYTD:8.97, lorYTD:6.2, llpTotalYTD:-1.69, recovery:58, salesYTD:132844 }
+        },
+        "Syariah":         {
+          enr:       [812179,823696,830817,837771,841040,846353,848316,850624],
+          cocYTD:    [4.23,3.0,4.2,3.65,2.9,3.29,2.53,2.43],
+          cocMTD:    [4.47,3.0,5.38,2.58,0.67,4.8,-1.16,1.79],
+          npl90:     [1.21,1.1,1.11,1.06,0.87,1.43,1.22,1.29],
+          tor:       [166,110,129,100,61,112,118,143],
+          osInv:     [5559,6123,4863,4582,6641,5922,4924,3475],
+          llpInvYTD: [-350,-349,-534,-536,-469,-415,-493,-520],
+          aging: {
+            p0:      [83.51,82.87,81.1,82.48,83.7,83.51,84.31,85.04],
+            p1_30:   [13.92,14.51,15.48,13.78,13.4,13.49,13.06,12.34],
+            p31_60:  [0.94,0.76,1.68,2.01,1.13,1.18,1.01,1.03],
+            p61_90:  [0.41,0.76,0.63,0.67,0.89,0.4,0.41,0.3],
+            p91_270: [1.21,1.1,1.11,1.06,0.87,1.43,1.22,1.29]
+          },
+          agingLastYear: { p0:81.73, p1_30:15.3, p31_60:1.11, p61_90:0.45, p91_270:1.41 },
+          delq: {
+            d0:  [16.49,17.13,18.9,17.52,16.3,16.49,15.69,14.96],
+            d30: [2.57,2.62,3.42,3.74,2.89,3.0,2.64,2.62],
+            d90: [1.21,1.1,1.11,1.06,0.87,1.43,1.22,1.29]
+          },
+          delqBudget:   { d0:17.49, d30:2.71, d90:1.12 },
+          delqLastYear: { d0:18.27, d30:2.97, d90:1.41 },
+          risk: {
+            woInYTD:    [3.38,2.0,2.05,2.24,2.72,2.43,2.4,2.3],
+            woRecYTD:   [0.55,0.19,0.41,0.62,0.72,0.65,0.75,0.78],
+            nclYTD:     [4.24,2.34,2.57,2.51,2.85,2.5,2.4,2.32],
+            lorYTD:     [1.25,0.46,0.87,0.8,0.77,0.65,0.64,0.7],
+            llpTotalYTD:[-0.01,0.66,1.63,1.14,0.05,0.79,0.14,0.11],
+            recovery:   [79,95,83,91,90,101,94,85],
+            salesYTD:   [446003,43776,81762,120896,161242,198780,235458,271228]
+          },
+          budget:    { cocYTD:4.43, npl90:1.12, tor:100, woInYTD:2.62, woRecYTD:0.39, nclYTD:3.63, lorYTD:1.22, llpTotalYTD:0.8, recovery:100, salesYTD:347240 },
+          lastYear:  { cocYTD:4.59, npl90:1.41, tor:87, woInYTD:3.61, woRecYTD:0.56, nclYTD:4.07, lorYTD:0.94, llpTotalYTD:0.52, recovery:74, salesYTD:264423 }
+        },
+        "SSF":         {
+          enr:       [154996,144191,160002,160358,172563,172481,182594,194856],
+          cocYTD:    [5.17,5.91,5.27,6.02,5.25,4.97,4.26,3.84],
+          cocMTD:    [10.06,5.91,4.79,7.4,3.18,3.87,1.1,1.71],
+          npl90:     [0.76,1.88,2.01,2.22,1.96,1.58,1.21,0.73],
+          tor:       [25,200,700,null,0,400,null,25],
+          osInv:     [2591,2242,514,275,1273,741,120,446],
+          llpInvYTD: [739,-287,-675,-679,-600,-610,-713,-666],
+          aging: {
+            p0:      [95.91,96.32,95.89,95.5,97.1,97.5,97.61,98.18],
+            p1_30:   [1.58,0.59,1.11,1.16,0.44,0.6,0.89,0.71],
+            p31_60:  [1.05,0.69,0.37,0.75,0.03,0.28,0.18,0.32],
+            p61_90:  [0.7,0.52,0.62,0.37,0.47,0.03,0.11,0.06],
+            p91_270: [0.76,1.88,2.01,2.22,1.96,1.58,1.21,0.73]
+          },
+          agingLastYear: { p0:99.68, p1_30:0.22, p31_60:0.0, p61_90:0.1, p91_270:0.0 },
+          delq: {
+            d0:  [4.09,3.68,4.11,4.5,2.9,2.5,2.39,1.82],
+            d30: [2.51,3.1,3.0,3.34,2.46,1.9,1.5,1.11],
+            d90: [0.76,1.88,2.01,2.22,1.96,1.58,1.21,0.73]
+          },
+          delqBudget:   { d0:2.73, d30:1.26, d90:0.51 },
+          delqLastYear: { d0:0.32, d30:0.1, d90:0.0 },
+          risk: {
+            woInYTD:    [0.14,0.0,0.0,1.66,2.22,3.66,3.7,4.02],
+            woRecYTD:   [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.14],
+            nclYTD:     [0.46,0.03,1.17,2.57,3.05,4.61,4.53,4.66],
+            lorYTD:     [0.28,0.02,1.17,0.9,0.66,0.81,0.71,0.57],
+            llpTotalYTD:[4.7,5.88,4.09,3.45,2.2,0.36,-0.27,-0.82],
+            recovery:   [57,101,85,79,null,73,94,125],
+            salesYTD:   [653744,77984,169268,253137,350691,433201,528305,639042]
+          },
+          budget:    { cocYTD:4.96, npl90:0.51, tor:100, woInYTD:1.01, woRecYTD:0.0, nclYTD:2.72, lorYTD:1.67, llpTotalYTD:2.24, recovery:100, salesYTD:662500 },
+          lastYear:  { cocYTD:4.94, npl90:0.0, tor:0, woInYTD:0.0, woRecYTD:0.0, nclYTD:0.0, lorYTD:0.0, llpTotalYTD:4.94, recovery:null, salesYTD:261336 }
+        },
+      }
+    },
+    "Mcy": {
+      aggregate:       {
+        enr:       [2027213,2064215,2116442,2132493,2154625,2183514,2234809,2296500],
+        cocYTD:    [7.59,11.11,11.43,10.56,9.66,9.83,9.28,9.6],
+        cocMTD:    [8.65,11.11,11.75,8.83,7.04,10.49,6.67,11.49],
+        npl90:     [2.21,2.4,2.64,2.63,2.66,2.58,2.4,2.3],
+        tor:       [115,116,107,106,92,98,93,90],
+        osInv:     [11390,10609,9618,9216,10279,10433,11215,12295],
+        llpInvYTD: [-118,-123,-413,-198,-464,-289,-381,-225],
+        aging: {
+          p0:      [75.46,74.93,72.98,74.47,75.48,75.26,75.34,76.23],
+          p1_30:   [19.28,19.41,20.44,18.99,18.47,18.8,18.97,18.34],
+          p31_60:  [1.86,1.88,2.72,2.57,2.21,2.32,2.19,2.1],
+          p61_90:  [1.19,1.38,1.22,1.34,1.18,1.04,1.1,1.03],
+          p91_270: [2.21,2.4,2.64,2.63,2.66,2.58,2.4,2.3]
+        },
+        agingLastYear: { p0:76.58, p1_30:18.16, p31_60:1.76, p61_90:1.14, p91_270:2.36 },
+        delq: {
+          d0:  [24.54,25.07,27.02,25.53,24.52,24.74,24.66,23.77],
+          d30: [5.26,5.66,6.58,6.53,6.05,5.95,5.69,5.43],
+          d90: [2.21,2.4,2.64,2.63,2.66,2.58,2.4,2.3]
+        },
+        delqBudget:   { d0:24.6, d30:5.54, d90:2.24 },
+        delqLastYear: { d0:23.42, d30:5.26, d90:2.36 },
+        risk: {
+          woInYTD:    [7.82,7.78,6.76,7.52,7.79,8.29,8.17,8.28],
+          woRecYTD:   [1.71,1.05,1.02,0.95,1.0,1.04,1.11,1.14],
+          nclYTD:     [6.65,6.92,5.99,6.81,7.01,7.42,7.21,7.27],
+          lorYTD:     [0.32,0.04,0.11,0.11,0.08,0.04,0.01,-0.01],
+          llpTotalYTD:[0.94,4.19,5.43,3.75,2.65,2.41,2.07,2.33],
+          recovery:   [98,100,98,98,101,104,104,104],
+          salesYTD:   [2656550,246127,499398,733687,981138,1235100,1514933,1816797]
+        },
+        budget:    { cocYTD:8.12, npl90:2.24, tor:100, woInYTD:8.08, woRecYTD:1.44, nclYTD:7.03, lorYTD:0.2, llpTotalYTD:1.09, recovery:100, salesYTD:2022493 },
+        lastYear:  { cocYTD:6.59, npl90:2.36, tor:101, woInYTD:7.67, woRecYTD:1.73, nclYTD:6.58, lorYTD:0.41, llpTotalYTD:0.01, recovery:95, salesYTD:1477425 }
+      },
+      aggNote: "Agregat Semua Mcy memakai sheet Motor (NDF Motor + DF Motor New) agar Budget & YoY tersedia — Noncoll dihitung terpisah dan tidak masuk agregat ini.",
+      segmentOrder: ["NDF Motor","DF Motor New","Noncoll"],
+      outOfScope: [],
+      segments: {
+        "NDF Motor":         {
+          enr:       [2026031,2063125,2115448,2131592,2153823,2182803,2234165,2295936],
+          cocYTD:    [7.59,11.1,11.43,10.56,9.67,9.83,9.28,9.61],
+          cocMTD:    [8.67,11.1,11.76,8.83,7.04,10.49,6.67,11.49],
+          npl90:     [2.21,2.4,2.64,2.63,2.66,2.58,2.4,2.3],
+          tor:       [115,116,107,106,92,97,93,90],
+          osInv:     [11356,10609,9608,9206,10270,10433,11215,12295],
+          llpInvYTD: [-37,-122,-411,-196,-468,-287,-379,-223],
+          aging: {
+            p0:      [75.45,74.92,72.98,74.47,75.47,75.25,75.34,76.23],
+            p1_30:   [19.29,19.41,20.44,18.99,18.47,18.8,18.97,18.34],
+            p31_60:  [1.87,1.88,2.72,2.57,2.21,2.32,2.19,2.1],
+            p61_90:  [1.19,1.38,1.22,1.34,1.18,1.04,1.1,1.03],
+            p91_270: [2.21,2.4,2.64,2.63,2.66,2.58,2.4,2.3]
+          },
+          agingLastYear: { p0:76.57, p1_30:18.16, p31_60:1.76, p61_90:1.14, p91_270:2.37 },
+          delq: {
+            d0:  [24.55,25.08,27.02,25.53,24.53,24.75,24.66,23.77],
+            d30: [5.26,5.67,6.58,6.54,6.05,5.95,5.69,5.43],
+            d90: [2.21,2.4,2.64,2.63,2.66,2.58,2.4,2.3]
+          },
+          delqBudget:   { d0:24.6, d30:5.54, d90:2.24 },
+          delqLastYear: { d0:23.43, d30:5.27, d90:2.37 },
+          risk: {
+            woInYTD:    [7.82,7.78,6.76,7.52,7.79,8.29,8.17,8.28],
+            woRecYTD:   [1.71,1.05,1.02,0.95,1.0,1.04,1.11,1.14],
+            nclYTD:     [6.64,6.91,5.99,6.81,7.01,7.42,7.21,7.28],
+            lorYTD:     [0.31,0.03,0.1,0.11,0.08,0.04,0.01,-0.01],
+            llpTotalYTD:[0.95,4.19,5.44,3.75,2.66,2.42,2.07,2.33],
+            recovery:   [98,101,98,98,101,104,104,104],
+            salesYTD:   [2655739,246127,499398,733687,981138,1235100,1514933,1816797]
+          },
+          budget:    { cocYTD:8.12, npl90:2.24, tor:100, woInYTD:8.08, woRecYTD:1.44, nclYTD:7.03, lorYTD:0.2, llpTotalYTD:1.09, recovery:100, salesYTD:2022493 },
+          lastYear:  { cocYTD:6.58, npl90:2.37, tor:101, woInYTD:7.66, woRecYTD:1.73, nclYTD:6.56, lorYTD:0.39, llpTotalYTD:0.03, recovery:95, salesYTD:1476647 }
+        },
+        "DF Motor New":         {
+          enr:       [1183,1089,994,901,802,711,644,564],
+          cocYTD:    [10.52,19.59,9.42,5.23,5.57,4.22,4.1,3.54],
+          cocMTD:    [-18.29,19.59,-1.68,-4.41,6.82,-2.89,3.34,-1.48],
+          npl90:     [0.0,0.41,0.45,0.5,0.0,0.0,0.0,0.0],
+          tor:       [null,null,0,null,null,null,null,null],
+          osInv:     [33,0,10,10,10,0,0,0],
+          llpInvYTD: [-81,-2,-1,-1,3,-2,-2,-2],
+          aging: {
+            p0:      [85.26,79.67,79.21,84.72,79.81,83.2,82.29,83.77],
+            p1_30:   [14.36,19.92,20.33,14.78,20.19,16.8,15.64,13.03],
+            p31_60:  [0.0,0.0,0.0,0.0,0.0,0.0,2.06,3.19],
+            p61_90:  [0.38,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            p91_270: [0.0,0.41,0.45,0.5,0.0,0.0,0.0,0.0]
+          },
+          agingLastYear: { p0:88.75, p1_30:9.25, p31_60:0.72, p61_90:1.28, p91_270:0.0 },
+          delq: {
+            d0:  [14.74,20.33,20.79,15.28,20.19,16.8,17.71,16.23],
+            d30: [0.38,0.41,0.45,0.5,0.0,0.0,2.06,3.19],
+            d90: [0.0,0.41,0.45,0.5,0.0,0.0,0.0,0.0]
+          },
+          delqBudget:   { d0:24.6, d30:5.54, d90:2.24 },
+          delqLastYear: { d0:11.25, d30:2.01, d90:0.0 },
+          risk: {
+            woInYTD:    [8.5,0.0,0.0,0.0,1.38,1.16,1.01,0.91],
+            woRecYTD:   [0.39,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            nclYTD:     [20.95,17.96,9.37,6.53,6.51,6.93,6.05,5.44],
+            lorYTD:     [12.8,17.96,9.37,6.53,5.13,5.77,5.04,4.53],
+            llpTotalYTD:[-10.43,1.63,0.05,-1.3,-0.94,-2.71,-1.95,-1.9],
+            recovery:   [null,50,null,null,null,41,null,null],
+            salesYTD:   [811,0,0,0,0,0,0,0]
+          },
+          budget:    { cocYTD:8.12, npl90:2.24, tor:100, woInYTD:8.08, woRecYTD:1.44, nclYTD:7.03, lorYTD:0.2, llpTotalYTD:1.09, recovery:100, salesYTD:2022493 },
+          lastYear:  { cocYTD:13.8, npl90:0.0, tor:200, woInYTD:10.9, woRecYTD:0.6, nclYTD:25.95, lorYTD:15.65, llpTotalYTD:-12.15, recovery:32, salesYTD:778 }
+        },
+        "Noncoll":         {
+          enr:       [0,0,0,0,0,0,0,0],
+          cocYTD:    [25.6,null,null,null,null,null,null,null],
+          cocMTD:    [null,null,null,null,null,null,null,null],
+          npl90:     [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+          tor:       [null,null,null,null,null,null,null,null],
+          osInv:     [0,0,0,0,0,0,0,0],
+          llpInvYTD: [0,0,0,0,0,0,0,0],
+          aging: {
+            p0:      [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            p1_30:   [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            p31_60:  [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            p61_90:  [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            p91_270: [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+          },
+          agingLastYear: { p0:0.0, p1_30:0.0, p31_60:1.54, p61_90:8.14, p91_270:90.33 },
+          delq: {
+            d0:  [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            d30: [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            d90: [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+          },
+          delqBudget:   { d0:null, d30:null, d90:null },
+          delqLastYear: { d0:100.0, d30:100.0, d90:90.33 },
+          risk: {
+            woInYTD:    [185.81,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            woRecYTD:   [48.15,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            nclYTD:     [138.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            lorYTD:     [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            llpTotalYTD:[-112.45,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+            recovery:   [null,null,null,null,null,null,null,null],
+            salesYTD:   [0,0,0,0,0,0,0,0]
+          },
+          budget:    { cocYTD:null, npl90:null, tor:100, woInYTD:null, woRecYTD:null, nclYTD:null, lorYTD:null, llpTotalYTD:null, recovery:100, salesYTD:null },
+          lastYear:  { cocYTD:38.49, npl90:90.33, tor:null, woInYTD:184.27, woRecYTD:39.01, nclYTD:145.67, lorYTD:0.0, llpTotalYTD:-107.18, recovery:null, salesYTD:0 }
+        },
+      }
+    },
+    "Leasing": {
+      aggregate:       {
+        enr:       [3928272,3974269,4029400,4043956,4039564,4018981,3928393,3872408],
+        cocYTD:    [2.02,4.15,4.46,5.53,3.45,3.52,4.54,3.77],
+        cocMTD:    [-0.78,4.15,4.76,7.62,-2.73,3.83,9.6,-0.97],
+        npl90:     [0.69,0.65,0.68,1.1,0.87,1.03,1.14,0.95],
+        tor:       [22,175,1300,62,24,144,31,144],
+        osInv:     [51985,51339,46254,48519,54171,51423,113073,108088],
+        llpInvYTD: [5691,3911,2861,4237,3538,2419,35312,36561],
+        aging: {
+          p0:      [88.33,88.33,85.79,82.76,87.03,85.53,86.49,88.01],
+          p1_30:   [9.84,9.39,11.02,13.76,9.6,11.01,9.84,8.82],
+          p31_60:  [0.79,1.32,1.61,1.56,1.53,1.6,1.6,1.36],
+          p61_90:  [0.35,0.3,0.89,0.82,0.97,0.84,0.93,0.85],
+          p91_270: [0.69,0.65,0.68,1.1,0.87,1.03,1.14,0.95]
+        },
+        agingLastYear: { p0:88.0, p1_30:9.08, p31_60:1.13, p61_90:0.61, p91_270:1.18 },
+        delq: {
+          d0:  [11.67,11.67,14.21,17.24,12.97,14.47,13.51,11.99],
+          d30: [1.83,2.28,3.18,3.48,3.37,3.46,3.67,3.16],
+          d90: [0.69,0.65,0.68,1.1,0.87,1.03,1.14,0.95]
+        },
+        delqBudget:   { d0:14.89, d30:2.8, d90:1.01 },
+        delqLastYear: { d0:12.0, d30:2.93, d90:1.18 },
+        risk: {
+          woInYTD:    [0.79,1.17,1.16,1.26,1.04,0.96,0.92,0.98],
+          woRecYTD:   [0.21,0.24,0.4,0.43,0.43,0.37,0.37,0.41],
+          nclYTD:     [0.86,1.16,0.99,1.21,0.99,1.09,1.08,1.19],
+          lorYTD:     [0.27,0.12,0.17,0.34,0.33,0.45,0.49,0.58],
+          llpTotalYTD:[1.16,2.99,3.47,4.32,2.46,2.44,3.46,2.58],
+          recovery:   [56,85,91,56,74,74,67,69],
+          salesYTD:   [3149640,305202,603081,881440,1176395,1415295,1658606,1877577]
+        },
+        budget:    { cocYTD:1.69, npl90:1.01, tor:100, woInYTD:1.07, woRecYTD:0.49, nclYTD:0.92, lorYTD:0.34, llpTotalYTD:0.77, recovery:100, salesYTD:1939600 },
+        lastYear:  { cocYTD:2.63, npl90:1.18, tor:46, woInYTD:0.58, woRecYTD:0.18, nclYTD:0.57, lorYTD:0.17, llpTotalYTD:2.06, recovery:96, salesYTD:1773802 }
+      },
+      aggNote: "",
+      segmentOrder: ["HETO","Machinery"],
+      outOfScope: [],
+      segments: {
+        "HETO":         {
+          enr:       [3235553,3260577,3299115,3311089,3302638,3286745,3199460,3149731],
+          cocYTD:    [1.85,3.53,4.77,5.51,3.41,3.59,4.94,4.05],
+          cocMTD:    [-0.07,3.53,5.99,6.96,-2.83,4.28,11.75,-1.44],
+          npl90:     [0.77,0.72,0.8,1.17,0.94,0.99,1.13,0.9],
+          tor:       [25,350,1200,42,47,158,28,185],
+          osInv:     [42165,41047,36371,40762,44628,41998,102992,97246],
+          llpInvYTD: [4950,1531,97,2772,1343,1744,33755,34026],
+          aging: {
+            p0:      [87.2,87.26,85.12,81.62,86.57,84.61,85.76,87.74],
+            p1_30:   [10.79,10.21,11.3,14.83,10.01,12.15,10.67,9.31],
+            p31_60:  [0.9,1.45,1.84,1.46,1.53,1.36,1.61,1.26],
+            p61_90:  [0.34,0.36,0.94,0.91,0.95,0.89,0.83,0.79],
+            p91_270: [0.77,0.72,0.8,1.17,0.94,0.99,1.13,0.9]
+          },
+          agingLastYear: { p0:87.18, p1_30:9.75, p31_60:1.28, p61_90:0.69, p91_270:1.11 },
+          delq: {
+            d0:  [12.8,12.74,14.88,18.38,13.43,15.39,14.24,12.26],
+            d30: [2.01,2.53,3.59,3.55,3.42,3.24,3.57,2.95],
+            d90: [0.77,0.72,0.8,1.17,0.94,0.99,1.13,0.9]
+          },
+          delqBudget:   { d0:16.54, d30:3.05, d90:1.01 },
+          delqLastYear: { d0:12.82, d30:3.07, d90:1.11 },
+          risk: {
+            woInYTD:    [0.66,1.03,1.13,1.34,1.11,1.04,1.01,1.09],
+            woRecYTD:   [0.22,0.28,0.18,0.29,0.34,0.29,0.31,0.37],
+            nclYTD:     [0.6,1.03,1.2,1.25,1.02,1.1,1.1,1.25],
+            lorYTD:     [0.15,0.14,0.18,0.15,0.21,0.3,0.35,0.49],
+            llpTotalYTD:[1.24,2.51,3.57,4.26,2.39,2.49,3.84,2.8],
+            recovery:   [56,85,93,91,74,81,73,70],
+            salesYTD:   [2520595,237125,469758,697535,931383,1128114,1328044,1505439]
+          },
+          budget:    { cocYTD:1.59, npl90:1.01, tor:100, woInYTD:1.14, woRecYTD:0.54, nclYTD:0.98, lorYTD:0.38, llpTotalYTD:0.61, recovery:100, salesYTD:1532600 },
+          lastYear:  { cocYTD:2.25, npl90:1.11, tor:43, woInYTD:0.44, woRecYTD:0.17, nclYTD:0.38, lorYTD:0.1, llpTotalYTD:1.87, recovery:106, salesYTD:1421928 }
+        },
+        "Machinery":         {
+          enr:       [692718,713692,730285,732867,736926,732236,728933,722678],
+          cocYTD:    [2.9,7.0,3.04,5.62,3.61,3.24,2.71,2.48],
+          cocMTD:    [-4.15,7.0,-0.81,10.61,-2.3,1.8,0.07,1.08],
+          npl90:     [0.33,0.35,0.14,0.79,0.57,1.18,1.21,1.18],
+          tor:       [0,0,null,300,0,117,100,40],
+          osInv:     [9820,10292,9884,7757,9543,9424,10081,10843],
+          llpInvYTD: [740,2379,2764,1466,2195,675,1557,2535],
+          aging: {
+            p0:      [93.57,93.18,88.82,87.83,89.07,89.62,89.65,89.18],
+            p1_30:   [5.42,5.67,9.8,8.97,7.79,5.94,6.24,6.73],
+            p31_60:  [0.31,0.78,0.57,1.99,1.52,2.66,1.53,1.81],
+            p61_90:  [0.38,0.04,0.67,0.43,1.05,0.6,1.37,1.1],
+            p91_270: [0.33,0.35,0.14,0.79,0.57,1.18,1.21,1.18]
+          },
+          agingLastYear: { p0:92.08, p1_30:5.74, p31_60:0.4, p61_90:0.25, p91_270:1.54 },
+          delq: {
+            d0:  [6.43,6.82,11.18,12.17,10.93,10.38,10.35,10.82],
+            d30: [1.02,1.16,1.38,3.2,3.15,4.44,4.11,4.09],
+            d90: [0.33,0.35,0.14,0.79,0.57,1.18,1.21,1.18]
+          },
+          delqBudget:   { d0:7.77, d30:1.69, d90:0.98 },
+          delqLastYear: { d0:7.92, d30:2.19, d90:1.54 },
+          risk: {
+            woInYTD:    [1.46,1.81,1.34,0.9,0.76,0.61,0.51,0.49],
+            woRecYTD:   [0.19,0.02,1.44,1.06,0.81,0.72,0.63,0.57],
+            nclYTD:     [2.18,1.79,0.03,1.03,0.85,1.03,1.0,0.91],
+            lorYTD:     [0.91,0.0,0.14,1.19,0.89,1.13,1.12,0.99],
+            llpTotalYTD:[0.72,5.2,3.01,4.59,2.76,2.22,1.71,1.57],
+            recovery:   [null,null,61,20,null,49,33,11],
+            salesYTD:   [629045,68078,133323,183906,245012,287182,330562,372139]
+          },
+          budget:    { cocYTD:2.16, npl90:0.98, tor:100, woInYTD:0.76, woRecYTD:0.27, nclYTD:0.65, lorYTD:0.16, llpTotalYTD:1.52, recovery:100, salesYTD:407000 },
+          lastYear:  { cocYTD:4.62, npl90:1.54, tor:50, woInYTD:1.3, woRecYTD:0.22, nclYTD:1.6, lorYTD:0.52, llpTotalYTD:3.02, recovery:77, salesYTD:351874 }
+        },
+      }
+    },
+    "PBF": {
+      aggregate:       {
+        enr:       [1444722,1451389,1449361,1459591,1462267,1484127,1507236,1514486],
+        cocYTD:    [5.21,9.91,8.0,3.32,4.47,3.4,2.58,1.49],
+        cocMTD:    [-0.04,9.91,6.09,-5.99,7.88,-0.82,-1.41,-4.88],
+        npl90:     [2.17,2.48,2.16,1.84,2.21,2.15,2.26,1.46],
+        tor:       [420,100,0,0,50,125,900,0],
+        osInv:     [21071,20983,24593,26998,27336,25738,22235,23087],
+        llpInvYTD: [2908,1365,3527,3570,5549,5691,3995,3900],
+        aging: {
+          p0:      [78.04,76.43,80.83,81.63,81.15,80.88,81.56,81.83],
+          p1_30:   [16.58,17.77,14.25,13.88,13.95,14.4,13.49,14.11],
+          p31_60:  [1.75,1.88,1.75,1.31,1.9,1.54,1.84,1.6],
+          p61_90:  [1.46,1.44,1.01,1.34,0.78,1.03,0.84,1.01],
+          p91_270: [2.17,2.48,2.16,1.84,2.21,2.15,2.26,1.46]
+        },
+        agingLastYear: { p0:78.15, p1_30:16.81, p31_60:1.87, p61_90:0.99, p91_270:2.17 },
+        delq: {
+          d0:  [21.96,23.57,19.17,18.37,18.85,19.12,18.44,18.17],
+          d30: [5.38,5.8,4.91,4.48,4.89,4.72,4.94,4.06],
+          d90: [2.17,2.48,2.16,1.84,2.21,2.15,2.26,1.46]
+        },
+        delqBudget:   { d0:24.21, d30:6.32, d90:2.62 },
+        delqLastYear: { d0:21.85, d30:5.03, d90:2.17 },
+        risk: {
+          woInYTD:    [1.66,5.78,4.79,4.1,3.51,3.15,2.63,3.69],
+          woRecYTD:   [0.88,0.83,0.44,0.42,0.42,0.71,0.94,1.42],
+          nclYTD:     [2.69,5.06,4.41,3.76,3.15,2.49,1.88,2.49],
+          lorYTD:     [0.59,0.01,0.0,0.0,-0.01,-0.03,0.09,0.08],
+          llpTotalYTD:[2.52,4.85,3.59,-0.43,1.32,0.91,0.7,-1.01],
+          recovery:   [65,99,null,null,112,108,75,null],
+          salesYTD:   [901524,63066,114938,165285,216605,285862,356866,428740]
+        },
+        budget:    { cocYTD:3.63, npl90:2.62, tor:100, woInYTD:2.48, woRecYTD:1.48, nclYTD:1.87, lorYTD:0.55, llpTotalYTD:1.76, recovery:100, salesYTD:521025 },
+        lastYear:  { cocYTD:5.58, npl90:2.17, tor:100, woInYTD:1.28, woRecYTD:0.39, nclYTD:1.17, lorYTD:0.23, llpTotalYTD:4.41, recovery:69, salesYTD:505016 }
+      },
+      aggNote: "",
+      segmentOrder: ["PBF & PBF_PM"],
+      outOfScope: [],
+      segments: {
+        "PBF & PBF_PM":         {
+          enr:       [1444722,1451389,1449361,1459591,1462267,1484127,1507236,1514486],
+          cocYTD:    [5.21,9.91,8.0,3.32,4.47,3.4,2.58,1.49],
+          cocMTD:    [-0.04,9.91,6.09,-5.99,7.88,-0.82,-1.41,-4.88],
+          npl90:     [2.17,2.48,2.16,1.84,2.21,2.15,2.26,1.46],
+          tor:       [420,100,0,0,50,125,900,0],
+          osInv:     [21071,20983,24593,26998,27336,25738,22235,23087],
+          llpInvYTD: [2908,1365,3527,3570,5549,5691,3995,3900],
+          aging: {
+            p0:      [78.04,76.43,80.83,81.63,81.15,80.88,81.56,81.83],
+            p1_30:   [16.58,17.77,14.25,13.88,13.95,14.4,13.49,14.11],
+            p31_60:  [1.75,1.88,1.75,1.31,1.9,1.54,1.84,1.6],
+            p61_90:  [1.46,1.44,1.01,1.34,0.78,1.03,0.84,1.01],
+            p91_270: [2.17,2.48,2.16,1.84,2.21,2.15,2.26,1.46]
+          },
+          agingLastYear: { p0:78.15, p1_30:16.81, p31_60:1.87, p61_90:0.99, p91_270:2.17 },
+          delq: {
+            d0:  [21.96,23.57,19.17,18.37,18.85,19.12,18.44,18.17],
+            d30: [5.38,5.8,4.91,4.48,4.89,4.72,4.94,4.06],
+            d90: [2.17,2.48,2.16,1.84,2.21,2.15,2.26,1.46]
+          },
+          delqBudget:   { d0:24.21, d30:6.32, d90:2.62 },
+          delqLastYear: { d0:21.85, d30:5.03, d90:2.17 },
+          risk: {
+            woInYTD:    [1.66,5.78,4.79,4.1,3.51,3.15,2.63,3.69],
+            woRecYTD:   [0.88,0.83,0.44,0.42,0.42,0.71,0.94,1.42],
+            nclYTD:     [2.69,5.06,4.41,3.76,3.15,2.49,1.88,2.49],
+            lorYTD:     [0.59,0.01,0.0,0.0,-0.01,-0.03,0.09,0.08],
+            llpTotalYTD:[2.52,4.85,3.59,-0.43,1.32,0.91,0.7,-1.01],
+            recovery:   [65,99,null,null,112,108,75,null],
+            salesYTD:   [901524,63066,114938,165285,216605,285862,356866,428740]
+          },
+          budget:    { cocYTD:3.63, npl90:2.62, tor:100, woInYTD:2.48, woRecYTD:1.48, nclYTD:1.87, lorYTD:0.55, llpTotalYTD:1.76, recovery:100, salesYTD:521025 },
+          lastYear:  { cocYTD:5.58, npl90:2.17, tor:100, woInYTD:1.28, woRecYTD:0.39, nclYTD:1.17, lorYTD:0.23, llpTotalYTD:4.41, recovery:69, salesYTD:505016 }
+        },
+      }
+    },
+  }
+};
+/* ============================================================
+   ===== AKHIR BAGIAN DATA =====
+   Kode di bawah ini generik — tidak perlu diubah tiap periode.
+   ============================================================ */
+
+const LAST = DATA.months.length - 1;
+let charts = {};
+
+function fmtNum(v, digits=0){
+  if(v===null || v===undefined || Number.isNaN(v)) return "n/a";
+  return v.toLocaleString("id-ID", {maximumFractionDigits:digits, minimumFractionDigits:digits});
+}
+function fmtPct(v, digits=2){
+  if(v===null || v===undefined) return "n/a";
+  return v.toFixed(digits) + "%";
+}
+function pctTick(v){ return (Math.round(Number(v)*100)/100) + "%"; }
+function destroy(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+function hasData(obj){
+  return obj && obj.enr && obj.enr[LAST]!==null && obj.enr[LAST]!==undefined && obj.enr[LAST]!==0;
+}
+
+function deltaTag(actual, ref, lowerIsBetter=true){
+  if(actual===null || ref===null || actual===undefined || ref===undefined) return {cls:"neutral", txt:"n/a"};
+  const d = actual - ref;
+  const good = lowerIsBetter ? d <= 0 : d >= 0;
+  return { cls: good ? "good" : "bad", d };
+}
+
+function statusTag(actual, budget, lowerIsBetter=true){
+  if(actual===null || actual===undefined) return '<span class="tag na">n/a</span>';
+  if(budget===null || budget===undefined) return '<span class="tag na">no budget</span>';
+  const d = actual - budget;
+  const relDiff = budget !== 0 ? Math.abs(d / budget) : Math.abs(d);
+  const good = lowerIsBetter ? d<=0 : d>=0;
+  const watch = !good && relDiff<=0.05;
+  if(good) return '<span class="tag good">on track</span>';
+  if(watch) return '<span class="tag watch">watch</span>';
+  return lowerIsBetter ? '<span class="tag bad">over budget</span>' : '<span class="tag bad">not achieve budget</span>';
+}
+function yoyTag(actual, ly, lowerIsBetter=true){
+  if(actual===null || actual===undefined || ly===null || ly===undefined) return '<span class="tag na">YoY n/a</span>';
+  const d = actual - ly;
+  const better = lowerIsBetter ? d<=0 : d>=0;
+  return better ? '<span class="tag good">better than YoY</span>' : '<span class="tag bad">worse than YoY</span>';
+}
+
+/* ---------- generic detail panel (KPI + trend + mini + aging + risk table) ---------- */
+function panelHTML(prefix){
+  return `
+    <div class="kpi-grid" id="${prefix}-kpiGrid"></div>
+    <div class="chart-card" style="margin-bottom:20px;">
+      <p class="chart-title" id="${prefix}-trendTitle">COC YTD% per bulan — realisasi vs budget vs baseline tahun lalu</p>
+      <p class="chart-sub">Abu-abu putus-putus = budget · Kuning putus-putus = baseline bulan sama tahun lalu</p>
+      <div class="chart-canvas-wrap" style="height:260px;"><canvas id="${prefix}-trendChart"></canvas></div>
+    </div>
+
+    <p class="section-label" style="margin-bottom:8px;">Komponen pembentuk COC (trend bulanan)</p>
+    <div class="grid-auto-small" id="${prefix}-compGrid" style="margin-bottom:20px;"></div>
+
+    <p class="section-label" style="margin-bottom:8px;">Bucket current & delikuensi kumulatif (% ENR)</p>
+    <p class="chart-sub" style="margin-top:-6px; margin-bottom:10px;">Abu-abu putus-putus = budget, jika tersedia</p>
+    <div class="grid-auto-small" id="${prefix}-delqGrid" style="margin-bottom:20px;"></div>
+
+    <p class="section-label" style="margin-bottom:8px;">Write-off: keluar vs recovery</p>
+    <div class="grid-auto-small" id="${prefix}-woGrid" style="margin-bottom:20px;"></div>
+
+    <div class="chart-card" style="overflow-x:auto;">
+      <table class="summary" id="${prefix}-riskTable">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th style="text-align:right;">Realisasi</th>
+            <th style="text-align:right;">vs LM (M-1)</th>
+            <th style="text-align:right;">Budget</th>
+            <th style="text-align:right;">YoY baseline*</th>
+            <th>Status vs budget & YoY</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p class="chart-sub" style="margin-top:10px;">*Baseline tahunan = realisasi bulan yang sama tahun sebelumnya · vs LM = perubahan dari bulan sebelumnya (M-1)</p>
+    </div>
+  `;
+}
+
+/* small-multiple chart card generator (title + optional sub + canvas placeholder) */
+function chartCard(canvasId, title, sub){
+  return `
+    <div class="chart-card">
+      <p class="chart-title">${title}</p>
+      ${sub ? `<p class="chart-sub">${sub}</p>` : ''}
+      <div class="chart-canvas-wrap" style="height:120px;"><canvas id="${canvasId}"></canvas></div>
+    </div>
+  `;
+}
+
+function renderKPI(prefix, obj, label){
+  const grid = document.getElementById(`${prefix}-kpiGrid`);
+  const cocNow = obj.cocYTD[LAST];
+  const cocLM = obj.cocYTD[LAST-1];
+  const enrNow = obj.enr[LAST];
+  const budgetCoc = obj.budget ? obj.budget.cocYTD : null;
+  const lyCoc = obj.lastYear ? obj.lastYear.cocYTD : null;
+  const dBudget = deltaTag(cocNow, budgetCoc, true);
+  const dLY = deltaTag(cocNow, lyCoc, true);
+  const dLM = deltaTag(cocNow, cocLM, true);
+
+  grid.innerHTML = `
+    <div class="kpi-card">
+      <p class="label">ENR — ${DATA.months[LAST]}</p>
+      <p class="value">${fmtNum(enrNow)}</p>
+      <p class="delta neutral">Rp juta</p>
+    </div>
+    <div class="kpi-card">
+      <p class="label">COC YTD%</p>
+      <p class="value">${fmtPct(cocNow)}</p>
+      <p class="delta neutral">Kumulatif tahun berjalan</p>
+    </div>
+    <div class="kpi-card">
+      <p class="label">vs Bulan Lalu (${DATA.months[LAST-1]}: ${fmtPct(cocLM)})</p>
+      <p class="value" style="font-size:20px;">${dLM.d!==undefined ? (dLM.d>=0?"+":"")+dLM.d.toFixed(2)+"pp" : "n/a"}</p>
+      <p class="delta ${dLM.cls}">${dLM.cls==="good" ? "Membaik MoM" : dLM.cls==="bad" ? "Memburuk MoM" : "n/a"}</p>
+    </div>
+    <div class="kpi-card">
+      <p class="label">vs Budget ${budgetCoc!==null&&budgetCoc!==undefined ? "("+fmtPct(budgetCoc)+")" : ""}</p>
+      <p class="value" style="font-size:20px;">${dBudget.d!==undefined ? (dBudget.d>=0?"+":"")+dBudget.d.toFixed(2)+"pp" : "n/a"}</p>
+      <p class="delta ${dBudget.cls}">${dBudget.cls==="good" ? "Di bawah budget" : dBudget.cls==="bad" ? "Di atas budget" : "Tidak ada budget"}</p>
+    </div>
+    <div class="kpi-card">
+      <p class="label">vs ${DATA.months[LAST]} tahun lalu ${lyCoc!==null&&lyCoc!==undefined ? "("+fmtPct(lyCoc)+")" : ""}</p>
+      <p class="value" style="font-size:20px;">${dLY.d!==undefined ? (dLY.d>=0?"+":"")+dLY.d.toFixed(2)+"pp" : "n/a"}</p>
+      <p class="delta ${dLY.cls}">${dLY.cls==="good" ? "Membaik YoY" : dLY.cls==="bad" ? "Memburuk YoY" : "n/a"}</p>
+    </div>
+  `;
+}
+
+function renderTrendChart(prefix, obj, label){
+  destroy(`${prefix}-trendChart`);
+  document.getElementById(`${prefix}-trendTitle`).textContent = `Trend COC YTD% — ${label}`;
+  const budgetLine = obj.budget ? DATA.months.map(()=>obj.budget.cocYTD) : null;
+  const lyLine = (obj.lastYear && obj.lastYear.cocYTD!==null && obj.lastYear.cocYTD!==undefined) ? DATA.months.map(()=>obj.lastYear.cocYTD) : null;
+  const datasets = [{
+    label: "COC YTD% realisasi", data: obj.cocYTD, borderColor:"#185fa5", backgroundColor:"rgba(24,95,165,0.08)",
+    borderWidth:2, tension:0.25, fill:true, pointRadius:3, pointBackgroundColor:"#185fa5", spanGaps:true
+  }];
+  if(budgetLine) datasets.push({ label:"Budget", data:budgetLine, borderColor:"#9ca3af", borderDash:[5,4], borderWidth:1.5, pointRadius:0, fill:false });
+  if(lyLine) datasets.push({ label:`${DATA.months[LAST]} tahun lalu (YoY)`, data:lyLine, borderColor:"#b07811", borderDash:[2,3], borderWidth:1.5, pointRadius:0, fill:false });
+  charts[`${prefix}-trendChart`] = new Chart(document.getElementById(`${prefix}-trendChart`), {
+    type:"line", data:{ labels:DATA.months, datasets },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:true, position:"top", align:"end", labels:{boxWidth:10, font:{size:11}, color:"#42505f"} } },
+      scales:{ y:{ ticks:{ callback:v=>pctTick(v), color:"#6b7889", font:{size:11} }, grid:{color:"#eef1f4"} }, x:{ ticks:{color:"#6b7889", font:{size:11}}, grid:{display:false} } } }
+  });
+}
+
+/* generic mini line chart. budgetVal (scalar) draws a flat dashed reference line if provided. */
+function miniLineChart(canvasId, data, color, opts={}){
+  destroy(canvasId);
+  const datasets = [{ data, borderColor:color, backgroundColor:opts.fillBg||"transparent", borderWidth:2, tension:0.25, fill:!!opts.fillBg, pointRadius:2, spanGaps:true }];
+  if(opts.budgetVal!==null && opts.budgetVal!==undefined){
+    datasets.push({ data: DATA.months.map(()=>opts.budgetVal), borderColor:"#9ca3af", borderDash:[4,3], borderWidth:1.5, pointRadius:0, fill:false });
+  }
+  const tickFmt = opts.tickFmt || (v=>pctTick(v));
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:"line",
+    data:{ labels:DATA.months, datasets },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ y:{ ticks:{ callback:tickFmt, color:"#6b7889", font:{size:10} }, grid:{color:"#eef1f4"} }, x:{ ticks:{color:"#6b7889", font:{size:9}}, grid:{display:false} } } }
+  });
+}
+
+/* ---------- Row 2: komponen pembentuk COC — LLP, NCL, OS INV, LOR, TOR ---------- */
+function renderCompCharts(prefix, obj){
+  const ids = [`${prefix}-llpChart`,`${prefix}-nclChart`,`${prefix}-osinvChart`,`${prefix}-lorChart`,`${prefix}-torChart`];
+  ids.forEach(destroy);
+  const grid = document.getElementById(`${prefix}-compGrid`);
+  grid.innerHTML =
+    chartCard(`${prefix}-llpChart`, "Δ LLP Total YTD%") +
+    chartCard(`${prefix}-nclChart`, "NCL YTD%") +
+    chartCard(`${prefix}-osinvChart`, "OS INV (Rp juta)") +
+    chartCard(`${prefix}-lorChart`, "LOR YTD%") +
+    chartCard(`${prefix}-torChart`, "TOR (%)");
+  miniLineChart(`${prefix}-llpChart`, obj.risk.llpTotalYTD, "#c14b2a", { budgetVal: obj.budget?obj.budget.llpTotalYTD:null });
+  miniLineChart(`${prefix}-nclChart`, obj.risk.nclYTD, "#2c5a7a", { budgetVal: obj.budget?obj.budget.nclYTD:null });
+  miniLineChart(`${prefix}-osinvChart`, obj.osInv, "#b07811", { tickFmt: v=>fmtNum(v) });
+  miniLineChart(`${prefix}-lorChart`, obj.risk.lorYTD, "#8a5a08", { budgetVal: obj.budget?obj.budget.lorYTD:null });
+  miniLineChart(`${prefix}-torChart`, obj.tor, "#12886e", { budgetVal: obj.budget?obj.budget.tor:null, fillBg:"rgba(18,136,110,0.08)" });
+}
+
+/* ---------- Row 4: bucket current (0 hari) + delq 0+/30+/90+, each with budget reference ---------- */
+function renderDelqCharts(prefix, obj){
+  const ids = [`${prefix}-curChart`,`${prefix}-delq0Chart`,`${prefix}-delq30Chart`,`${prefix}-delq90Chart`];
+  ids.forEach(destroy);
+  const grid = document.getElementById(`${prefix}-delqGrid`);
+  if(!obj.aging || !obj.delq){ grid.innerHTML = ""; return; }
+  grid.innerHTML =
+    chartCard(`${prefix}-curChart`, "Bucket 0 hari / current") +
+    chartCard(`${prefix}-delq0Chart`, "Delq 0+", "1-30 s/d 91-270 hari") +
+    chartCard(`${prefix}-delq30Chart`, "Delq 30+", "31-60 s/d 91-270 hari") +
+    chartCard(`${prefix}-delq90Chart`, "Delq 90+ (= NPL)", "91-270 hari");
+  miniLineChart(`${prefix}-curChart`, obj.aging.p0, "#12886e", { fillBg:"rgba(18,136,110,0.08)" });
+  miniLineChart(`${prefix}-delq0Chart`, obj.delq.d0, "#2c5a7a", { budgetVal: obj.delqBudget?obj.delqBudget.d0:null });
+  miniLineChart(`${prefix}-delq30Chart`, obj.delq.d30, "#b07811", { budgetVal: obj.delqBudget?obj.delqBudget.d30:null });
+  miniLineChart(`${prefix}-delq90Chart`, obj.delq.d90, "#7f2020", { budgetVal: obj.delqBudget?obj.delqBudget.d90:null, fillBg:"rgba(127,32,32,0.08)" });
+}
+
+/* ---------- Row 5: WO In vs WO Rec ---------- */
+function renderWoCharts(prefix, obj){
+  const ids = [`${prefix}-woInChart`,`${prefix}-woRecChart`];
+  ids.forEach(destroy);
+  const grid = document.getElementById(`${prefix}-woGrid`);
+  grid.innerHTML =
+    chartCard(`${prefix}-woInChart`, "WO In YTD%", "Piutang yang di-write-off") +
+    chartCard(`${prefix}-woRecChart`, "WO Rec YTD%", "Recovery dari piutang WO");
+  miniLineChart(`${prefix}-woInChart`, obj.risk.woInYTD, "#c14b2a", { budgetVal: obj.budget?obj.budget.woInYTD:null });
+  miniLineChart(`${prefix}-woRecChart`, obj.risk.woRecYTD, "#12886e", { budgetVal: obj.budget?obj.budget.woRecYTD:null, fillBg:"rgba(18,136,110,0.08)" });
+}
+
+function riskRow(label, unitFn, actual, lm, budget, ly, lowerIsBetter=true){
+  const lmTag = (actual===null||actual===undefined||lm===null||lm===undefined)
+    ? '<span class="tag na">n/a</span>'
+    : (() => {
+        const d = actual - lm;
+        if(Math.abs(d) < 1e-9) return '<span class="tag na">flat</span>';
+        const good = lowerIsBetter ? d<=0 : d>=0;
+        const arrow = d>0 ? "▲" : "▼";
+        return `<span class="tag ${good?'good':'bad'}">${arrow} ${unitFn(Math.abs(d))}</span>`;
+      })();
+  return `
+    <tr>
+      <td>${label}</td>
+      <td class="num">${unitFn(actual)}</td>
+      <td class="num">${lmTag}</td>
+      <td class="num">${budget!==null && budget!==undefined ? unitFn(budget) : "n/a"}</td>
+      <td class="num">${ly!==null && ly!==undefined ? unitFn(ly) : "n/a"}</td>
+      <td><div style="display:flex; gap:6px; flex-wrap:wrap;">${statusTag(actual, budget, lowerIsBetter)}${yoyTag(actual, ly, lowerIsBetter)}</div></td>
+    </tr>
+  `;
+}
+
+function renderRiskTable(prefix, obj){
+  const tbody = document.querySelector(`#${prefix}-riskTable tbody`);
+  if(!obj.risk){ tbody.innerHTML = "<tr><td colspan='6'>Data tidak tersedia</td></tr>"; return; }
+  const r = obj.risk, b = obj.budget || {}, ly = obj.lastYear || {};
+  const prev = LAST - 1;
+  const pctFn = v => fmtPct(v);
+  const ratioFn = v => (v===null||v===undefined) ? "n/a" : pctTick(v);
+  const rpFn = v => (v===null||v===undefined) ? "n/a" : "Rp "+fmtNum(v)+" jt";
+  tbody.innerHTML =
+    riskRow("WO In YTD%", pctFn, r.woInYTD[LAST], r.woInYTD[prev], b.woInYTD, ly.woInYTD, true) +
+    riskRow("WO Rec YTD%", pctFn, r.woRecYTD[LAST], r.woRecYTD[prev], b.woRecYTD, ly.woRecYTD, false) +
+    riskRow("NCL YTD%", pctFn, r.nclYTD[LAST], r.nclYTD[prev], b.nclYTD, ly.nclYTD, true) +
+    riskRow("LOR YTD%", pctFn, r.lorYTD[LAST], r.lorYTD[prev], b.lorYTD, ly.lorYTD, true) +
+    riskRow("Δ LLP total YTD%", pctFn, r.llpTotalYTD[LAST], r.llpTotalYTD[prev], b.llpTotalYTD, ly.llpTotalYTD, true) +
+    riskRow("Inventory recovery ratio", ratioFn, r.recovery[LAST], r.recovery[prev], b.recovery, ly.recovery, false) +
+    riskRow("Sales amount YTD", rpFn, r.salesYTD[LAST], r.salesYTD[prev], b.salesYTD, ly.salesYTD, false);
+}
+
+function renderPanel(prefix, obj, label){
+  const container = document.getElementById(`panel-${prefix}`);
+  if(!hasData(obj)){
+    container.innerHTML = `<div class="no-portfolio">Tidak ada portofolio aktif untuk <b>${label}</b> pada periode ${DATA.months[LAST]} (ENR = 0 / runoff selesai).</div>`;
+    delete container.dataset.mounted;
+    return;
+  }
+  if(!container.dataset.mounted){
+    container.innerHTML = panelHTML(prefix);
+    container.dataset.mounted = "1";
+  }
+  renderKPI(prefix, obj, label);
+  renderTrendChart(prefix, obj, label);
+  renderCompCharts(prefix, obj);
+  renderDelqCharts(prefix, obj);
+  renderWoCharts(prefix, obj);
+  renderRiskTable(prefix, obj);
+}
+
+/* ---------- flatten helper: iterate leaf sub-segments ---------- */
+// opts.groupFilter: only this group (for per-tab concern lists)
+// opts.excludeOutOfScope: skip segments marked out-of-scope for that group (used for consolidated Summary calcs)
+function forEachLeafSegment(cb, opts={}){
+  const groups = opts.groupFilter ? [opts.groupFilter] : DATA.groupOrder;
+  groups.forEach(gName=>{
+    const g = DATA.groups[gName];
+    const oos = g.outOfScope || [];
+    g.segmentOrder.forEach(sName=>{
+      if(opts.excludeOutOfScope && oos.includes(sName)) return;
+      cb(gName, sName, g.segments[sName]);
+    });
+  });
+}
+
+/* ---------- generic concern computation for a set of leaf segments ---------- */
+function computeConcerns(opts={}){
+  const concerns = [];
+  let leafCount = 0, onTrackCount = 0, budgetedCount = 0;
+  const showGroupLabel = !opts.groupFilter;
+
+  forEachLeafSegment((gName, sName, p)=>{
+    if(!hasData(p)) return;
+    leafCount++;
+    const last = LAST, prev = LAST-1;
+    const cocN = p.cocYTD[last];
+    const cocB = p.budget ? p.budget.cocYTD : null;
+    const cocLYv = p.lastYear ? p.lastYear.cocYTD : null;
+    const overPP = (cocB!==null && cocB!==undefined && cocN!==null) ? cocN-cocB : null;
+    const yoyPP = (cocLYv!==null && cocLYv!==undefined && cocN!==null) ? cocN-cocLYv : null;
+    const nplN = p.npl90[last], nplP = p.npl90[prev];
+    const nplDelta = (nplN!==null && nplN!==undefined && nplP!==null && nplP!==undefined) ? nplN-nplP : null;
+    const llpN = p.llpInvYTD[last], llpP = p.llpInvYTD[prev];
+    const llpDelta = (llpN!==null && llpN!==undefined && llpP!==null && llpP!==undefined) ? llpN-llpP : null;
+    const torN = p.tor[last];
+    const torGap = (torN!==null && torN!==undefined) ? torN-100 : null;
+
+    if(cocB!==null && cocB!==undefined){
+      budgetedCount++;
+      if(cocN!==null && cocN<=cocB) onTrackCount++;
+    }
+
+    const tagLabel = showGroupLabel
+      ? `<b>${sName}</b> <span style="color:var(--slate-500); font-weight:500;">(${gName})</span>`
+      : `<b>${sName}</b>`;
+
+    if(overPP!==null && overPP>0.3){
+      concerns.push({ tag:"bad", severity:overPP*10, text:`${tagLabel} — COC YTD% ${fmtPct(cocN)}, ${overPP.toFixed(2)}pp di atas budget (${fmtPct(cocB)})` });
+    }
+    if(yoyPP!==null && yoyPP>0.3){
+      concerns.push({ tag:"bad", severity:yoyPP*8, text:`${tagLabel} — COC YTD% memburuk ${yoyPP.toFixed(2)}pp vs ${DATA.months[LAST]} tahun lalu (${fmtPct(cocLYv)})` });
+    }
+    if(llpDelta!==null && llpDelta>5000){
+      concerns.push({ tag:"bad", severity:llpDelta/500, text:`${tagLabel} — Δ LLP inventori naik Rp${fmtNum(llpDelta)} juta dalam sebulan (${DATA.months[prev]} → ${DATA.months[last]})` });
+    }
+    if(nplDelta!==null && nplDelta>0.1){
+      concerns.push({ tag:"watch", severity:nplDelta*15, text:`${tagLabel} — NPL 90+ naik ${nplDelta.toFixed(2)}pp MoM, kini ${fmtPct(nplN)}` });
+    }
+    if(torGap!==null && torGap<-20){
+      concerns.push({ tag:"watch", severity:-torGap*0.5, text:`${tagLabel} — TOR ${torN}% (target 100%), disposal aset melambat` });
+    }
+  }, opts);
+
+  concerns.sort((a,b)=>b.severity-a.severity);
+  return { concerns, leafCount, onTrackCount, budgetedCount };
+}
+
+function renderConcernList(listElId, concerns, maxItems=6){
+  const top = concerns.slice(0, maxItems);
+  const list = document.getElementById(listElId);
+  if(top.length===0){
+    list.innerHTML = '<li class="concern-empty">Tidak ada concern signifikan terdeteksi dari data periode ini.</li>';
+  } else {
+    list.innerHTML = top.map(c=>`<li class="concern-item"><span class="tag ${c.tag}">${c.tag==="bad"?"perhatian":"watch"}</span><span>${c.text}</span></li>`).join("");
+  }
+  return top;
+}
+
+/* ---------- Summary tab ---------- */
+function renderSummaryTab(){
+  const cons = DATA.summary;
+  const cocNow = cons.cocYTD[LAST];
+  const cocBudget = cons.budget ? cons.budget.cocYTD : null;
+  const cocLY = cons.lastYear ? cons.lastYear.cocYTD : null;
+  const dBudget = deltaTag(cocNow, cocBudget, true);
+  const dLY = deltaTag(cocNow, cocLY, true);
+
+  const { concerns, leafCount, onTrackCount, budgetedCount } = computeConcerns({ excludeOutOfScope:true });
+  const top = renderConcernList("concernList", concerns);
+  const uniqueFocusSegments = new Set(top.map(c=>c.text.match(/<b>(.*?)<\/b>/)[1])).size;
+
+  const grid = document.getElementById("execHeadlineGrid");
+  grid.innerHTML = `
+    <div class="kpi-card" style="border-left-color:${dBudget.cls==='good' ? 'var(--teal-600)' : 'var(--coral-600)'}">
+      <p class="label">COC YTD% konsolidasi</p>
+      <p class="value">${fmtPct(cocNow)}</p>
+      <p class="delta ${dBudget.cls}">${dBudget.cls==="good" ? "Achieve to budget" : "Belum achieve to budget"} (${dBudget.d!==undefined?(dBudget.d>=0?"+":"")+dBudget.d.toFixed(2):"n/a"}pp)</p>
+    </div>
+    <div class="kpi-card" style="border-left-color:${dLY.cls==='good' ? 'var(--teal-600)' : dLY.cls==='bad' ? 'var(--coral-600)' : 'var(--slate-300)'}">
+      <p class="label">Tren vs ${DATA.months[LAST]} tahun lalu</p>
+      <p class="value" style="font-size:20px;">${dLY.cls==="good" ? "Membaik" : dLY.cls==="bad" ? "Memburuk" : "Data n/a"}</p>
+      <p class="delta ${dLY.cls}">${dLY.cls==="neutral" ? "Baseline YoY belum tersedia" : `${dLY.d>=0?"+":""}${dLY.d.toFixed(2)}pp vs baseline (${fmtPct(cocLY)})`}</p>
+    </div>
+    <div class="kpi-card" style="border-left-color:var(--amber-600)">
+      <p class="label">Sub-segmen jadi area of focus</p>
+      <p class="value">${uniqueFocusSegments}</p>
+      <p class="delta neutral">Dari ${leafCount} sub-segmen aktif (cakupan Without FIT)</p>
+    </div>
+    <div class="kpi-card" style="border-left-color:var(--navy-600)">
+      <p class="label">Sub-segmen on-track vs budget</p>
+      <p class="value">${onTrackCount} / ${budgetedCount}</p>
+      <p class="delta neutral">COC YTD% ≤ budget masing-masing</p>
+    </div>
+  `;
+  renderPanel("summary", DATA.summary, "Summary konsolidasi");
+}
+
+function buildSummaryPanelDOM(){
+  const panel = document.createElement("div");
+  panel.className = "tab-panel";
+  panel.id = "tabpanel-Summary";
+  panel.innerHTML = `
+    <p class="chart-sub" style="margin:-4px 0 16px;">${DATA.summaryScopeNote || ""}</p>
+    <div class="kpi-grid" id="execHeadlineGrid" style="margin-bottom:16px;"></div>
+    <div class="chart-card" id="concernCard" style="margin-bottom:24px;">
+      <p class="chart-title">Area of focus — otomatis dari seluruh sub-segmen</p>
+      <p class="chart-sub">Diurutkan dari yang paling signifikan. Dihitung dari selisih vs budget, gap vs LY, kenaikan MoM pada NPL/LLP, dan kecepatan disposal (TOR).</p>
+      <ul id="concernList" style="margin:8px 0 0; padding:0; list-style:none;"></ul>
+    </div>
+    <div id="panel-summary"></div>
+    <hr class="big-divider">
+    <p class="section-label">Ringkasan seluruh sub-segmen — periode terakhir</p>
+    <div class="chart-card" style="overflow-x:auto;">
+      <table class="summary" id="summaryTable">
+        <thead>
+          <tr>
+            <th>Segmen</th>
+            <th style="text-align:right;">ENR (Rp jt)</th>
+            <th style="text-align:right;">COC YTD%</th>
+            <th style="text-align:right;">vs LM</th>
+            <th style="text-align:right;">Budget</th>
+            <th style="text-align:right;">NPL 90+%</th>
+            <th style="text-align:right;">TOR</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p class="chart-sub" style="margin-top:10px;">Segmen bertanda <i>*di luar cakupan BFI Without FIT</i> tidak ikut dihitung dalam KPI Summary konsolidasi.</p>
+    </div>
+  `;
+  return panel;
+}
+
+/* ---------- product group tabs ---------- */
+let activeGroup = null;
+let activeSegment = {}; // per group: "__agg__" or a segment name
+
+function groupAggStrip(gName){
+  const g = DATA.groups[gName];
+  const agg = g.aggregate;
+  const dBudget = deltaTag(agg.cocYTD[LAST], agg.budget?agg.budget.cocYTD:null, true);
+  const dLY = deltaTag(agg.cocYTD[LAST], agg.lastYear?agg.lastYear.cocYTD:null, true);
+  return `
+    <div class="group-agg-strip">
+      <div class="agg-item"><span class="agg-label">ENR ${gName}</span><span class="agg-value">${fmtNum(agg.enr[LAST])} jt</span></div>
+      <div class="agg-item"><span class="agg-label">COC YTD%</span><span class="agg-value">${fmtPct(agg.cocYTD[LAST])}</span></div>
+      <div class="agg-item"><span class="agg-label">vs Budget</span><span class="agg-value ${dBudget.cls==='good'?'good':dBudget.cls==='bad'?'bad':''}">${dBudget.d!==undefined?(dBudget.d>=0?"+":"")+dBudget.d.toFixed(2)+"pp":"n/a"}</span></div>
+      <div class="agg-item"><span class="agg-label">vs YoY</span><span class="agg-value ${dLY.cls==='good'?'good':dLY.cls==='bad'?'bad':''}">${dLY.d!==undefined?(dLY.d>=0?"+":"")+dLY.d.toFixed(2)+"pp":"n/a"}</span></div>
+      <div class="agg-item"><span class="agg-label">NPL 90+%</span><span class="agg-value">${fmtPct(agg.npl90[LAST])}</span></div>
+      <div class="agg-item"><span class="agg-label">TOR</span><span class="agg-value">${agg.tor[LAST]!==null&&agg.tor[LAST]!==undefined?agg.tor[LAST]+"%":"n/a"}</span></div>
+    </div>
+  `;
+}
+
+function buildTabPanel(gName){
+  const g = DATA.groups[gName];
+  const panel = document.createElement("div");
+  panel.className = "tab-panel";
+  panel.id = `tabpanel-${gName}`;
+
+  let pillsHTML = `<button class="segment-pill" data-group="${gName}" data-segment="__agg__">Semua ${gName} <span class="pill-note">(agregat)</span></button>`;
+  g.segmentOrder.forEach(sName=>{
+    const oosMark = (g.outOfScope||[]).includes(sName) ? ' <span class="pill-note">*</span>' : '';
+    pillsHTML += `<button class="segment-pill" data-group="${gName}" data-segment="${sName}">${sName}${oosMark}</button>`;
+  });
+
+  const scopeFootnote = (g.outOfScope && g.outOfScope.length)
+    ? `<p class="chart-sub" style="margin:-8px 0 16px;">*${g.outOfScope.join(", ")} berada di luar cakupan BFI Without FIT, sehingga tidak masuk hitungan KPI tab Summary — tetap dipantau di sini karena relevan secara bisnis.</p>`
+    : '';
+
+  const aggNote = g.aggNote ? `<p class="chart-sub" style="margin:-8px 0 16px;">${g.aggNote}</p>` : '';
+
+  panel.innerHTML = `
+    <div id="agg-strip-${gName}">${groupAggStrip(gName)}</div>
+    ${aggNote}
+    ${scopeFootnote}
+    <div class="chart-card" id="concernCard-${gName}" style="margin-bottom:20px;">
+      <p class="chart-title">Key concern — grup ${gName}</p>
+      <p class="chart-sub">Over budget, memburuk vs bulan lalu (MoM), dan memburuk vs tahun lalu (YoY), khusus sub-segmen di grup ini.</p>
+      <ul id="concernList-${gName}" style="margin:8px 0 0; padding:0; list-style:none;"></ul>
+    </div>
+    <div class="segment-pills" id="pills-${gName}">${pillsHTML}</div>
+    <div id="panel-tab-${gName}"></div>
+  `;
+  return panel;
+}
+
+function renderGroupConcerns(gName){
+  const { concerns } = computeConcerns({ groupFilter: gName });
+  renderConcernList(`concernList-${gName}`, concerns, 5);
+}
+
+function selectSegment(gName, sName){
+  activeSegment[gName] = sName;
+  document.querySelectorAll(`#pills-${gName} .segment-pill`).forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.segment === sName);
+  });
+  const g = DATA.groups[gName];
+  const obj = sName === "__agg__" ? g.aggregate : g.segments[sName];
+  const label = sName === "__agg__" ? `Semua ${gName} (agregat)` : sName;
+  renderPanel(`tab-${gName}`, obj, label);
+}
+
+function selectTab(tabId){
+  activeGroup = tabId;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tabId));
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active", p.id===`tabpanel-${tabId}`));
+  if(tabId === "Summary"){
+    renderSummaryTab();
+    return;
+  }
+  renderGroupConcerns(tabId);
+  if(!activeSegment[tabId]) activeSegment[tabId] = "__agg__";
+  selectSegment(tabId, activeSegment[tabId]);
+}
+
+function initTabs(){
+  const nav = document.getElementById("tabNav");
+  const panelsWrap = document.getElementById("tabPanels");
+  const allTabs = ["Summary", ...DATA.groupOrder];
+
+  allTabs.forEach(tabId=>{
+    const btn = document.createElement("button");
+    btn.className = "tab-btn";
+    btn.dataset.tab = tabId;
+    btn.textContent = tabId;
+    btn.addEventListener("click", ()=>selectTab(tabId));
+    nav.appendChild(btn);
+
+    const panel = tabId === "Summary" ? buildSummaryPanelDOM() : buildTabPanel(tabId);
+    panelsWrap.appendChild(panel);
+    if(tabId !== "Summary"){
+      panel.querySelectorAll(".segment-pill").forEach(pill=>{
+        pill.addEventListener("click", ()=>selectSegment(tabId, pill.dataset.segment));
+      });
+    }
+  });
+  selectTab("Summary");
+}
+
+/* ---------- bottom summary table (all leaf segments, grouped) ---------- */
+function lmCellHTML(actual, lm, lowerIsBetter=true){
+  if(actual===null||actual===undefined||lm===null||lm===undefined) return '<span class="tag na">n/a</span>';
+  const d = actual - lm;
+  if(Math.abs(d) < 0.005) return '<span class="tag na">flat</span>';
+  const good = lowerIsBetter ? d<=0 : d>=0;
+  const arrow = d>0 ? "▲" : "▼";
+  return `<span class="tag ${good?'good':'bad'}">${arrow} ${Math.abs(d).toFixed(2)}pp</span>`;
+}
+
+function renderTable(){
+  const tbody = document.querySelector("#summaryTable tbody");
+  tbody.innerHTML = "";
+  DATA.groupOrder.forEach(gName=>{
+    const g = DATA.groups[gName];
+    const oos = g.outOfScope || [];
+    const groupRow = document.createElement("tr");
+    groupRow.innerHTML = `<td class="group-row" colspan="8">${gName}</td>`;
+    tbody.appendChild(groupRow);
+
+    const aggTr = document.createElement("tr");
+    const agg = g.aggregate;
+    aggTr.innerHTML = `
+      <td><i>Semua ${gName} (agregat)</i></td>
+      <td class="num">${fmtNum(agg.enr[LAST])}</td>
+      <td class="num">${fmtPct(agg.cocYTD[LAST])}</td>
+      <td class="num">${lmCellHTML(agg.cocYTD[LAST], agg.cocYTD[LAST-1], true)}</td>
+      <td class="num">${agg.budget ? fmtPct(agg.budget.cocYTD) : "n/a"}</td>
+      <td class="num">${fmtPct(agg.npl90[LAST])}</td>
+      <td class="num">${agg.tor[LAST]!==null&&agg.tor[LAST]!==undefined ? agg.tor[LAST]+"%" : "n/a"}</td>
+      <td>${statusTag(agg.cocYTD[LAST], agg.budget?agg.budget.cocYTD:null, true)}</td>
+    `;
+    tbody.appendChild(aggTr);
+
+    g.segmentOrder.forEach(sName=>{
+      const p = g.segments[sName];
+      const isOOS = oos.includes(sName);
+      const displayName = isOOS ? `${sName} <span title="Di luar cakupan BFI Without FIT">*</span>` : sName;
+      const tr = document.createElement("tr");
+      if(!hasData(p)){
+        tr.innerHTML = `<td>${displayName}</td><td colspan="7" style="color:var(--slate-500);">Tidak ada portofolio aktif</td>`;
+      } else {
+        tr.innerHTML = `
+          <td>${displayName}</td>
+          <td class="num">${fmtNum(p.enr[LAST])}</td>
+          <td class="num">${fmtPct(p.cocYTD[LAST])}</td>
+          <td class="num">${lmCellHTML(p.cocYTD[LAST], p.cocYTD[LAST-1], true)}</td>
+          <td class="num">${p.budget ? fmtPct(p.budget.cocYTD) : "n/a"}</td>
+          <td class="num">${fmtPct(p.npl90[LAST])}</td>
+          <td class="num">${p.tor[LAST]!==null&&p.tor[LAST]!==undefined ? p.tor[LAST]+"%" : "n/a"}</td>
+          <td>${statusTag(p.cocYTD[LAST], p.budget?p.budget.cocYTD:null, true)}</td>
+        `;
+      }
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+const MONTH_ID = {Jan:"Januari",Feb:"Februari",Mar:"Maret",Apr:"April",May:"Mei",Jun:"Juni",Jul:"Juli",Aug:"Agustus",Sep:"September",Oct:"Oktober",Nov:"November",Dec:"Desember"};
+function fullMonthLabel(code){
+  const [m, y] = code.split("-");
+  return `${MONTH_ID[m]||m} 20${y}`;
+}
+
+function init(){
+  document.getElementById("mastheadTitle").textContent = `Cost of Credit - Periode ${fullMonthLabel(DATA.months[LAST])}`;
+  document.getElementById("periodBadge").textContent = "Periode terakhir: " + DATA.months[LAST];
+  initTabs();
+  renderTable();
+}
+init();
+</script>
+
+</body>
+</html>
