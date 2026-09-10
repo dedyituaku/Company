@@ -144,14 +144,12 @@ document.addEventListener('DOMContentLoaded',function(){
     var ALLOWED_NIK=[1611,2195,104,154,3735,1151,3135,2980,999];
     var norm=function(v){var n=parseInt(String(v).replace(/\D/g,''),10);return isNaN(n)?null:n};
     var gate=document.getElementById('accessGate');
-    if(localStorage.getItem('bfiDashAuth')==='1'){gate.style.display='none';return}
     document.body.classList.add('gate-locked');
     var nikEl=document.getElementById('gateNik'), err=document.getElementById('gateErr');
     function tryUnlock(){
       var nik=norm(nikEl.value);
       if(nik===null){err.textContent='Isi NIK.';return}
       if(ALLOWED_NIK.indexOf(nik)>=0){
-        localStorage.setItem('bfiDashAuth','1');
         gate.style.display='none';
         document.body.classList.remove('gate-locked');
       }else{
