@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="data.js"></script>
+    <style>
+      :root {
+        --navy: #0a1628;
+        --navy2: #10213d;
+        --gold: #d4a537;
+        --blue: #2f80ed;
+        --ink: #ffffff;
+        --mute: rgba(255, 255, 255, 0.62);
+        --font: "Montserrat", "Inter", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--navy); }
+      #root { position: relative; width: 1920px; height: 1080px; font-family: var(--font); color: var(--ink); }
+      #bg { position: absolute; inset: 0; z-index: 0;
+        background: radial-gradient(ellipse 80% 70% at 50% 40%, #12274a 0%, var(--navy) 62%, #060e1b 100%); }
+      #particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+      #particles i { position: absolute; border-radius: 50%; display: block; }
+      #flash { position: absolute; inset: 0; z-index: 50; background: #fff; opacity: 0; pointer-events: none; }
+      .scene-host { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; z-index: 10; }
+
+      /* ---------- gaya bersama (dipakai semua scene) ---------- */
+      .eyebrow { font-weight: 700; font-size: 28px; letter-spacing: 0.34em; text-transform: uppercase; color: var(--gold); }
+      .h1 { font-weight: 800; font-size: 68px; line-height: 1.05; letter-spacing: -0.02em; }
+      .chip { display: flex; align-items: center; gap: 16px; height: 84px; padding: 0 28px 0 18px; border-radius: 42px;
+        background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.16); font-weight: 600; font-size: 28px; white-space: nowrap; }
+      .chip .ic { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: rgba(47,128,237,0.22); color: #7db4ff; }
+      .chip .ic svg { width: 32px; height: 32px; }
+      .panel { position: absolute; border-radius: 28px; padding: 36px 40px; background: linear-gradient(160deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025));
+        border: 1.5px solid rgba(255,255,255,0.14); }
+      .plabel { font-weight: 700; font-size: 28px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mute); }
+      .bignum { font-weight: 900; font-size: 148px; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+      .unit { font-weight: 700; font-size: 56px; color: var(--gold); margin-left: 8px; }
+      .tag { display: inline-block; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; padding: 8px 18px; border-radius: 999px; }
+      .tag.good { background: rgba(212,165,55,0.18); color: var(--gold); border: 1.5px solid rgba(212,165,55,0.6); }
+      .dummy { position: absolute; right: 100px; top: 56px; font-weight: 800; font-size: 28px; letter-spacing: 0.1em; color: #ffd36b;
+        border: 2px dashed #ffd36b; border-radius: 10px; padding: 10px 18px; background: rgba(10,22,40,0.7); z-index: 30; }
+    </style>
+  </head>
+  <body>
+    <!-- ikon bersama -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-seg" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="16"/><path d="M24 8v16h16M24 24 12.7 35.3"/></g></symbol>
+        <symbol id="i-proc" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 16h28M30 10l6 6-6 6M40 32H12M18 26l-6 6 6 6"/></g></symbol>
+        <symbol id="i-chan" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="24" r="5"/><circle cx="38" cy="11" r="5"/><circle cx="38" cy="37" r="5"/><path d="M15 22l18-9M15 26l18 9"/></g></symbol>
+        <symbol id="i-sys" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="38" height="25" rx="3"/><path d="M17 41h14M24 33v8M12 27l8-8 5 5 10-10"/></g></symbol>
+        <symbol id="i-coll" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="14" r="7"/><path d="M9 41c0-9 6-15 15-15s15 6 15 15"/><path d="M33 8l5-4M36 14h6"/></g></symbol>
+        <symbol id="i-split" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="7" r="3.5"/><path d="M24 10.5v10M24 20.5 11 33M24 20.5 37 33"/><circle cx="11" cy="38" r="4"/><circle cx="37" cy="38" r="4"/></g></symbol>
+        <symbol id="i-box" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15 24 6l18 9v19L24 43 6 34zM6 15l18 10 18-10M24 25v18"/></g></symbol>
+        <symbol id="i-debt" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 24V8h16l20 20-14 14z"/><circle cx="15" cy="17" r="2.5"/></g></symbol>
+        <symbol id="i-cert" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="19" r="12"/><path d="M17 30l-4 14 11-6 11 6-4-14M19 19l4 4 7-8"/></g></symbol>
+        <symbol id="i-users" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="15" r="6"/><circle cx="35" cy="18" r="5"/><path d="M4 40c0-7 5-12 13-12s13 5 13 12M31 29c7 0 13 4 14 11"/></g></symbol>
+        <symbol id="i-bars" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 40V26M20 40V12M32 40V30M43 40V20M4 43h40"/></g></symbol>
+        <symbol id="i-target" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="9"/><circle cx="24" cy="24" r="2"/></g></symbol>
+        <symbol id="i-coin" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="17"/><path d="M30 17c-1-2-3-3-6-3-4 0-6 2-6 4.500s2 3.500 6 4.500 6 2 6 4.500-2 4.500-6 4.500c-3 0-5-1-6-3M24 10v28"/></g></symbol>
+      </defs>
+    </svg>
+
+    <div id="root" data-composition-id="main" data-start="0" data-duration="90" data-width="1920" data-height="1080">
+      <div id="bg" class="clip" data-start="0" data-duration="90" data-track-index="0"></div>
+      <div id="particles" class="clip" data-start="0" data-duration="90" data-track-index="1"></div>
+
+      <div id="s1" class="scene-host clip" data-composition-id="s1" data-composition-src="compositions/s1.html" data-start="0" data-duration="8" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s2" class="scene-host clip" data-composition-id="s2" data-composition-src="compositions/s2.html" data-start="8" data-duration="12" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s3" class="scene-host clip" data-composition-id="s3" data-composition-src="compositions/s3.html" data-start="20" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s4" class="scene-host clip" data-composition-id="s4" data-composition-src="compositions/s4.html" data-start="38" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s5" class="scene-host clip" data-composition-id="s5" data-composition-src="compositions/s5.html" data-start="56" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s6" class="scene-host clip" data-composition-id="s6" data-composition-src="compositions/s6.html" data-start="74" data-duration="12" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s7" class="scene-host clip" data-composition-id="s7" data-composition-src="compositions/s7.html" data-start="86" data-duration="4" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+
+      <div id="flash" class="clip" data-start="0" data-duration="90" data-track-index="3"></div>
+
+      <!-- Slot VO per scene: ganti file senyap dengan hasil ElevenLabs (nama sama). -->
+      <audio id="vo-1" class="clip" src="assets/vo/scene1.mp3" data-start="1" data-duration="3" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-2" class="clip" src="assets/vo/scene2.mp3" data-start="9" data-duration="5.5" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-3" class="clip" src="assets/vo/scene3.mp3" data-start="21" data-duration="7" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-4" class="clip" src="assets/vo/scene4.mp3" data-start="39" data-duration="7.5" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-5" class="clip" src="assets/vo/scene5.mp3" data-start="57" data-duration="7.5" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-6" class="clip" src="assets/vo/scene6.mp3" data-start="75" data-duration="4.5" data-track-index="5" data-volume="1"></audio>
+      <!-- Musik latar PLACEHOLDER (senyap). Ducking di-generate oleh build.mjs dari data.json -->
+      <audio id="bgm" class="clip" src="assets/music/bgm-placeholder.mp3" data-start="0" data-duration="90" data-track-index="6" data-volume="1" data-fade-out="2" data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0.42},{&quot;t&quot;:0.7,&quot;v&quot;:0.42},{&quot;t&quot;:1,&quot;v&quot;:0.14},{&quot;t&quot;:4,&quot;v&quot;:0.14},{&quot;t&quot;:4.3,&quot;v&quot;:0.42},{&quot;t&quot;:8.7,&quot;v&quot;:0.42},{&quot;t&quot;:9,&quot;v&quot;:0.14},{&quot;t&quot;:14.5,&quot;v&quot;:0.14},{&quot;t&quot;:14.8,&quot;v&quot;:0.42},{&quot;t&quot;:20.7,&quot;v&quot;:0.42},{&quot;t&quot;:21,&quot;v&quot;:0.14},{&quot;t&quot;:28,&quot;v&quot;:0.14},{&quot;t&quot;:28.3,&quot;v&quot;:0.42},{&quot;t&quot;:38.7,&quot;v&quot;:0.42},{&quot;t&quot;:39,&quot;v&quot;:0.14},{&quot;t&quot;:46.5,&quot;v&quot;:0.14},{&quot;t&quot;:46.8,&quot;v&quot;:0.42},{&quot;t&quot;:56.7,&quot;v&quot;:0.42},{&quot;t&quot;:57,&quot;v&quot;:0.14},{&quot;t&quot;:64.5,&quot;v&quot;:0.14},{&quot;t&quot;:64.8,&quot;v&quot;:0.42},{&quot;t&quot;:74.7,&quot;v&quot;:0.42},{&quot;t&quot;:75,&quot;v&quot;:0.14},{&quot;t&quot;:79.5,&quot;v&quot;:0.14},{&quot;t&quot;:79.8,&quot;v&quot;:0.42}]}]}"></audio>
+    </div>
+
+    <script>
+      const D = window.RAKERNAS_DATA;
+      const tl = gsap.timeline({ paused: true });
+
+      // flash putih di setiap batas scene
+      tl.set("#flash", { opacity: 0 }, 0);
+      D.timing.flashAt.forEach((t) => {
+        tl.to("#flash", { opacity: 1, duration: 0.32, ease: "power2.in" }, t - 0.32);
+        tl.to("#flash", { opacity: 0, duration: 0.55, ease: "power2.out" }, t + 0.02);
+      });
+
+      // partikel cahaya halus (seeded)
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+      const rnd = mulberry32(2026);
+      const host = document.getElementById("particles");
+      for (let i = 0; i < 46; i++) {
+        const el = document.createElement("i");
+        const size = 3 + rnd() * 7;
+        const gold = rnd() < 0.55;
+        el.style.cssText = `left:${(rnd() * 1920).toFixed(0)}px;top:${(rnd() * 1080).toFixed(0)}px;width:${size}px;height:${size}px;` +
+          `background:${gold ? "#d4a537" : "#6fa8ff"};box-shadow:0 0 ${size * 3}px ${gold ? "rgba(212,165,55,.8)" : "rgba(47,128,237,.8)"};opacity:0;`;
+        host.appendChild(el);
+        const rise = 120 + rnd() * 260, drift = (rnd() - 0.5) * 120;
+        tl.fromTo(el, { y: 0, x: 0 }, { y: -rise, x: drift, duration: 90, ease: "none" }, 0);
+        const cycle = 3 + rnd() * 4, peak = 0.25 + rnd() * 0.5, off = rnd() * cycle;
+        tl.fromTo(el, { opacity: 0 }, { opacity: peak, duration: cycle, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor((90 - off) / cycle) - 1) }, off);
+      }
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

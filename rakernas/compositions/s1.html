@@ -1,0 +1,40 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; color: #fff; }
+    #s1-glows { position: absolute; inset: 0; }
+    .s1-light { position: absolute; top: 0; width: 360px; height: 640px; margin-left: -180px; opacity: 0; }
+    .s1-beam { position: absolute; inset: 0; clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%); }
+    .s1-orb { position: absolute; left: 50%; top: 150px; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; }
+    #s1-text { position: absolute; left: 0; right: 0; top: 520px; text-align: center; }
+    #s1-year { font-weight: 900; font-size: 230px; line-height: 1; letter-spacing: -0.04em; }
+    #s1-line { margin-top: 18px; font-weight: 800; font-size: 66px; letter-spacing: -0.01em; }
+    #s1-line b { color: #d4a537; font-weight: 800; }
+    #s1-sub { display: inline-block; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s1" data-width="1920" data-height="1080">
+    <div id="s1-glows">
+      <div id="s1-l1" class="s1-light" style="left:528px"><div class="s1-beam" style="background:linear-gradient(180deg,rgba(212,165,55,.55),rgba(212,165,55,0) 85%)"></div><div class="s1-orb" style="background:radial-gradient(circle,#fff 0,#f3d07a 25%,rgba(212,165,55,0) 70%)"></div></div>
+      <div id="s1-l2" class="s1-light" style="left:960px"><div class="s1-beam" style="background:linear-gradient(180deg,rgba(47,128,237,.6),rgba(47,128,237,0) 85%)"></div><div class="s1-orb" style="background:radial-gradient(circle,#fff 0,#8bbcff 25%,rgba(47,128,237,0) 70%)"></div></div>
+      <div id="s1-l3" class="s1-light" style="left:1392px"><div class="s1-beam" style="background:linear-gradient(180deg,rgba(212,165,55,.55),rgba(212,165,55,0) 85%)"></div><div class="s1-orb" style="background:radial-gradient(circle,#fff 0,#f3d07a 25%,rgba(212,165,55,0) 70%)"></div></div>
+    </div>
+    <div id="s1-text">
+      <div id="s1-year" class="clip" data-start="3.2" data-duration="4.8">2026.</div>
+      <div id="s1-line">
+        <span id="s1-a" class="clip" data-start="4.3" data-duration="3.7" style="display:inline-block">Tiga Key Initiatives.</span>
+        <span id="s1-sub" class="clip" data-start="5.6" data-duration="2.4"><b>Satu arah.</b></span>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    [["#s1-l1", 0.6], ["#s1-l2", 1.5], ["#s1-l3", 2.4]].forEach(([id, t]) => {
+      tl.fromTo(id, { opacity: t === 0.6 ? 0.4 : 0, scaleY: 0.6, transformOrigin: "50% 0%" }, { opacity: 1, scaleY: 1, duration: 0.9, ease: "power3.out" }, t === 0.6 ? 0 : t);
+    });
+    tl.fromTo("#s1-glows", { y: 0 }, { y: 30, duration: 8, ease: "none" }, 0);          // parallax
+    tl.fromTo("#s1-year", { opacity: 0, y: 40, scale: 0.92, filter: "blur(14px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 1.0, ease: "power3.out" }, 3.2);
+    tl.fromTo("#s1-a", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 4.3);
+    tl.fromTo("#s1-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 5.6);
+    tl.fromTo("#s1-text", { y: 0 }, { y: -14, duration: 4.8, ease: "none" }, 3.2);
+    window.__timelines["s1"] = tl;
+  </script>
+</template>

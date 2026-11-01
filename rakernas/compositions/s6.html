@@ -1,0 +1,44 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; color: #fff; }
+    #s6-svg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+    .s6-lab { position: absolute; left: 192px; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; }
+    #s6-title { position: absolute; left: 0; right: 0; top: 770px; text-align: center; font-weight: 800; font-size: 72px; letter-spacing: -0.02em; line-height: 1.12; }
+    #s6-title b { color: #d4a537; font-weight: 800; }
+  </style>
+  <div id="root" data-composition-id="s6" data-width="1920" data-height="1080">
+    <svg id="s6-svg" viewBox="0 0 1920 1080">
+      <defs>
+        <linearGradient id="s6-hz" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <radialGradient id="s6-sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff2c9"/><stop offset=".3" stop-color="#d4a537" stop-opacity=".6"/><stop offset="1" stop-color="#d4a537" stop-opacity="0"/></radialGradient>
+      </defs>
+      <ellipse id="s6-glow" cx="1500" cy="520" rx="520" ry="220" fill="url(#s6-sun)" opacity="0"/>
+      <rect id="s6-hzl" x="260" y="518" width="1400" height="3" fill="url(#s6-hz)" opacity="0"/>
+      <path id="s6-m1" d="M200 250 C 620 250, 760 520, 1100 520 S 1500 520, 1700 520" fill="none" stroke="#d4a537" stroke-width="9" stroke-linecap="round" pathLength="1"/>
+      <path id="s6-m2" d="M200 390 C 560 390, 760 520, 1100 520 S 1500 520, 1700 520" fill="none" stroke="#2f80ed" stroke-width="9" stroke-linecap="round" pathLength="1"/>
+      <path id="s6-m3" d="M200 530 C 560 530, 760 520, 1100 520 S 1500 520, 1700 520" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" pathLength="1"/>
+      <path id="s6-one" d="M1100 520 L 1700 520" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" pathLength="1" opacity="0"/>
+      <circle id="s6-head" cx="0" cy="0" r="16" fill="#fff" opacity="0"/>
+    </svg>
+    <div id="s6-l1" class="s6-lab" style="top:206px;color:#d4a537">Collection Effectiveness</div>
+    <div id="s6-l2" class="s6-lab" style="top:346px;color:#2f80ed">Cost Optimization</div>
+    <div id="s6-l3" class="s6-lab" style="top:486px;color:#fff">Manpower Capability</div>
+    <div id="s6-title"><span id="s6-t1" style="display:inline-block">Dari 3 Key Initiatives 2026,</span><br><b id="s6-t2" style="display:inline-block">menuju 2027.</b></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    [["#s6-m1", "#s6-l1", 0.6], ["#s6-m2", "#s6-l2", 1.2], ["#s6-m3", "#s6-l3", 1.8]].forEach(([p, l, t]) => {
+      tl.fromTo(p, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 3.6, ease: "power2.inOut" }, t);
+      tl.fromTo(l, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, t);
+      tl.to(l, { opacity: 0, duration: 0.6 }, t + 3.2);
+    });
+    tl.fromTo("#s6-one", { strokeDasharray: 1, strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: 2.2, ease: "power2.in" }, 4.6);
+    tl.fromTo("#s6-head", { opacity: 0, attr: { cx: 1100, cy: 520 } }, { opacity: 1, attr: { cx: 1700, cy: 520 }, duration: 2.2, ease: "power2.in" }, 4.6);
+    tl.fromTo("#s6-hzl", { opacity: 0, scaleX: 0.3, transformOrigin: "50% 50%" }, { opacity: 1, scaleX: 1, duration: 2.0, ease: "power2.out" }, 5.2);
+    tl.fromTo("#s6-glow", { opacity: 0 }, { opacity: 1, duration: 2.4, ease: "power2.inOut" }, 5.4);
+    tl.fromTo("#s6-t1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 6.4);
+    tl.fromTo("#s6-t2", { opacity: 0, y: 30, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 7.6);
+    tl.fromTo("#s6-svg", { x: 20 }, { x: -20, duration: 12, ease: "none" }, 0);
+    window.__timelines["s6"] = tl;
+  </script>
+</template>

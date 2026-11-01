@@ -1,0 +1,24 @@
+# Script Voice Over - Rakernas Opening (Bahasa Indonesia)
+# Satu file audio per scene. Taruh hasil ElevenLabs di assets/vo/sceneN.mp3 (menimpa file senyap placeholder).
+# Setelah file asli masuk, sesuaikan durasi scene (lihat README.md) dan dur di data.json.
+
+[SCENE 1 | 0-8 dtk | assets/vo/scene1.mp3]
+Awal tahun, kita menetapkan tiga prioritas.
+
+[SCENE 2 | 8-20 dtk | assets/vo/scene2.mp3]
+Collection effectiveness, cost optimization, dan manpower capability.
+
+[SCENE 3 | 20-38 dtk | assets/vo/scene3.mp3]
+Segmentasi lebih tajam, handling lebih tepat. Delinquency turun, recovery naik.
+
+[SCENE 4 | 38-56 dtk | assets/vo/scene4.mp3]
+Kapasitas collector dioptimalkan, strategi handling lebih efisien, biaya lebih terkendali.
+
+[SCENE 5 | 56-74 dtk | assets/vo/scene5.mp3]
+Kapasitas manager dibangun, kinerja terukur. Hasilnya, insentif manager meningkat.
+
+[SCENE 6 | 74-86 dtk | assets/vo/scene6.mp3]
+Fondasi sudah kuat. Saatnya melangkah lebih jauh.
+
+[SCENE 7 | 86-90 dtk | tanpa VO]
+(tanpa narasi - logo + tagline)

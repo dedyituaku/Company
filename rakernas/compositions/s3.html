@@ -1,0 +1,107 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; color: #fff; }
+    #s3-fg { position: absolute; inset: 0; }
+    #s3-head { position: absolute; left: 192px; top: 112px; }
+    #s3-head .h1 { margin-top: 10px; }
+    #s3-chips { position: absolute; left: 192px; top: 252px; display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: 16px; }
+        .s3-p { top: 466px; height: 506px; width: 744px; }
+    #s3-p1 { left: 192px; } #s3-p2 { left: 984px; }
+    .s3-row { display: flex; align-items: baseline; gap: 26px; margin-top: 18px; }
+    .s3-prev { font-weight: 700; font-size: 44px; color: var(--mute); text-decoration: line-through; text-decoration-thickness: 3px; font-variant-numeric: tabular-nums; }
+    .s3-arrow { font-size: 44px; color: var(--gold); font-weight: 800; }
+    #s3-p1 .bignum { color: #fff; } #s3-p2 .bignum { color: #fff; }
+    .s3-delta { margin-top: 14px; } .s3-nw { white-space: nowrap; } .s3-u1 { margin: 0 10px 0 0; }
+    #s3-line { position: absolute; left: 40px; top: 326px; width: 664px; height: 140px; overflow: visible; }
+    #s3-bars { position: absolute; left: 40px; top: 326px; width: 664px; height: 110px; display: flex; align-items: flex-end; gap: 28px; }
+    .s3-bar { flex: 1; border-radius: 14px 14px 0 0; position: relative; }
+    .s3-bar span { position: absolute; left: 0; right: 0; bottom: -38px; text-align: center; font-weight: 700; font-size: 28px; letter-spacing: 0.04em; color: var(--mute); text-transform: uppercase; }
+  </style>
+  <div id="root" data-composition-id="s3" data-width="1920" data-height="1080">
+    <div id="s3-fg">
+      <div id="s3-head"><div class="eyebrow">Key Initiative 1</div><div class="h1">Improve Collection Effectiveness</div></div>
+      <div id="s3-chips">
+        <div class="chip s3-chip"><span class="ic"><svg><use href="#i-seg"/></svg></span>Data Segmentation</div>
+        <div class="chip s3-chip"><span class="ic"><svg><use href="#i-proc"/></svg></span>Handling Process</div>
+        <div class="chip s3-chip"><span class="ic"><svg><use href="#i-chan"/></svg></span>Recovery Channel</div>
+        <div class="chip s3-chip"><span class="ic"><svg><use href="#i-sys"/></svg></span>Collection System</div>
+      </div>
+
+      <div id="s3-p1" class="panel s3-p">
+        <div class="plabel">Delinquency 30+</div>
+        <div class="s3-row"><span class="s3-prev" id="s3-prev1"></span><span class="s3-arrow">→</span><span class="bignum" id="s3-n1"></span></div>
+        <div class="s3-delta"><span class="tag good" id="s3-d1"></span></div>
+        <svg id="s3-line" viewBox="0 0 664 140"><defs><linearGradient id="s3-lg" x1="0" x2="1"><stop offset="0" stop-color="#2f80ed"/><stop offset="1" stop-color="#d4a537"/></linearGradient></defs>
+          <path id="s3-grid" d="M0 139H664M0 70H664" stroke="rgba(255,255,255,.12)" stroke-width="1.5" fill="none"/>
+          <path id="s3-path" fill="none" stroke="url(#s3-lg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" pathLength="1"/>
+          <circle id="s3-dot" cx="0" cy="0" r="11" fill="#d4a537"/></svg>
+      </div>
+
+      <div id="s3-p2" class="panel s3-p">
+        <div class="plabel">WO Recovery</div>
+        <div class="s3-row"><span class="s3-prev" id="s3-prev2"></span><span class="s3-arrow">→</span><span class="s3-nw"><span class="unit s3-u1"></span><span class="bignum" id="s3-n2"></span><span class="unit s3-u2"></span></span></div>
+        <div class="s3-delta"><span class="tag good" id="s3-d2"></span></div>
+        <div id="s3-bars"><div class="s3-bar" id="s3-b1" style="background:linear-gradient(180deg,#5f7392,#3b4d6b)"><span>Sebelum</span></div><div class="s3-bar" id="s3-b2" style="background:linear-gradient(180deg,#f0c35a,#d4a537)"><span>Sesudah</span></div></div>
+      </div>
+      <div id="s3-dummy" class="dummy" style="display:none"></div>
+    </div>
+  </div>
+  <script>
+    const D = window.RAKERNAS_DATA, M = D.meta;
+    const dec = (...v) => Math.max(...v.map((x) => (String(x).split(".")[1] || "").length));
+    const fmt = (v, d) => v.toFixed(d).replace(".", ",");
+    const q = (s) => document.querySelector(s);
+
+    // --- Delinquency 30+
+    const a = D.delq30, da = dec(a.before, a.after);
+    q("#s3-prev1").textContent = fmt(a.before, da) + a.unit;
+    q("#s3-n1").textContent = fmt(a.before, da) + a.unit;
+    q("#s3-d1").textContent = (a.after < a.before ? "▼ " : "▲ ") + fmt(Math.abs(a.after - a.before), da) + " pp";
+    // --- WO Recovery
+    const w = D.woRecovery, dw = dec(w.before, w.after);
+    const [wu1, wu2] = w.unit.split(" "); q(".s3-u1").textContent = wu1; q(".s3-u2").textContent = wu2 || "";
+    const money = (v) => fmt(v, dw);
+    q("#s3-prev2").textContent = money(w.before);
+    q("#s3-n2").textContent = money(w.before);
+    q("#s3-d2").textContent = "▲ " + fmt(((w.after - w.before) / w.before) * 100, 0) + "%";
+    if (M.showDummyMarkers) { const d = q("#s3-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
+
+    // garis tren (ilustrasi, diturunkan dari before→after, bukan data riil)
+    const N = 9, pts = [], lo = Math.min(a.before, a.after), hi = Math.max(a.before, a.after), pad = (hi - lo) * 0.6 || 1;
+    for (let i = 0; i < N; i++) {
+      const p = i / (N - 1), e = p * p * (3 - 2 * p), wob = Math.sin(i * 2.1) * 0.1 * (hi - lo) * (1 - p);
+      pts.push([ (i / (N - 1)) * 664, 10 + (1 - ((a.before + (a.after - a.before) * e + wob - (lo - pad)) / (hi + pad - (lo - pad)))) * 110 ]);
+    }
+    q("#s3-path").setAttribute("d", "M" + pts.map((p) => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L"));
+    const last = pts[N - 1];
+
+    // batang
+    const mx = Math.max(w.before, w.after) * 1.05;
+    const H1 = (w.before / mx) * 110, H2 = (w.after / mx) * 110;
+
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s3-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.3);
+    document.querySelectorAll(".s3-chip").forEach((c, i) =>
+      tl.fromTo(c, { opacity: 0, y: 24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 1.2 + i * 0.4));
+    tl.fromTo("#s3-p1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 3.4);
+    tl.fromTo("#s3-p2", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 3.9);
+    tl.fromTo("#s3-fg", { x: 14 }, { x: -14, duration: 18, ease: "none" }, 0);   // parallax halus
+
+    // counter delinquency + reveal garis
+    const c1 = { v: a.before };
+    tl.to(c1, { v: a.after, duration: 1.7, ease: "power2.inOut", onUpdate() { q("#s3-n1").textContent = fmt(c1.v, da) + a.unit; } }, 5.2);
+    tl.fromTo("#s3-d1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 6.9);
+    tl.fromTo("#s3-path", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 2.4, ease: "power2.inOut" }, 5.4);
+    tl.fromTo("#s3-grid", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.0);
+    tl.fromTo("#s3-dot", { opacity: 0, attr: { cx: pts[0][0], cy: pts[0][1] } }, { opacity: 1, attr: { cx: last[0], cy: last[1] }, duration: 2.4, ease: "power2.inOut" }, 5.4);
+
+    // counter WO + bar naik
+    const c2 = { v: w.before };
+    tl.to(c2, { v: w.after, duration: 1.7, ease: "power2.inOut", onUpdate() { q("#s3-n2").textContent = money(c2.v); } }, 8.4);
+    tl.fromTo("#s3-d2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 10.1);
+    tl.fromTo("#s3-b1", { height: 0 }, { height: H1, duration: 1.0, ease: "power3.out" }, 8.4);
+    tl.fromTo("#s3-b2", { height: 0 }, { height: H2, duration: 1.6, ease: "power3.out" }, 9.0);
+    tl.fromTo("#s3-bars span", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 9.6);
+    window.__timelines["s3"] = tl;
+  </script>
+</template>
