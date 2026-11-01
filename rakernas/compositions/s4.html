@@ -2,24 +2,38 @@
   <style>
     #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; color: #fff; }
     #s4-fg { position: absolute; inset: 0; }
-    #s4-head { position: absolute; left: 192px; top: 112px; }
-    #s4-head .h1 { margin-top: 10px; }
-    #s4-chips { position: absolute; left: 192px; top: 252px; display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: 16px; }
-        .s4-p { top: 466px; height: 506px; width: 744px; }
-    #s4-p1 { left: 192px; } #s4-p2 { left: 984px; }
-    .s4-row { display: flex; align-items: baseline; gap: 26px; margin-top: 18px; }
-    .s4-prev { font-weight: 700; font-size: 44px; color: var(--mute); text-decoration: line-through; text-decoration-thickness: 3px; font-variant-numeric: tabular-nums; }
-    .s4-arrow { font-size: 44px; color: var(--gold); font-weight: 800; }
-    .s4-delta { margin-top: 14px; }
-    .s4-meter { position: absolute; left: 40px; right: 40px; top: 318px; }
-    .s4-mrow { margin-bottom: 10px; }
-    .s4-mlab { font-weight: 700; font-size: 28px; letter-spacing: 0.04em; color: var(--mute); margin-bottom: 2px; }
-    .s4-track { height: 26px; border-radius: 18px; background: rgba(255,255,255,0.08); overflow: hidden; }
-    .s4-fill { height: 100%; border-radius: 18px; }
-  </style>
+    #s4-head { position: absolute; left: 192px; top: 108px; }
+    #s4-head .h1 { margin-top: 8px; }
+    #s4-msg { position: absolute; left: 192px; top: 236px; font-weight: 700; font-size: 44px; line-height: 56px; color: #fff; }
+    #s4-msg b { color: #d4a537; font-weight: 800; }
+    #s4-chips { position: absolute; left: 192px; top: 318px; display: flex; gap: 14px; }
+    #s4-chips .chip { height: 60px; font-size: 26px; padding: 0 22px 0 10px; gap: 12px; }
+    #s4-chips .chip .ic { width: 40px; height: 40px; }
+    #s4-chips .chip .ic svg { width: 24px; height: 24px; }
+    .s4-p { top: 410px; height: 558px; }
+    #s4-p1 { left: 192px; width: 960px; } #s4-p2 { left: 1176px; width: 552px; }
+    .s4-row { display: flex; align-items: flex-end; gap: 22px; margin-top: 10px; }
+    .s4-yr { font-weight: 700; font-size: 28px; line-height: 34px; color: var(--mute); } .s4-yr.a { color: var(--gold); }
+    .s4-prev { font-weight: 700; font-size: 44px; line-height: 120px; color: var(--mute); text-decoration: line-through; text-decoration-thickness: 3px; font-variant-numeric: tabular-nums; }
+    .s4-arrow { font-size: 44px; line-height: 120px; color: var(--gold); font-weight: 800; }
+    .s4-nw { display: flex; align-items: baseline; height: 120px; white-space: nowrap; }
+    .s4-p .bignum { font-size: 120px; line-height: 120px; }
+    .s4-p .unit { font-size: 48px; }
+    .s4-tagw { margin-left: auto; align-self: center; }
+    .s4-meter { position: absolute; left: 40px; right: 40px; top: 306px; }
+    .s4-p .plabel { letter-spacing: 0.08em; }
+    .s4-mrow { margin-bottom: 14px; }
+    .s4-mlab { font-weight: 700; font-size: 28px; line-height: 34px; color: var(--mute); } .s4-mlab.a { color: var(--gold); }
+    .s4-track { height: 40px; border-radius: 20px; background: rgba(255,255,255,0.08); position: relative; }
+    .s4-fill { height: 100%; border-radius: 20px; }
+    #s4-target { position: absolute; top: -10px; bottom: -10px; width: 0; border-left: 3px dashed #fff; }
+    #s4-tlab { position: absolute; top: -40px; transform: translateX(-50%); font-weight: 700; font-size: 28px; color: #fff; white-space: nowrap; }
+    #s4-mt { position: relative; height: 44px; }
+      </style>
   <div id="root" data-composition-id="s4" data-width="1920" data-height="1080">
     <div id="s4-fg">
       <div id="s4-head"><div class="eyebrow">Key Initiative 2</div><div class="h1">Collection Cost Optimization</div></div>
+      <div id="s4-msg">Realisasi cost sesuai plan, <b>efektif dan efisien</b></div>
       <div id="s4-chips">
         <div class="chip s4-chip"><span class="ic"><svg><use href="#i-coll"/></svg></span>Field Collector Capacity</div>
         <div class="chip s4-chip"><span class="ic"><svg><use href="#i-split"/></svg></span>NPL-WO Segmentation</div>
@@ -28,22 +42,30 @@
       </div>
 
       <div id="s4-p1" class="panel s4-p">
-        <div class="plabel">Cost of Credit</div>
-        <div class="s4-row"><span class="s4-prev" id="s4-prev1"></span><span class="s4-arrow">→</span><span class="bignum" id="s4-n1"></span></div>
-        <div class="s4-delta"><span class="tag good" id="s4-d1"></span></div>
+        <div class="plabel" id="s4-l1"></div>
+        <div class="s4-row">
+          <div><div class="s4-yr s4-yb"></div><div class="s4-prev" id="s4-prev1"></div></div><span class="s4-arrow">→</span>
+          <div><div class="s4-yr a s4-ya"></div><div class="s4-nw"><span class="bignum" id="s4-n1"></span><span class="unit" id="s4-u1"></span></div></div>
+          <div class="s4-tagw"><span class="tag" id="s4-d1"></span></div>
+        </div>
         <div class="s4-meter">
-          <div class="s4-mrow"><div class="s4-mlab">Sebelum</div><div class="s4-track"><div class="s4-fill" id="s4-f1a" style="background:linear-gradient(90deg,#3b4d6b,#5f7392)"></div></div></div>
-          <div class="s4-mrow"><div class="s4-mlab">Sesudah</div><div class="s4-track"><div class="s4-fill" id="s4-f1b" style="background:linear-gradient(90deg,#2f80ed,#7db4ff)"></div></div></div>
+          <div id="s4-mt"><div id="s4-tlab"></div></div>
+          <div class="s4-mrow"><div class="s4-mlab s4-yb"></div><div class="s4-track"><div class="s4-fill" id="s4-f1a" style="background:linear-gradient(90deg,#3b4d6b,#7a8fb0)"></div><div class="s4-tl"></div></div></div>
+          <div class="s4-mrow"><div class="s4-mlab a s4-ya"></div><div class="s4-track"><div class="s4-fill" id="s4-f1b" style="background:linear-gradient(90deg,#2f80ed,#7db4ff)"></div></div></div>
+          <div id="s4-target"></div>
         </div>
       </div>
 
       <div id="s4-p2" class="panel s4-p">
-        <div class="plabel">Cost per Collection (indeks)</div>
-        <div class="s4-row"><span class="s4-prev" id="s4-prev2"></span><span class="s4-arrow">→</span><span class="bignum" id="s4-n2"></span></div>
-        <div class="s4-delta"><span class="tag good" id="s4-d2"></span></div>
-        <div class="s4-meter">
-          <div class="s4-mrow"><div class="s4-mlab">Sebelum</div><div class="s4-track"><div class="s4-fill" id="s4-f2a" style="background:linear-gradient(90deg,#3b4d6b,#5f7392)"></div></div></div>
-          <div class="s4-mrow"><div class="s4-mlab">Sesudah</div><div class="s4-track"><div class="s4-fill" id="s4-f2b" style="background:linear-gradient(90deg,#d4a537,#f0c35a)"></div></div></div>
+        <div class="plabel" id="s4-l2"></div>
+        <div class="s4-row">
+          <div><div class="s4-yr s4-yb"></div><div class="s4-prev" id="s4-prev2"></div></div><span class="s4-arrow">→</span>
+          <div><div class="s4-yr a s4-ya"></div><div class="s4-nw"><span class="bignum" id="s4-n2"></span></div></div>
+        </div>
+        <div style="margin-top:12px"><span class="tag" id="s4-d2"></span></div>
+        <div class="s4-meter" style="top:318px">
+          <div class="s4-mrow"><div class="s4-mlab s4-yb"></div><div class="s4-track"><div class="s4-fill" id="s4-f2a" style="background:linear-gradient(90deg,#3b4d6b,#7a8fb0)"></div></div></div>
+          <div class="s4-mrow"><div class="s4-mlab a s4-ya"></div><div class="s4-track"><div class="s4-fill" id="s4-f2b" style="background:linear-gradient(90deg,#d4a537,#f0c35a)"></div></div></div>
         </div>
       </div>
       <div id="s4-dummy" class="dummy" style="display:none"></div>
@@ -53,39 +75,49 @@
     const D = window.RAKERNAS_DATA, M = D.meta;
     const dec = (...v) => Math.max(...v.map((x) => (String(x).split(".")[1] || "").length));
     const fmt = (v, d) => v.toFixed(d).replace(".", ",");
-    const q = (s) => document.querySelector(s);
-
-    const c = D.coc, dc = dec(c.before, c.after), p = D.costPerCollection, dp = dec(p.before, p.after);
-    q("#s4-prev1").textContent = fmt(c.before, dc) + c.unit;
-    q("#s4-n1").textContent = fmt(c.before, dc) + c.unit;
-    q("#s4-d1").textContent = (c.after < c.before ? "▼ " : "▲ ") + fmt(Math.abs(c.after - c.before), dc) + " pp";
-    q("#s4-prev2").textContent = fmt(p.before, dp);
-    q("#s4-n2").textContent = fmt(p.before, dp);
-    q("#s4-d2").textContent = (p.after < p.before ? "▼ " : "▲ ") + fmt(Math.abs(((p.after - p.before) / p.before) * 100), 0) + "%";
+    const q = (s) => document.querySelector(s), qa = (s) => document.querySelectorAll(s);
+    qa(".s4-yb").forEach((e) => (e.textContent = M.yearBefore));
+    qa(".s4-ya").forEach((e) => (e.textContent = M.yearAfter));
     if (M.showDummyMarkers) { const d = q("#s4-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
 
-    const w1 = [(c.before / Math.max(c.before, c.after)) * 100, (c.after / Math.max(c.before, c.after)) * 100];
-    const w2 = [(p.before / Math.max(p.before, p.after)) * 100, (p.after / Math.max(p.before, p.after)) * 100];
+    const c = D.costVsPlan, dc = dec(c.before, c.after), p = D.costPerRecovery, dp = dec(p.before, p.after);
+    const sign = (e) => (e.after < e.before ? "▼ " : "▲ ");
+    const goodCls = (e) => ((e.better === "down") === (e.after < e.before) ? "up" : "bad");
+    q("#s4-l1").textContent = c.label; q("#s4-l2").textContent = p.label;
+    q("#s4-prev1").textContent = fmt(c.before, dc) + c.unit; q("#s4-n1").textContent = fmt(c.before, dc); q("#s4-u1").textContent = c.unit;
+    q("#s4-d1").textContent = sign(c) + fmt(Math.abs(c.after - c.before), dc) + " pp"; q("#s4-d1").classList.add(goodCls(c));
+    q("#s4-prev2").textContent = fmt(p.before, dp); q("#s4-n2").textContent = fmt(p.before, dp);
+    q("#s4-d2").textContent = sign(p) + fmt(Math.abs(((p.after - p.before) / p.before) * 100), 0) + "% (" + p.unit + ")"; q("#s4-d2").classList.add(goodCls(p));
+    q("#s4-tlab").textContent = "Target " + fmt(c.target, 0) + c.unit;
+
+    // skala bar 1: 0..130% ; bar 2: 0..max
+    const SC = 130, trackW = 880, w1a = (c.before / SC) * 100, w1b = (c.after / SC) * 100;
+    const tx = (c.target / SC) * trackW;
+    q("#s4-tlab").style.left = tx + "px"; q("#s4-target").style.left = tx + "px";
+    const mx = Math.max(p.before, p.after);
+    const w2a = (p.before / mx) * 100, w2b = (p.after / mx) * 100;
 
     const tl = gsap.timeline({ paused: true });
     tl.fromTo("#s4-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.3);
-    document.querySelectorAll(".s4-chip").forEach((el, i) =>
-      tl.fromTo(el, { opacity: 0, y: 24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 1.2 + i * 0.5));
-    tl.fromTo("#s4-p1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 4.0);
-    tl.fromTo("#s4-p2", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 4.5);
-    tl.fromTo("#s4-fg", { x: 14 }, { x: -14, duration: 18, ease: "none" }, 0);
+    tl.fromTo("#s4-msg", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 1.2);
+    qa(".s4-chip").forEach((el, i) => tl.fromTo(el, { opacity: 0, y: 20, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 2.2 + i * 0.4));
+    tl.fromTo("#s4-fg", { x: 12 }, { x: -12, duration: 18, ease: "none" }, 0);
 
+    tl.fromTo("#s4-p1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 4.2);
+    tl.fromTo("#s4-f1a", { width: "0%" }, { width: w1a + "%", duration: 1.0, ease: "power3.out" }, 5.2);
+    tl.fromTo("#s4-target", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.6);
+    tl.fromTo("#s4-tlab", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.6);
     const c1 = { v: c.before };
-    tl.fromTo("#s4-f1a", { width: "0%" }, { width: w1[0] + "%", duration: 1.0, ease: "power3.out" }, 5.4);
-    tl.to(c1, { v: c.after, duration: 1.7, ease: "power2.inOut", onUpdate() { q("#s4-n1").textContent = fmt(c1.v, dc) + c.unit; } }, 6.0);
-    tl.fromTo("#s4-f1b", { width: "0%" }, { width: w1[1] + "%", duration: 1.7, ease: "power2.inOut" }, 6.0);
-    tl.fromTo("#s4-d1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 7.7);
+    tl.to(c1, { v: c.after, duration: 1.8, ease: "power2.inOut", onUpdate() { q("#s4-n1").textContent = fmt(c1.v, dc); } }, 6.4);
+    tl.fromTo("#s4-f1b", { width: "0%" }, { width: w1b + "%", duration: 1.8, ease: "power2.inOut" }, 6.4);
+    tl.fromTo("#s4-d1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 8.3);
 
+    tl.fromTo("#s4-p2", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 9.6);
+    tl.fromTo("#s4-f2a", { width: "0%" }, { width: w2a + "%", duration: 0.9, ease: "power3.out" }, 10.6);
     const c2 = { v: p.before };
-    tl.fromTo("#s4-f2a", { width: "0%" }, { width: w2[0] + "%", duration: 1.0, ease: "power3.out" }, 8.6);
-    tl.to(c2, { v: p.after, duration: 1.7, ease: "power2.inOut", onUpdate() { q("#s4-n2").textContent = fmt(c2.v, dp); } }, 9.2);
-    tl.fromTo("#s4-f2b", { width: "0%" }, { width: w2[1] + "%", duration: 1.7, ease: "power2.inOut" }, 9.2);
-    tl.fromTo("#s4-d2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 10.9);
+    tl.to(c2, { v: p.after, duration: 1.6, ease: "power2.inOut", onUpdate() { q("#s4-n2").textContent = fmt(c2.v, dp); } }, 11.2);
+    tl.fromTo("#s4-f2b", { width: "0%" }, { width: w2b + "%", duration: 1.6, ease: "power2.inOut" }, 11.2);
+    tl.fromTo("#s4-d2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 12.9);
     window.__timelines["s4"] = tl;
   </script>
 </template>

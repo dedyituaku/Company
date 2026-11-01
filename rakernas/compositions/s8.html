@@ -1,0 +1,51 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; color: #fff; }
+    #s8-all { position: absolute; inset: 0; }
+    #s8-glow { position: absolute; left: 960px; top: 400px; width: 1100px; height: 700px; margin: -350px 0 0 -550px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(47,128,237,0.38) 0%, rgba(212,165,55,0.16) 42%, rgba(212,165,55,0) 70%); opacity: 0; }
+    #s8-wrap { position: absolute; left: 0; right: 0; top: 230px; text-align: center; }
+    #s8-logo { display: inline-flex; align-items: center; justify-content: center; width: 560px; height: 280px; }
+    #s8-logo img { max-width: 560px; max-height: 280px; object-fit: contain; filter: drop-shadow(0 0 28px rgba(255,255,255,0.35)); }
+    #s8-logo.ph { flex-direction: column; border: 3px dashed #ffd36b; border-radius: 28px; background: rgba(10,22,40,.6); }
+    #s8-logo.ph b { font-weight: 900; font-size: 120px; letter-spacing: 0.04em; line-height: 1; }
+    #s8-logo.ph i { font-style: normal; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; color: #ffd36b; margin-top: 10px; }
+    #s8-rule { width: 160px; height: 4px; margin: 46px auto 40px; background: linear-gradient(90deg,#d4a537,#2f80ed); border-radius: 2px; }
+    #s8-tag { display: inline-block; font-weight: 800; font-size: 58px; letter-spacing: -0.01em; padding: 14px 32px; border-radius: 16px; }
+    #s8-tag.dummy-on { border: 3px dashed #ffd36b; color: #ffd36b; }
+    #s8-note { margin-top: 18px; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; color: #ffd36b; }
+  </style>
+  <div id="root" data-composition-id="s8" data-width="1920" data-height="1080">
+    <div id="s8-all">
+      <div id="s8-glow"></div>
+      <div id="s8-wrap">
+        <div id="s8-logo"></div>
+        <div id="s8-rule"></div>
+        <div id="s8-tag"></div>
+        <div id="s8-note"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const D = window.RAKERNAS_DATA, M = D.meta, q = (s) => document.querySelector(s);
+    const logo = q("#s8-logo");
+    if (M.logoExists) {
+      logo.innerHTML = '<img id="s8-logo-img" src="' + M.logoFile + '" alt="BFI">';
+    } else {
+      logo.classList.add("ph");
+      logo.innerHTML = "<b>" + M.logoText + "</b>" + (M.showDummyMarkers ? "<i>" + M.logoNote + "</i>" : "");
+      if (!M.showDummyMarkers) logo.style.cssText += ";border:none;background:none";
+    }
+    q("#s8-tag").textContent = M.tagline;
+    if (M.showDummyMarkers && M.taglineIsDummy) { q("#s8-tag").classList.add("dummy-on"); q("#s8-note").textContent = "PLACEHOLDER"; }
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s8-glow", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 2.4, ease: "power2.out" }, 0.2);
+    tl.fromTo("#s8-logo", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 2.0, ease: "power2.out" }, 0.5);
+    tl.fromTo("#s8-rule", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 2.0);
+    tl.fromTo("#s8-tag", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 2.4);
+    tl.fromTo("#s8-note", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 3.0);
+    tl.fromTo("#s8-glow", { scale: 1 }, { scale: 1.08, duration: 5, ease: "sine.inOut", immediateRender: false }, 2.6);
+    tl.fromTo("#s8-all", { opacity: 1 }, { opacity: 0, duration: 0.9, ease: "power2.inOut", immediateRender: false }, 5.0);
+    window.__timelines["s8"] = tl;
+  </script>
+</template>

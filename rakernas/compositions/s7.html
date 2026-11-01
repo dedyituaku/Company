@@ -1,36 +1,55 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; color: #fff; }
-    #s7-wrap { position: absolute; left: 0; right: 0; top: 270px; text-align: center; }
-    #s7-logo { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 520px; height: 230px; border-radius: 28px;
-      border: 3px dashed #ffd36b; background: rgba(10,22,40,.6); }
-    #s7-logo b { font-weight: 900; font-size: 110px; letter-spacing: 0.04em; color: #fff; line-height: 1; }
-    #s7-logo i { font-style: normal; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; color: #ffd36b; margin-top: 10px; }
-    #s7-rule { width: 160px; height: 4px; margin: 44px auto 40px; background: linear-gradient(90deg,#d4a537,#2f80ed); border-radius: 2px; }
-    #s7-tag { display: inline-block; font-weight: 800; font-size: 58px; letter-spacing: -0.01em; padding: 14px 32px; border-radius: 16px; }
-    #s7-tag.dummy-on { border: 3px dashed #ffd36b; color: #ffd36b; }
-    #s7-note { margin-top: 18px; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; color: #ffd36b; }
+    #s7-fg { position: absolute; inset: 0; }
+    #s7-head { position: absolute; left: 192px; top: 108px; }
+    #s7-head .h1 b { color: #d4a537; font-weight: 800; }
+    #s7-cards { position: absolute; left: 192px; top: 262px; width: 1536px; display: flex; gap: 40px; }
+    .s7-card { width: 485px; height: 712px; border-radius: 30px; padding: 30px 34px; position: relative; overflow: hidden;
+      background: linear-gradient(165deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025)); border: 1.5px solid rgba(255,255,255,0.16); }
+    .s7-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--c); }
+    .s7-no { font-weight: 900; font-size: 64px; line-height: 64px; color: var(--c); letter-spacing: -0.03em; }
+    .s7-t { margin-top: 10px; height: 160px; font-weight: 800; font-size: 34px; line-height: 40px; letter-spacing: -0.01em; }
+    .s7-tg { margin-top: 6px; height: 76px; font-style: italic; font-weight: 600; font-size: 28px; line-height: 36px; color: var(--c); }
+    .s7-kw { list-style: none; margin-top: 10px; border-top: 1.5px solid rgba(255,255,255,0.16); padding-top: 14px; }
+    .s7-kw li { position: relative; padding-left: 26px; margin-bottom: 10px; font-weight: 600; font-size: 28px; line-height: 34px; color: rgba(255,255,255,0.92); }
+    .s7-kw li::before { content: ""; position: absolute; left: 0; top: 11px; width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+    .s7-sweep { position: absolute; top: -20%; bottom: -20%; left: 0; width: 40%; opacity: 0;
+      background: linear-gradient(90deg, rgba(243,208,122,0), rgba(255,236,170,0.75), rgba(243,208,122,0)); }
   </style>
   <div id="root" data-composition-id="s7" data-width="1920" data-height="1080">
-    <div id="s7-wrap">
-      <div id="s7-logo"><b id="s7-logotxt"></b><i id="s7-logonote"></i></div>
-      <div id="s7-rule"></div>
-      <div id="s7-tag"></div>
-      <div id="s7-note"></div>
+    <div id="s7-fg">
+      <div id="s7-head"><div class="eyebrow">Roadmap</div><div class="h1">Key Initiatives <b>2027</b></div></div>
+      <div id="s7-cards">
+        <div id="s7-c1" class="s7-card" style="--c:#d4a537"><div class="s7-no">01</div><div class="s7-t"></div><div class="s7-tg"></div><ul class="s7-kw"><li></li><li></li><li></li><li></li></ul><div class="s7-sweep"></div></div>
+        <div id="s7-c2" class="s7-card" style="--c:#2f80ed"><div class="s7-no">02</div><div class="s7-t"></div><div class="s7-tg"></div><ul class="s7-kw"><li></li><li></li><li></li><li></li></ul><div class="s7-sweep"></div></div>
+        <div id="s7-c3" class="s7-card" style="--c:#d4a537"><div class="s7-no">03</div><div class="s7-t"></div><div class="s7-tg"></div><ul class="s7-kw"><li></li><li></li><li></li><li></li></ul><div class="s7-sweep"></div></div>
+      </div>
     </div>
   </div>
   <script>
-    const D = window.RAKERNAS_DATA, M = D.meta, q = (s) => document.querySelector(s);
-    q("#s7-logotxt").textContent = M.logoText;
-    q("#s7-logonote").textContent = M.showDummyMarkers ? M.logoNote : "";
-    q("#s7-tag").textContent = M.tagline;
-    if (M.showDummyMarkers && M.taglineIsDummy) { q("#s7-tag").classList.add("dummy-on"); q("#s7-note").textContent = "PLACEHOLDER"; }
-    if (!M.showDummyMarkers) q("#s7-logo").style.cssText += ";border:none;background:none";
+    const D = window.RAKERNAS_DATA;
+    D.initiatives2027.forEach((it, i) => {
+      const c = document.getElementById("s7-c" + (i + 1));
+      c.querySelector(".s7-t").textContent = it.title;
+      c.querySelector(".s7-tg").textContent = it.tagline;
+      c.querySelectorAll(".s7-kw li").forEach((li, j) => { if (it.keywords[j]) li.textContent = it.keywords[j]; else li.remove(); });
+    });
     const tl = gsap.timeline({ paused: true });
-    tl.fromTo("#s7-logo", { opacity: 0, scale: 0.9, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.3);
-    tl.fromTo("#s7-rule", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.8);
-    tl.fromTo("#s7-tag", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.9);
-    tl.fromTo("#s7-note", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.3);
+    tl.fromTo("#s7-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.4);
+    tl.fromTo("#s7-fg", { x: 12 }, { x: -12, duration: 20, ease: "none" }, 0);
+    const at = [4.0, 7.6, 11.2];
+    at.forEach((t, i) => {
+      const id = "#s7-c" + (i + 1);
+      tl.fromTo(id, { opacity: 0, y: 70, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, t);
+      // sapuan cahaya emas saat kartu muncul
+      tl.fromTo(id + " .s7-sweep", { opacity: 0.9, x: -300, rotation: 18 }, { opacity: 0, x: 700, rotation: 18, duration: 1.1, ease: "power2.inOut" }, t + 0.1);
+      // kartu sebelumnya meredup saat kartu baru fokus
+      if (i > 0) for (let j = 1; j <= i; j++) tl.to("#s7-c" + j, { opacity: 0.45, duration: 0.5 }, t - 0.05);
+    });
+    // akhir: ketiga kartu tampil bersama
+    [1, 2, 3].forEach((n) => tl.to("#s7-c" + n, { opacity: 1, duration: 0.8, ease: "power2.out" }, 15.2));
+    [1, 2, 3].forEach((n) => tl.fromTo("#s7-c" + n + " .s7-sweep", { opacity: 0.8, x: -300, rotation: 18 }, { opacity: 0, x: 700, rotation: 18, duration: 1.2, ease: "power2.inOut" }, 15.2 + (n - 1) * 0.25));
     window.__timelines["s7"] = tl;
   </script>
 </template>

@@ -1,24 +1,27 @@
-# Script Voice Over - Rakernas Opening (Bahasa Indonesia)
+# Script Voice Over - Rakernas Opening (Bahasa Indonesia) - v3
 # Satu file audio per scene. Taruh hasil ElevenLabs di assets/vo/sceneN.mp3 (menimpa file senyap placeholder).
 # Setelah file asli masuk, sesuaikan durasi scene (lihat README.md) dan dur di data.json.
 
 [SCENE 1 | 0-8 dtk | assets/vo/scene1.mp3]
-Awal tahun, kita menetapkan tiga prioritas.
+Tahun ini, kita menetapkan tiga prioritas.
 
 [SCENE 2 | 8-20 dtk | assets/vo/scene2.mp3]
 Collection effectiveness, cost optimization, dan manpower capability.
 
-[SCENE 3 | 20-38 dtk | assets/vo/scene3.mp3]
-Segmentasi lebih tajam, handling lebih tepat. Delinquency turun, recovery naik.
+[SCENE 3 | 20-40 dtk | assets/vo/scene3.mp3]
+Segmentasi lebih tajam, handling lebih tepat. Delinquency turun, recovery naik, inventory lebih sehat.
 
-[SCENE 4 | 38-56 dtk | assets/vo/scene4.mp3]
-Kapasitas collector dioptimalkan, strategi handling lebih efisien, biaya lebih terkendali.
+[SCENE 4 | 40-58 dtk | assets/vo/scene4.mp3]
+Kapasitas collector dioptimalkan, cost terealisasi sesuai plan, secara efektif dan efisien.
 
-[SCENE 5 | 56-74 dtk | assets/vo/scene5.mp3]
+[SCENE 5 | 58-76 dtk | assets/vo/scene5.mp3]
 Kapasitas manager dibangun, kinerja terukur. Hasilnya, insentif manager meningkat.
 
-[SCENE 6 | 74-86 dtk | assets/vo/scene6.mp3]
-Fondasi sudah kuat. Saatnya melangkah lebih jauh.
+[SCENE 6 | 76-86 dtk | assets/vo/scene6.mp3]
+2026 telah kita selesaikan. Siap menghadapi tantangan 2027.
 
-[SCENE 7 | 86-90 dtk | tanpa VO]
-(tanpa narasi - logo + tagline)
+[SCENE 7 | 86-106 dtk | assets/vo/scene7.mp3]
+Tahun depan, tiga arah baru. Pertama, meningkatkan cara kita menagih. Kedua, mempercepat pemulihan dan penyelesaian. Ketiga, memperkuat siapa yang mengeksekusi, dan seberapa efisien.
+
+[SCENE 8 | 106-112 dtk | assets/vo/scene8.mp3]
+(tanpa narasi - logo + tagline; slot senyap cadangan)

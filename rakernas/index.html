@@ -39,6 +39,9 @@
       .unit { font-weight: 700; font-size: 56px; color: var(--gold); margin-left: 8px; }
       .tag { display: inline-block; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; padding: 8px 18px; border-radius: 999px; }
       .tag.good { background: rgba(212,165,55,0.18); color: var(--gold); border: 1.5px solid rgba(212,165,55,0.6); }
+      .tag.up { background: rgba(61,220,132,0.16); color: #3ddc84; border: 1.5px solid rgba(61,220,132,0.6); }
+      .tag.bad { background: rgba(255,99,99,0.16); color: #ff7b7b; border: 1.5px solid rgba(255,99,99,0.6); }
+      #footnote { position: absolute; left: 96px; bottom: 54px; z-index: 20; font-weight: 600; font-size: 28px; line-height: 36px; color: rgba(255,255,255,0.6); opacity: 0; }
       .dummy { position: absolute; right: 100px; top: 56px; font-weight: 800; font-size: 28px; letter-spacing: 0.1em; color: #ffd36b;
         border: 2px dashed #ffd36b; border-radius: 10px; padding: 10px 18px; background: rgba(10,22,40,0.7); z-index: 30; }
     </style>
@@ -63,34 +66,42 @@
       </defs>
     </svg>
 
-    <div id="root" data-composition-id="main" data-start="0" data-duration="90" data-width="1920" data-height="1080">
-      <div id="bg" class="clip" data-start="0" data-duration="90" data-track-index="0"></div>
-      <div id="particles" class="clip" data-start="0" data-duration="90" data-track-index="1"></div>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="112" data-width="1920" data-height="1080">
+      <div id="bg" class="clip" data-start="0" data-duration="112" data-track-index="0"></div>
+      <div id="particles" class="clip" data-start="0" data-duration="112" data-track-index="1"></div>
 
       <div id="s1" class="scene-host clip" data-composition-id="s1" data-composition-src="compositions/s1.html" data-start="0" data-duration="8" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
       <div id="s2" class="scene-host clip" data-composition-id="s2" data-composition-src="compositions/s2.html" data-start="8" data-duration="12" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="s3" class="scene-host clip" data-composition-id="s3" data-composition-src="compositions/s3.html" data-start="20" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="s4" class="scene-host clip" data-composition-id="s4" data-composition-src="compositions/s4.html" data-start="38" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="s5" class="scene-host clip" data-composition-id="s5" data-composition-src="compositions/s5.html" data-start="56" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="s6" class="scene-host clip" data-composition-id="s6" data-composition-src="compositions/s6.html" data-start="74" data-duration="12" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="s7" class="scene-host clip" data-composition-id="s7" data-composition-src="compositions/s7.html" data-start="86" data-duration="4" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s3" class="scene-host clip" data-composition-id="s3" data-composition-src="compositions/s3.html" data-start="20" data-duration="20" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s4" class="scene-host clip" data-composition-id="s4" data-composition-src="compositions/s4.html" data-start="40" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s5" class="scene-host clip" data-composition-id="s5" data-composition-src="compositions/s5.html" data-start="58" data-duration="18" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s6" class="scene-host clip" data-composition-id="s6" data-composition-src="compositions/s6.html" data-start="76" data-duration="10" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s7" class="scene-host clip" data-composition-id="s7" data-composition-src="compositions/s7.html" data-start="86" data-duration="20" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="s8" class="scene-host clip" data-composition-id="s8" data-composition-src="compositions/s8.html" data-start="106" data-duration="6" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
 
-      <div id="flash" class="clip" data-start="0" data-duration="90" data-track-index="3"></div>
+      <div id="footnote" class="clip" data-start="20" data-duration="56" data-track-index="4"></div>
+      <div id="flash" class="clip" data-start="0" data-duration="112" data-track-index="3"></div>
 
       <!-- Slot VO per scene: ganti file senyap dengan hasil ElevenLabs (nama sama). -->
-      <audio id="vo-1" class="clip" src="assets/vo/scene1.mp3" data-start="1" data-duration="3" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-1" class="clip" src="assets/vo/scene1.mp3" data-start="1" data-duration="3.2" data-track-index="5" data-volume="1"></audio>
       <audio id="vo-2" class="clip" src="assets/vo/scene2.mp3" data-start="9" data-duration="5.5" data-track-index="5" data-volume="1"></audio>
-      <audio id="vo-3" class="clip" src="assets/vo/scene3.mp3" data-start="21" data-duration="7" data-track-index="5" data-volume="1"></audio>
-      <audio id="vo-4" class="clip" src="assets/vo/scene4.mp3" data-start="39" data-duration="7.5" data-track-index="5" data-volume="1"></audio>
-      <audio id="vo-5" class="clip" src="assets/vo/scene5.mp3" data-start="57" data-duration="7.5" data-track-index="5" data-volume="1"></audio>
-      <audio id="vo-6" class="clip" src="assets/vo/scene6.mp3" data-start="75" data-duration="4.5" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-3" class="clip" src="assets/vo/scene3.mp3" data-start="21" data-duration="9.5" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-4" class="clip" src="assets/vo/scene4.mp3" data-start="41" data-duration="7" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-5" class="clip" src="assets/vo/scene5.mp3" data-start="59" data-duration="7.5" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-6" class="clip" src="assets/vo/scene6.mp3" data-start="77" data-duration="4.5" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-7" class="clip" src="assets/vo/scene7.mp3" data-start="87" data-duration="15" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-8" class="clip" src="assets/vo/scene8.mp3" data-start="107" data-duration="3" data-track-index="5" data-volume="1"></audio>
       <!-- Musik latar PLACEHOLDER (senyap). Ducking di-generate oleh build.mjs dari data.json -->
-      <audio id="bgm" class="clip" src="assets/music/bgm-placeholder.mp3" data-start="0" data-duration="90" data-track-index="6" data-volume="1" data-fade-out="2" data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0.42},{&quot;t&quot;:0.7,&quot;v&quot;:0.42},{&quot;t&quot;:1,&quot;v&quot;:0.14},{&quot;t&quot;:4,&quot;v&quot;:0.14},{&quot;t&quot;:4.3,&quot;v&quot;:0.42},{&quot;t&quot;:8.7,&quot;v&quot;:0.42},{&quot;t&quot;:9,&quot;v&quot;:0.14},{&quot;t&quot;:14.5,&quot;v&quot;:0.14},{&quot;t&quot;:14.8,&quot;v&quot;:0.42},{&quot;t&quot;:20.7,&quot;v&quot;:0.42},{&quot;t&quot;:21,&quot;v&quot;:0.14},{&quot;t&quot;:28,&quot;v&quot;:0.14},{&quot;t&quot;:28.3,&quot;v&quot;:0.42},{&quot;t&quot;:38.7,&quot;v&quot;:0.42},{&quot;t&quot;:39,&quot;v&quot;:0.14},{&quot;t&quot;:46.5,&quot;v&quot;:0.14},{&quot;t&quot;:46.8,&quot;v&quot;:0.42},{&quot;t&quot;:56.7,&quot;v&quot;:0.42},{&quot;t&quot;:57,&quot;v&quot;:0.14},{&quot;t&quot;:64.5,&quot;v&quot;:0.14},{&quot;t&quot;:64.8,&quot;v&quot;:0.42},{&quot;t&quot;:74.7,&quot;v&quot;:0.42},{&quot;t&quot;:75,&quot;v&quot;:0.14},{&quot;t&quot;:79.5,&quot;v&quot;:0.14},{&quot;t&quot;:79.8,&quot;v&quot;:0.42}]}]}"></audio>
+      <audio id="bgm" class="clip" src="assets/music/bgm-placeholder.mp3" data-start="0" data-duration="112" data-track-index="6" data-volume="1" data-fade-out="2" data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0.42},{&quot;t&quot;:0.7,&quot;v&quot;:0.42},{&quot;t&quot;:1,&quot;v&quot;:0.14},{&quot;t&quot;:4.2,&quot;v&quot;:0.14},{&quot;t&quot;:4.5,&quot;v&quot;:0.42},{&quot;t&quot;:8.7,&quot;v&quot;:0.42},{&quot;t&quot;:9,&quot;v&quot;:0.14},{&quot;t&quot;:14.5,&quot;v&quot;:0.14},{&quot;t&quot;:14.8,&quot;v&quot;:0.42},{&quot;t&quot;:20.7,&quot;v&quot;:0.42},{&quot;t&quot;:21,&quot;v&quot;:0.14},{&quot;t&quot;:30.5,&quot;v&quot;:0.14},{&quot;t&quot;:30.8,&quot;v&quot;:0.42},{&quot;t&quot;:40.7,&quot;v&quot;:0.42},{&quot;t&quot;:41,&quot;v&quot;:0.14},{&quot;t&quot;:48,&quot;v&quot;:0.14},{&quot;t&quot;:48.3,&quot;v&quot;:0.42},{&quot;t&quot;:58.7,&quot;v&quot;:0.42},{&quot;t&quot;:59,&quot;v&quot;:0.14},{&quot;t&quot;:66.5,&quot;v&quot;:0.14},{&quot;t&quot;:66.8,&quot;v&quot;:0.42},{&quot;t&quot;:76.7,&quot;v&quot;:0.42},{&quot;t&quot;:77,&quot;v&quot;:0.14},{&quot;t&quot;:81.5,&quot;v&quot;:0.14},{&quot;t&quot;:81.8,&quot;v&quot;:0.42},{&quot;t&quot;:86.7,&quot;v&quot;:0.42},{&quot;t&quot;:87,&quot;v&quot;:0.14},{&quot;t&quot;:102,&quot;v&quot;:0.14},{&quot;t&quot;:102.3,&quot;v&quot;:0.42}]}]}"></audio>
     </div>
 
     <script>
       const D = window.RAKERNAS_DATA;
       const tl = gsap.timeline({ paused: true });
+      const TOTAL = D.timing.total;
+      document.getElementById("footnote").textContent = D.meta.footnote;
+      tl.fromTo("#footnote", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out", immediateRender: false }, 20.5);
+      tl.to("#footnote", { opacity: 0, duration: 0.4 }, 75.4);
 
       // flash putih di setiap batas scene
       tl.set("#flash", { opacity: 0 }, 0);
@@ -111,9 +122,9 @@
           `background:${gold ? "#d4a537" : "#6fa8ff"};box-shadow:0 0 ${size * 3}px ${gold ? "rgba(212,165,55,.8)" : "rgba(47,128,237,.8)"};opacity:0;`;
         host.appendChild(el);
         const rise = 120 + rnd() * 260, drift = (rnd() - 0.5) * 120;
-        tl.fromTo(el, { y: 0, x: 0 }, { y: -rise, x: drift, duration: 90, ease: "none" }, 0);
+        tl.fromTo(el, { y: 0, x: 0 }, { y: -rise, x: drift, duration: TOTAL, ease: "none" }, 0);
         const cycle = 3 + rnd() * 4, peak = 0.25 + rnd() * 0.5, off = rnd() * cycle;
-        tl.fromTo(el, { opacity: 0 }, { opacity: peak, duration: cycle, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor((90 - off) / cycle) - 1) }, off);
+        tl.fromTo(el, { opacity: 0 }, { opacity: peak, duration: cycle, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor((TOTAL - off) / cycle) - 1) }, off);
       }
       window.__timelines["main"] = tl;
     </script>

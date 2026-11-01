@@ -9,11 +9,13 @@
     #s5-p1 { left: 192px; } #s5-p2 { left: 984px; }
     #s5-ring { position: absolute; left: 30px; top: 96px; width: 350px; height: 350px; }
     #s5-n1 { position: absolute; left: 30px; top: 214px; width: 350px; text-align: center; font-size: 96px; }
+    #s5-ya1 { position: absolute; left: 30px; top: 312px; width: 350px; text-align: center; font-weight: 700; font-size: 28px; color: #d4a537; }
     #s5-side { position: absolute; left: 410px; top: 170px; width: 290px; }
     .s5-prev { font-weight: 700; font-size: 40px; color: var(--mute); font-variant-numeric: tabular-nums; margin-top: 10px; }
     #s5-big { position: absolute; left: 40px; right: 40px; top: 120px; text-align: left; }
     #s5-n2 { font-size: 220px; color: var(--gold); }
     #s5-up { position: absolute; right: 36px; top: 24px; width: 84px; height: 84px; color: var(--gold); }
+    #s5-yr2 { margin-top: 14px; font-weight: 700; font-size: 28px; color: #d4a537; }
     #s5-cap { margin-top: 22px; font-weight: 700; font-size: 32px; color: #fff; line-height: 1.3; }
   </style>
   <div id="root" data-composition-id="s5" data-width="1920" data-height="1080">
@@ -32,14 +34,14 @@
           <circle id="s5-arc0" cx="190" cy="190" r="160" fill="none" stroke="#5f7392" stroke-width="26" stroke-linecap="round" transform="rotate(-90 190 190)" pathLength="1"/>
           <circle id="s5-arc" cx="190" cy="190" r="160" fill="none" stroke="#2f80ed" stroke-width="26" stroke-linecap="round" transform="rotate(-90 190 190)" pathLength="1"/>
         </svg>
-        <div class="bignum" id="s5-n1"></div>
-        <div id="s5-side"><div class="plabel">Sebelum</div><div class="s5-prev" id="s5-prev1"></div><div style="margin-top:26px"><span class="tag good" id="s5-d1"></span></div></div>
+        <div class="bignum" id="s5-n1"></div><div class="s5-yatag s5-ya" id="s5-ya1"></div>
+        <div id="s5-side"><div class="plabel s5-yb"></div><div class="s5-prev" id="s5-prev1"></div><div style="margin-top:26px"><span class="tag up" id="s5-d1"></span></div></div>
       </div>
 
       <div id="s5-p2" class="panel s5-p">
         <div class="plabel">Insentif Manager</div>
         <svg id="s5-up" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 34 20 22l8 8 14-16M30 14h12v12"/></g></svg>
-        <div id="s5-big"><div class="bignum" id="s5-n2"></div><div id="s5-cap">Insentif Manager naik <span id="s5-cap-n"></span></div></div>
+        <div id="s5-big"><div class="bignum" id="s5-n2"></div><div id="s5-cap">Insentif Manager naik <span id="s5-cap-n"></span></div><div id="s5-yr2" class="s5-ya"></div></div>
       </div>
       <div id="s5-dummy" class="dummy" style="display:none"></div>
     </div>
@@ -49,6 +51,9 @@
     const fmt = (v, d) => v.toFixed(d).replace(".", ",");
     const q = (s) => document.querySelector(s);
     const m = D.certifiedManager, g = D.incentiveGrowth;
+    document.querySelectorAll(".s5-yb").forEach((e) => (e.textContent = M.yearBefore));
+    document.querySelectorAll(".s5-ya").forEach((e) => (e.textContent = M.yearAfter));
+    document.getElementById("s5-yr2").textContent = M.yearAfter + " vs " + M.yearBefore;
     q("#s5-n1").textContent = fmt(m.before, 0) + m.unit;
     q("#s5-prev1").textContent = fmt(m.before, 0) + m.unit;
     q("#s5-d1").textContent = "▲ " + fmt(m.after - m.before, 0) + " pp";
