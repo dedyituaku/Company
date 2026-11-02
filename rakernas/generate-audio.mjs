@@ -257,6 +257,20 @@ if (args.includes("--voice-test")) {
   process.exit(0);
 }
 
+// ---------- samakan level antar klip VO (gain per slot, +-4 dB maks) ----------
+function measureLufs(f) {
+  const r = spawnSync("ffmpeg", ["-hide_banner", "-nostats", "-i", f, "-af", "ebur128", "-f", "null", "-"], { encoding: "utf8" });
+  const sum = r.stderr.slice(r.stderr.lastIndexOf("Summary:"));
+  return parseFloat(/I:\s+(-?[\d.]+) LUFS/.exec(sum)[1]);
+}
+function equalizeVo() {
+  const L = data.vo.slots.map((x) => measureLufs(x.file));
+  const target = [...L].sort((a, b) => a - b)[Math.floor(L.length / 2)];
+  data.vo.slots.forEach((x, i) => { x.lufs = L[i]; x.gain = +Math.min(1.58, Math.max(0.63, 10 ** ((target - L[i]) / 20))).toFixed(3); });
+  data.audio.voLufsTarget = target;
+  console.log("Level VO per scene (LUFS) -> gain: " + data.vo.slots.map((x) => `s${x.scene} ${x.lufs} (x${x.gain})`).join(", "));
+}
+
 // ---------- 1. VOICE OVER ----------
 const audio = data.audio || (data.audio = {});
 const sceneId = (n) => "s" + n;
@@ -310,9 +324,12 @@ if (want("vo")) {
   data.vo.slots = slots;
   Object.assign(audio, { generated: true, lead, dur, voDur, cues, script,
     chars: { vo: totalChars }, voice: { id: EL.voiceId, name: EL.voiceName, model: EL.modelId } });
+  equalizeVo();
   data.elevenlabs = saveEL();
   writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
   console.log(`\nTiming baru: total ${data.timing.total} dtk -> ` + scenes.map((x) => `${x.id} ${x.start}-${x.end}`).join(", "));
+} else if (want("vogain") && audio.generated) {
+  equalizeVo(); writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
 } else if (!audio.generated) {
   die("Timing scene belum ada: jalankan VO dulu (tanpa --only, atau --only=vo) sebelum SFX/musik.");
 }
@@ -369,7 +386,8 @@ if (want("music")) {
   if (already && !FORCE) console.log(`Musik ${M.name}: sudah ada (${audio.musicDur?.[M.name] ?? "?"} dtk); lewati (--force untuk ulang)`);
   else {
     process.stdout.write(`Musik: Music API satu track ${need} dtk ... `);
-    const r = api("POST", `/v1/music?output_format=${EL.outputFormat}`, { prompt: M.prompts.calm, music_length_ms: need * 1000, force_instrumental: true, model_id: "music_v1" });
+    const SKIP_MUSIC_API = args.includes("--no-music-api");   // hemat kredit: langsung pakai stem yang sudah ada
+    const r = SKIP_MUSIC_API ? { status: 0, buf: Buffer.from("dilewati (--no-music-api)") } : api("POST", `/v1/music?output_format=${EL.outputFormat}`, { prompt: M.prompts.calm, music_length_ms: need * 1000, force_instrumental: true, model_id: "music_v1" });
     if (r.status === 200) {
       writeFileSync(outFile, r.buf); audio.sources.music[M.name] = "elevenlabs-music"; console.log("ok");
     } else {

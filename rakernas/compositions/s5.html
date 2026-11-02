@@ -85,7 +85,7 @@
     const c2 = { v: 0 };
     tl.to(c2, { v: g, duration: 1.8, ease: "power3.out", onUpdate() { q("#s5-n2").textContent = "+" + fmt(c2.v, 0) + "%"; } }, IM);
     tl.fromTo("#s5-up", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, IM);
-    tl.fromTo("#s5-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, IM + 1.4);
+    tl.fromTo("#s5-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, IM + 0.6);
     window.__timelines["s5"] = tl;
   </script>
 </template>

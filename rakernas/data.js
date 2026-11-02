@@ -91,57 +91,57 @@ window.RAKERNAS_DATA = {
   ],
   "timing": {
     "_catatan": "Detik pada timeline utama. Ubah juga data-start/data-duration host di index.html jika durasi scene diubah.",
-    "total": 160.58,
+    "total": 155.78,
     "scenes": [
       {
         "id": "s1",
         "start": 0,
-        "end": 9.61
+        "end": 9.32
       },
       {
         "id": "s2",
-        "start": 9.61,
-        "end": 21.4
+        "start": 9.32,
+        "end": 21.64
       },
       {
         "id": "s3",
-        "start": 21.4,
-        "end": 64.1
+        "start": 21.64,
+        "end": 63.45
       },
       {
         "id": "s4",
-        "start": 64.1,
-        "end": 81.9
+        "start": 63.45,
+        "end": 80.96
       },
       {
         "id": "s5",
-        "start": 81.9,
-        "end": 98.34
+        "start": 80.96,
+        "end": 95.42
       },
       {
         "id": "s6",
-        "start": 98.34,
-        "end": 106.9
+        "start": 95.42,
+        "end": 103.82
       },
       {
         "id": "s7",
-        "start": 106.9,
-        "end": 153.72
+        "start": 103.82,
+        "end": 149.47
       },
       {
         "id": "s8",
-        "start": 153.72,
-        "end": 160.58
+        "start": 149.47,
+        "end": 155.78
       }
     ],
     "flashAt": [
-      9.61,
-      21.4,
-      64.1,
-      81.9,
-      98.34,
-      106.9,
-      153.72
+      9.32,
+      21.64,
+      63.45,
+      80.96,
+      95.42,
+      103.82,
+      149.47
     ]
   },
   "vo": {
@@ -151,49 +151,65 @@ window.RAKERNAS_DATA = {
         "scene": 1,
         "file": "assets/vo/scene1.mp3",
         "start": 5.5,
-        "dur": 3.709
+        "dur": 3.422,
+        "lufs": -23,
+        "gain": 0.977
       },
       {
         "scene": 2,
         "file": "assets/vo/scene2.mp3",
-        "start": 10.11,
-        "dur": 10.893
+        "start": 9.82,
+        "dur": 11.416,
+        "lufs": -23.2,
+        "gain": 1
       },
       {
         "scene": 3,
         "file": "assets/vo/scene3.mp3",
-        "start": 21.9,
-        "dur": 41.796
+        "start": 22.14,
+        "dur": 40.908,
+        "lufs": -25,
+        "gain": 1.23
       },
       {
         "scene": 4,
         "file": "assets/vo/scene4.mp3",
-        "start": 64.6,
-        "dur": 16.901
+        "start": 63.95,
+        "dur": 16.614,
+        "lufs": -25.6,
+        "gain": 1.318
       },
       {
         "scene": 5,
         "file": "assets/vo/scene5.mp3",
-        "start": 82.4,
-        "dur": 15.543
+        "start": 81.46,
+        "dur": 13.558,
+        "lufs": -23,
+        "gain": 0.977
       },
       {
         "scene": 6,
         "file": "assets/vo/scene6.mp3",
-        "start": 98.74,
-        "dur": 7.758
+        "start": 95.82,
+        "dur": 7.602,
+        "lufs": -24.5,
+        "gain": 1.161
       },
       {
         "scene": 7,
         "file": "assets/vo/scene7.mp3",
-        "start": 107.4,
-        "dur": 45.923
+        "start": 104.32,
+        "dur": 44.748,
+        "lufs": -23.6,
+        "gain": 1.047
       },
       {
         "scene": 8,
         "file": "assets/vo/scene8.mp3",
-        "start": 154.72,
-        "dur": 5.46
+        "start": 150.47,
+        "dur": 4.911,
+        "lufs": -23,
+        "gain": 0.977
       }
     ],
     "duck": {
@@ -615,7 +631,12 @@ window.RAKERNAS_DATA = {
         "alias": "lor"
       }
     ],
-    "_pronunciation": "Dictionary ElevenLabs (alias). WO/NPL-WO/KPI diganti di teks TTS lewat vo.txt [PRONUNCIATION] (wé-o, en-pe-el wé-o, ka-pe-i); 'Lor' dibaca sebagai kata."
+    "_pronunciation": "Dictionary ElevenLabs (alias). WO/NPL-WO/KPI diganti di teks TTS lewat vo.txt [PRONUNCIATION] (wé-o, en-pe-el wé-o, ka-pe-i); 'Lor' dibaca sebagai kata.",
+    "dictionary": {
+      "id": "NcnDWbttHoO3LFpXv4Pi",
+      "versionId": "pMaHh8zGdeF04ttUMXRG",
+      "hash": "b6daf33597"
+    }
   },
   "audio": {
     "_catatan": "Diisi otomatis oleh generate-audio.mjs (generated=true). Nilai awal di bawah = timing brief lama agar proyek tetap bisa dirender sebelum audio dibuat. cues = detik DI DALAM scene tempat kata penanda [[...]] di vo.txt diucapkan; dipakai compositions/sN.html.",
@@ -631,77 +652,77 @@ window.RAKERNAS_DATA = {
       "s8": 1
     },
     "dur": {
-      "s1": 9.61,
-      "s2": 11.79,
-      "s3": 42.7,
-      "s4": 17.8,
-      "s5": 16.44,
-      "s6": 8.56,
-      "s7": 46.82,
-      "s8": 6.86
+      "s1": 9.32,
+      "s2": 12.32,
+      "s3": 41.81,
+      "s4": 17.51,
+      "s5": 14.46,
+      "s6": 8.4,
+      "s7": 45.65,
+      "s8": 6.31
     },
     "cues": {
       "s1": {
         "y": 5.5,
-        "k": 7.485,
-        "end": 9.169
+        "k": 7.276,
+        "end": 8.89
       },
       "s2": {
-        "c1": 4.32,
-        "c2": 6.955,
-        "c3": 8.778,
-        "end": 11.367
+        "c1": 4.424,
+        "c2": 7.141,
+        "c3": 9.103,
+        "end": 11.878
       },
       "s3": {
-        "c1": 3.658,
-        "m1": 7.884,
-        "c2": 10.856,
-        "m2": 15.279,
-        "c3": 17.636,
-        "m3": 20.295,
-        "c4": 23.267,
-        "m4": 27.017,
-        "c5": 30.442,
-        "m5": 34.505,
-        "f": 36.49,
-        "end": 42.249
+        "c1": 3.577,
+        "m1": 7.536,
+        "c2": 10.113,
+        "m2": 14.188,
+        "c3": 16.487,
+        "m3": 19.494,
+        "c4": 22.756,
+        "m4": 27.168,
+        "c5": 30.454,
+        "m5": 33.659,
+        "f": 35.748,
+        "end": 41.368
       },
       "s4": {
-        "p": 4.238,
-        "m": 6.595,
-        "end": 17.358
+        "p": 4.157,
+        "m": 6.444,
+        "end": 17.079
       },
       "s5": {
-        "k": 3.704,
-        "b": 6.816,
-        "m": 8.952,
-        "i": 11.936,
-        "im": 13.944,
-        "end": 16.011
+        "k": 3.913,
+        "b": 6.235,
+        "m": 7.768,
+        "i": 10.531,
+        "im": 12.075,
+        "end": 14.014
       },
       "s6": {
         "y": 0.4,
-        "r": 4.127,
-        "end": 8.109
+        "r": 4.173,
+        "end": 7.97
       },
       "s7": {
-        "c1": 9.01,
-        "c2": 21.572,
-        "c3": 35.899,
-        "end": 46.383
+        "c1": 8.743,
+        "c2": 21.305,
+        "c3": 35.539,
+        "end": 45.221
       },
       "s8": {
-        "end": 6.433
+        "end": 5.876
       }
     },
     "script": {
       "s1": "dua ribu dua puluh enam. Three key initiatives.",
       "s2": "Di awal tahun, kita menetapkan tiga prioritas: meningkatkan efektivitas collection, mengoptimalkan cost, dan memperkuat kapabilitas manpower.",
-      "s3": "Pertama, Collection Effectiveness. Delinquency tiga puluh plus turun dari empat koma lima persen menjadi tiga koma delapan persen. Delinquency sembilan puluh plus membaik dari satu koma enam persen menjadi satu koma tiga persen. Wo In turun dari delapan puluh menjadi enam puluh lima miliar rupiah. Wo Recovery naik dari seratus lima puluh menjadi seratus sembilan puluh miliar rupiah. Dan Lor membaik dari tiga belas koma tujuh persen menjadi delapan persen. Seluruh angka dua ribu dua puluh enam adalah proyeksi sampai akhir tahun.",
+      "s3": "Pertama, Collection Effectiveness. Delinquency tiga puluh plus turun dari empat koma lima persen menjadi tiga koma delapan persen. Delinquency sembilan puluh plus membaik dari satu koma enam persen menjadi satu koma tiga persen. WO In turun dari delapan puluh menjadi enam puluh lima miliar rupiah. WO Recovery naik dari seratus lima puluh menjadi seratus sembilan puluh miliar rupiah. Dan Lor membaik dari tiga belas koma tujuh persen menjadi delapan persen. Seluruh angka dua ribu dua puluh enam adalah proyeksi sampai akhir tahun.",
       "s4": "Kedua, Collection Cost Optimization. Realisasi cost terhadap plan berada di sembilan puluh tujuh persen, lebih baik dari seratus empat persen di tahun sebelumnya. Cost terealisasi sesuai plan, secara efektif dan efisien.",
       "s5": "Ketiga, Manpower Capability. Rata-rata KPI manager naik dari sembilan puluh enam persen menjadi seratus empat persen. Dan insentif manager meningkat delapan belas persen.",
       "s6": "dua ribu dua puluh enam telah kita selesaikan. Siap menghadapi tantangan dua ribu dua puluh tujuh.",
-      "s7": "Sebagai penguatan strategi dua ribu dua puluh enam, berikut ini Key Initiatives dua ribu dua puluh tujuh. Pertama, Collection Effectiveness Transformation: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-Wo, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation: memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
+      "s7": "Sebagai penguatan strategi dua ribu dua puluh enam, berikut ini Key Initiatives dua ribu dua puluh tujuh. Pertama, Collection Effectiveness Transformation: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation: memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
       "s8": "Bersama, kita melangkah menuju dua ribu dua puluh tujuh dengan optimis."
     },
     "sources": {
@@ -718,38 +739,36 @@ window.RAKERNAS_DATA = {
       }
     },
     "voDur": {
-      "s1": 3.709,
-      "s2": 10.893,
-      "s3": 41.796,
-      "s4": 16.901,
-      "s5": 15.543,
-      "s6": 7.758,
-      "s7": 45.923,
-      "s8": 5.46
+      "s1": 3.422,
+      "s2": 11.416,
+      "s3": 40.908,
+      "s4": 16.614,
+      "s5": 13.558,
+      "s6": 7.602,
+      "s7": 44.748,
+      "s8": 4.911
     },
     "chars": {
-      "vo": 1857
+      "vo": 1861
     },
     "voice": {
-      "id": "onwK4e9ZLuTAKqWW03F9",
-      "name": "Daniel - Steady Broadcaster (pria, formal, ala penyiar)",
+      "id": "I7sakys8pBZ1Z5f0UhT9",
+      "name": "Putri Maharani (My Voices)",
       "model": "eleven_multilingual_v2"
     },
-    "notes": [
-      "Music API tidak tersedia di paket (HTTP 402): Music API is not available for free users. Please upgrade to a paid plan to use the API.. Bed dibuat dari stem Sound Effects API + acrossfade."
-    ],
+    "notes": [],
     "musicStems": [
       "assets/music/stems/stem01-open.mp3",
       "assets/music/stems/stem02-calm.mp3",
       "assets/music/stems/stem03-calm.mp3",
       "assets/music/stems/stem04-build.mp3",
       "assets/music/stems/stem05-heroic.mp3",
-      "assets/music/stems/stem06-heroic.mp3",
       "assets/music/stems/stem07-resolve.mp3"
     ],
     "musicDur": {
-      "bgm-main": 160.63
-    }
+      "bgm-main": 155.82
+    },
+    "voLufsTarget": -23.2
   },
   "voice": {
     "_catatan": "Narator: ganti id/speed di sini lalu: node generate-audio.mjs --only=vo && node build.mjs. id kosong = skrip berhenti (tidak memilih suara sendiri). Pasca-proses: low-shelf, high-pass, de-esser, kompresor lembut (tanpa pitch shift).",

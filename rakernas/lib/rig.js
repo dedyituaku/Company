@@ -72,6 +72,8 @@
     tl.to(LS, { pulse: 0, duration: 1.8, ease: E }, r + 0.17);
     ramp(LEVEL.s7, s6.end - 1.0, 2.5);                  // S7
     ramp(LEVEL.s8, s7.end - 1.0, 2.5);                  // S8 (beam memusat ke logo)
+    window.__timelines = window.__timelines || {};
+    window.__timelines["lights"] = tl;                  // didaftarkan (deterministik; juga di-seek manual oleh render())
     return tl;
   })();
   function G(t) {

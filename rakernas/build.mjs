@@ -38,7 +38,7 @@ const setTag = (id, attrs) => {
 
 // ---- VO: sinkron start/durasi + fade in 150 ms / out 250 ms ----
 for (const s of d.vo.slots) {
-  setTag(`vo-${s.scene}`, { "data-start": s.start, "data-duration": s.dur, "data-fade-in": d.vo.fadeIn ?? 0.15, "data-fade-out": d.vo.fadeOut ?? 0.25 });
+  setTag(`vo-${s.scene}`, { "data-start": s.start, "data-duration": s.dur, "data-volume": s.gain ?? 1, "data-fade-in": d.vo.fadeIn ?? 0.15, "data-fade-out": d.vo.fadeOut ?? 0.25 });
 }
 
 // ---- SFX ----
