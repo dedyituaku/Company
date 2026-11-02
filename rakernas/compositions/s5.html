@@ -64,26 +64,28 @@
     q("#s5-cap-n").textContent = fmt(g, 0) + "%";
     if (M.showDummyMarkers) { const d = q("#s5-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
 
+    const C = (window.RAKERNAS_DATA.audio.cues.s5), DUR = window.RAKERNAS_DATA.audio.dur.s5;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
+    const MM = Math.max(C.m, C.b + 0.9), IM = Math.max(C.im, C.i + 0.8);   // M = angka KPI akhir disebut, IM = angka insentif disebut
     tl.fromTo("#s5-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.3);
     document.querySelectorAll(".s5-chip").forEach((el, i) =>
       tl.fromTo(el, { opacity: 0, y: 24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 1.4 + i * 0.6));
-    tl.fromTo("#s5-p1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 3.8);
-    tl.fromTo("#s5-fg", { x: 14 }, { x: -14, duration: 18, ease: "none" }, 0);
+    tl.fromTo("#s5-p1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, C.k);
+    tl.fromTo("#s5-fg", { x: 14 }, { x: -14, duration: DUR, ease: "none" }, 0);
 
     const c1 = { v: m.before };
-    tl.fromTo("#s5-arc0", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 1 - m.before / RM, duration: 0.9, ease: "power3.out" }, 5.0);
-    tl.fromTo("#s5-arc", { strokeDasharray: 1, strokeDashoffset: 1 - m.before / RM }, { strokeDashoffset: 1 - m.after / RM, duration: 2.0, ease: "power2.inOut" }, 5.9);
-    tl.to(c1, { v: m.after, duration: 2.0, ease: "power2.inOut", onUpdate() { q("#s5-n1").textContent = fmt(c1.v, 0) + m.unit; } }, 5.9);
-    tl.fromTo("#s5-d1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 8.0);
+    tl.fromTo("#s5-arc0", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 1 - m.before / RM, duration: 0.9, ease: "power3.out" }, C.b);
+    tl.fromTo("#s5-arc", { strokeDasharray: 1, strokeDashoffset: 1 - m.before / RM }, { strokeDashoffset: 1 - m.after / RM, duration: 2.0, ease: "power2.inOut" }, MM);
+    tl.to(c1, { v: m.after, duration: 2.0, ease: "power2.inOut", onUpdate() { q("#s5-n1").textContent = fmt(c1.v, 0) + m.unit; } }, MM);
+    tl.fromTo("#s5-d1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, MM + 2.1);
 
     // insentif: persentase saja, tanpa nominal
-    tl.fromTo("#s5-p2", { opacity: 0, y: 60 }, { opacity: 0.28, y: 0, duration: 0.9, ease: "power3.out" }, 4.6);
-    tl.to("#s5-p2", { opacity: 1, duration: 0.8, ease: "power2.out" }, 10.4);
+    tl.fromTo("#s5-p2", { opacity: 0, y: 60 }, { opacity: 0.28, y: 0, duration: 0.9, ease: "power3.out" }, C.k + 0.8);
+    tl.to("#s5-p2", { opacity: 1, duration: 0.8, ease: "power2.out" }, C.i);
     const c2 = { v: 0 };
-    tl.to(c2, { v: g, duration: 1.8, ease: "power3.out", onUpdate() { q("#s5-n2").textContent = "+" + fmt(c2.v, 0) + "%"; } }, 11.2);
-    tl.fromTo("#s5-up", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 11.2);
-    tl.fromTo("#s5-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 12.6);
+    tl.to(c2, { v: g, duration: 1.8, ease: "power3.out", onUpdate() { q("#s5-n2").textContent = "+" + fmt(c2.v, 0) + "%"; } }, IM);
+    tl.fromTo("#s5-up", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, IM);
+    tl.fromTo("#s5-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, IM + 1.4);
     window.__timelines["s5"] = tl;
   </script>
 </template>

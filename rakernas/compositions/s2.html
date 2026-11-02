@@ -20,12 +20,13 @@
     </div>
   </div>
   <script>
+    const C = (window.RAKERNAS_DATA.audio.cues.s2), DUR = window.RAKERNAS_DATA.audio.dur.s2;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
     tl.fromTo("#s2-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 0.4);
-    [["#s2-c1", 1.4], ["#s2-c2", 2.8], ["#s2-c3", 4.2]].forEach(([id, t]) => {
+    [["#s2-c1", C.c1], ["#s2-c2", C.c2], ["#s2-c3", C.c3]].forEach(([id, t]) => {
       tl.fromTo(id, { opacity: 0, y: 90, rotateX: 10 }, { opacity: 1, y: 0, rotateX: 0, duration: 0.9, ease: "power3.out" }, t);
     });
-    tl.fromTo("#s2-cards", { x: 20 }, { x: -20, duration: 12, ease: "none" }, 0);   // parallax
+    tl.fromTo("#s2-cards", { x: 20 }, { x: -20, duration: DUR, ease: "none" }, 0);   // parallax
     window.__timelines["s2"] = tl;
   </script>
 </template>

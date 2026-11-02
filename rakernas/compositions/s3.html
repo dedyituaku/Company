@@ -87,15 +87,15 @@
     const q = (s, r) => (r || document).querySelector(s);
     if (M.showDummyMarkers) { const d = q("#s3-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
 
+    const C = (window.RAKERNAS_DATA.audio.cues.s3), DUR = window.RAKERNAS_DATA.audio.dur.s3;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
     tl.fromTo("#s3-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.3);
     document.querySelectorAll(".s3-chip").forEach((c, i) =>
       tl.fromTo(c, { opacity: 0, y: 20, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 1.0 + i * 0.35));
-    tl.fromTo("#s3-fg", { x: 12 }, { x: -12, duration: 20, ease: "none" }, 0);
+    tl.fromTo("#s3-fg", { x: 12 }, { x: -12, duration: DUR, ease: "none" }, 0);
 
-    const starts = [3.6, 4.7, 5.8, 7.0, 8.1];
-    document.querySelectorAll(".s3-card").forEach((card, i) => {
-      const e = D[card.dataset.k], d = dec(e.before, e.after), t0 = starts[i];
+        document.querySelectorAll(".s3-card").forEach((card, i) => {
+      const e = D[card.dataset.k], d = dec(e.before, e.after), t0 = C["c" + (i + 1)], tm = C["m" + (i + 1)];   // kartu muncul saat nama disebut; counter jalan saat "menjadi"
       const [u1, u2] = e.unit.includes(" ") ? e.unit.split(" ") : ["", e.unit];
       q(".s3-lab", card).textContent = e.label;
       q(".s3-yb", card).textContent = M.yearBefore;
@@ -109,8 +109,8 @@
       tag.classList.add(good ? "up" : "bad");
       const cnt = { v: e.before };
       tl.fromTo(card, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, t0);
-      tl.to(cnt, { v: e.after, duration: 1.5, ease: "power2.inOut", onUpdate() { n.textContent = fmt(cnt.v, d); } }, t0 + 0.5);
-      tl.fromTo(tag, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, t0 + 2.0);
+      tl.to(cnt, { v: e.after, duration: 1.5, ease: "power2.inOut", onUpdate() { n.textContent = fmt(cnt.v, d); } }, tm);
+      tl.fromTo(tag, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, tm + 1.5);
     });
     window.__timelines["s3"] = tl;
   </script>

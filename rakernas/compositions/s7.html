@@ -35,10 +35,12 @@
       c.querySelector(".s7-tg").textContent = it.tagline;
       c.querySelectorAll(".s7-kw li").forEach((li, j) => { if (it.keywords[j]) li.textContent = it.keywords[j]; else li.remove(); });
     });
+    const C = (window.RAKERNAS_DATA.audio.cues.s7), DUR = window.RAKERNAS_DATA.audio.dur.s7;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
     tl.fromTo("#s7-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.4);
-    tl.fromTo("#s7-fg", { x: 12 }, { x: -12, duration: 20, ease: "none" }, 0);
-    const at = [4.0, 7.6, 11.2];
+    tl.fromTo("#s7-fg", { x: 12 }, { x: -12, duration: DUR, ease: "none" }, 0);
+    const at = [C.c1, C.c2, C.c3];   // kartu muncul saat "Pertama / Kedua / Ketiga"
+    const FIN = Math.max(C.c3 + 3.0, C.end - 1.5);
     at.forEach((t, i) => {
       const id = "#s7-c" + (i + 1);
       tl.fromTo(id, { opacity: 0, y: 70, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, t);
@@ -48,8 +50,8 @@
       if (i > 0) for (let j = 1; j <= i; j++) tl.to("#s7-c" + j, { opacity: 0.45, duration: 0.5 }, t - 0.05);
     });
     // akhir: ketiga kartu tampil bersama
-    [1, 2, 3].forEach((n) => tl.to("#s7-c" + n, { opacity: 1, duration: 0.8, ease: "power2.out" }, 15.2));
-    [1, 2, 3].forEach((n) => tl.fromTo("#s7-c" + n + " .s7-sweep", { opacity: 0.8, x: -300, rotation: 18 }, { opacity: 0, x: 700, rotation: 18, duration: 1.2, ease: "power2.inOut" }, 15.2 + (n - 1) * 0.25));
+    [1, 2, 3].forEach((n) => tl.to("#s7-c" + n, { opacity: 1, duration: 0.8, ease: "power2.out" }, FIN));
+    [1, 2, 3].forEach((n) => tl.fromTo("#s7-c" + n + " .s7-sweep", { opacity: 0.8, x: -300, rotation: 18 }, { opacity: 0, x: 700, rotation: 18, duration: 1.2, ease: "power2.inOut" }, FIN + (n - 1) * 0.25));
     window.__timelines["s7"] = tl;
   </script>
 </template>

@@ -21,19 +21,21 @@
     </div>
   </div>
   <script>
+    const C = (window.RAKERNAS_DATA.audio.cues.s6), DUR = window.RAKERNAS_DATA.audio.dur.s6;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
+    const R = Math.max(C.r, 3.0);   // "Siap menghadapi tantangan" = kilatan + Ready for New Challenges
     // teks utama emas, perlahan membesar
-    tl.fromTo("#s6-y", { opacity: 0, scale: 0.9, y: 30, filter: "blur(12px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 1.2, ease: "power3.out" }, 0.4);
-    tl.fromTo("#s6-d", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 1.1);
-    tl.fromTo("#s6-t1", { scale: 1 }, { scale: 1.03, duration: 8, ease: "none" }, 0.4);
+    tl.fromTo("#s6-y", { opacity: 0, scale: 0.9, y: 30, filter: "blur(12px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 1.2, ease: "power3.out" }, C.y);
+    tl.fromTo("#s6-d", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, C.y + 0.7);
+    tl.fromTo("#s6-t1", { scale: 1 }, { scale: 1.03, duration: DUR, ease: "none" }, C.y);
     // jeda ~1.5 dtk (2.3 -> 3.8), lalu kilatan cahaya
-    tl.fromTo("#s6-burst", { opacity: 0, scale: 0.15 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }, 3.8);
-    tl.to("#s6-burst", { opacity: 0, scale: 1.5, duration: 0.9, ease: "power2.in" }, 4.15);
+    tl.fromTo("#s6-burst", { opacity: 0, scale: 0.15 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }, R - 0.2);
+    tl.to("#s6-burst", { opacity: 0, scale: 1.5, duration: 0.9, ease: "power2.in" }, R + 0.15);
     // garis cahaya emas
-    tl.fromTo("#s6-rule", { opacity: 0, scaleX: 0.05 }, { opacity: 1, scaleX: 1, duration: 0.45, ease: "power4.out" }, 3.95);
+    tl.fromTo("#s6-rule", { opacity: 0, scaleX: 0.05 }, { opacity: 1, scaleX: 1, duration: 0.45, ease: "power4.out" }, R - 0.05);
     // teks tegas dengan hentakan ringan
-    tl.fromTo("#s6-t2s", { opacity: 0, scale: 1.22 }, { opacity: 1, scale: 1, duration: 0.32, ease: "power4.out" }, 4.0);
-    tl.fromTo("#s6-shock", { y: 0 }, { y: 10, duration: 0.07, ease: "power1.out", yoyo: true, repeat: 3 }, 4.0);
+    tl.fromTo("#s6-t2s", { opacity: 0, scale: 1.22 }, { opacity: 1, scale: 1, duration: 0.32, ease: "power4.out" }, R);
+    tl.fromTo("#s6-shock", { y: 0 }, { y: 10, duration: 0.07, ease: "power1.out", yoyo: true, repeat: 3 }, R);
     window.__timelines["s6"] = tl;
   </script>
 </template>

@@ -1,27 +1,44 @@
-# Script Voice Over - Rakernas Opening (Bahasa Indonesia) - v3
-# Satu file audio per scene. Taruh hasil ElevenLabs di assets/vo/sceneN.mp3 (menimpa file senyap placeholder).
-# Setelah file asli masuk, sesuaikan durasi scene (lihat README.md) dan dur di data.json.
+# Naskah Voice Over - Rakernas Opening (Bahasa Indonesia) - v6 (TEMPLATE)
+# Dibaca oleh generate-audio.mjs. Satu blok [SCENE N] = satu file assets/vo/sceneN.mp3.
+#
+# Sintaks:
+#   {{path}}            angka dari data.json dibaca dalam kata ("3.8" -> "tiga koma delapan"). Contoh {{delq30.after}}
+#   {{path+N}}          angka + N (mis. {{meta.yearAfter+1}} -> tahun berikutnya). "2026*" dibaca 2026.
+#   {{dir:key|a|b}}     kata arah: a bila data[key].after < before, b bila lebih besar. Contoh {{dir:delq30|turun|naik}}
+#   {{txt:path}}        teks dari data.json ("&" dibaca "and"). Contoh {{txt:initiatives2027.0.title}}
+#   [[nama]]            PENANDA SINKRON (tidak diucapkan). Waktu kata setelahnya diambil dari timestamp ElevenLabs
+#                       dan dipakai compositions/sN.html untuk memunculkan kartu/counter tepat saat disebut.
+#
+# Header: lead = jeda (dtk) sebelum VO mulai di dalam scene; min = durasi scene minimum sesuai animasi.
+# Durasi scene = max(min, lead + durasi VO + 1 dtk jeda).
 
-[SCENE 1 | 0-8 dtk | assets/vo/scene1.mp3]
-Tahun ini, kita menetapkan tiga prioritas.
+[PRONUNCIATION]
+# Ganti ucapan sebelum dikirim ke TTS (urutan: paling spesifik dulu). Hanya mengubah suara, bukan layar.
+NPL-WO = en pi el double-u o
+WO = double-u o
+LOR = el o er
+KPI = ka pi ai
 
-[SCENE 2 | 8-20 dtk | assets/vo/scene2.mp3]
-Collection effectiveness, cost optimization, dan manpower capability.
+[SCENE 1 | lead=5.0 | min=8]
+[[y]]{{meta.yearAfter}}. [[k]]Tiga Key Initiatives.
 
-[SCENE 3 | 20-40 dtk | assets/vo/scene3.mp3]
-Segmentasi lebih tajam, handling lebih tepat. Delinquency turun, recovery naik, inventory lebih sehat.
+[SCENE 2 | lead=1.0 | min=7]
+Di awal tahun, kita menetapkan tiga prioritas: [[c1]]meningkatkan efektivitas collection, [[c2]]mengoptimalkan cost, dan [[c3]]memperkuat kapabilitas manpower.
 
-[SCENE 4 | 40-58 dtk | assets/vo/scene4.mp3]
-Kapasitas collector dioptimalkan, cost terealisasi sesuai plan, secara efektif dan efisien.
+[SCENE 3 | lead=1.0 | min=12]
+Pertama, Collection Effectiveness. [[c1]]Delinquency tiga puluh plus {{dir:delq30|turun|naik}} dari {{delq30.before}} persen [[m1]]menjadi {{delq30.after}} persen. [[c2]]Delinquency sembilan puluh plus {{dir:delq90|membaik|memburuk}} dari {{delq90.before}} persen [[m2]]menjadi {{delq90.after}} persen. [[c3]]WO In {{dir:woIn|turun|naik}} dari {{woIn.before}} [[m3]]menjadi {{woIn.after}} miliar rupiah. [[c4]]WO Recovery {{dir:woRecovery|turun|naik}} dari {{woRecovery.before}} [[m4]]menjadi {{woRecovery.after}} miliar rupiah. [[c5]]Dan LOR {{dir:lor|membaik|memburuk}} dari {{lor.before}} persen [[m5]]menjadi {{lor.after}} persen. [[f]]Seluruh angka {{meta.yearAfter}} adalah proyeksi sampai akhir tahun.
 
-[SCENE 5 | 58-76 dtk | assets/vo/scene5.mp3]
-Kapasitas manager dibangun, rata-rata KPI manager meningkat, dan insentif ikut naik.
+[SCENE 4 | lead=1.0 | min=10]
+Kedua, Collection Cost Optimization. [[p]]Realisasi cost terhadap plan berada di [[m]]{{costVsPlan.after}} persen, {{dir:costVsPlan|lebih baik|lebih tinggi}} dari {{costVsPlan.before}} persen di tahun sebelumnya. Cost terealisasi sesuai plan, secara efektif dan efisien.
 
-[SCENE 6 | 76-86 dtk | assets/vo/scene6.mp3]
-2026 telah kita selesaikan. Siap menghadapi tantangan 2027.
+[SCENE 5 | lead=1.0 | min=12]
+Ketiga, Manpower Capability. [[k]]Rata-rata KPI manager {{dir:avgKpiManager|turun|naik}} dari [[b]]{{avgKpiManager.before}} persen [[m]]menjadi {{avgKpiManager.after}} persen. Dan [[i]]insentif manager meningkat [[im]]{{incentiveGrowth}} persen.
 
-[SCENE 7 | 86-106 dtk | assets/vo/scene7.mp3]
-Tahun depan, tiga arah baru. Pertama, meningkatkan cara kita menagih. Kedua, mempercepat pemulihan dan penyelesaian. Ketiga, memperkuat siapa yang mengeksekusi, dan seberapa efisien.
+[SCENE 6 | lead=0.6 | min=6]
+[[y]]{{meta.yearAfter}} telah kita selesaikan. [[r]]Siap menghadapi tantangan {{meta.yearAfter+1}}.
 
-[SCENE 8 | 106-112 dtk | assets/vo/scene8.mp3]
-(tanpa narasi - logo + tagline; slot senyap cadangan)
+[SCENE 7 | lead=1.0 | min=12]
+Tahun depan, tiga arah baru. [[c1]]Pertama, {{txt:initiatives2027.0.title}}: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. [[c2]]Kedua, {{txt:initiatives2027.1.title}}: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. [[c3]]Ketiga, {{txt:initiatives2027.2.title}}: memperkuat siapa yang mengeksekusi, dan seberapa efisien.
+
+[SCENE 8 | lead=1.5 | min=6]
+Bersama, kita melangkah menuju {{meta.yearAfter+1}}.

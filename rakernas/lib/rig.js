@@ -3,6 +3,10 @@
 (function () {
   const W = 1920, H = 1080;
   const CUE = { igniteEnd: 2.4, widenEnd: 3.6, closeEnd: 4.6, convStart: 4.1, impact: 5.0, s1End: 8.0 };
+  // batas scene mengikuti durasi VO (data.json > timing); fallback ke brief awal
+  const TM = (window.RAKERNAS_DATA && window.RAKERNAS_DATA.timing) || null;
+  const S1E = TM ? TM.scenes[0].end : 8, LASTS = TM ? TM.scenes[TM.scenes.length - 1].start : 106, TOT = TM ? TM.total : 112;
+  CUE.s1End = S1E;
   const sm = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
   const lerp = (a, b, x) => a + (b - a) * x;
   function mulberry32(a) { return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -50,32 +54,32 @@
   // ---- envelope
   function G(t) { // intensitas global rig
     if (t < CUE.s1End - 0.1) return 1;
-    if (t < 8.35) return 1 - sm(7.9, 8.35, t);
+    if (t < S1E + 0.35) return 1 - sm(S1E - 0.1, S1E + 0.35, t);
     if (t < 75.9) return 0;
     let g = 0.3 * sm(75.9, 76.4, t);
     if (t > 107) g = lerp(g, 0.42, sm(107, 110, t));
-    if (t > 110.8) g *= 1 - 0.7 * sm(110.8, 112, t);
+    if (t > TOT - 1.2) g *= 1 - 0.7 * sm(TOT - 1.2, TOT, t);
     return g;
   }
   function boost(t) { return t < CUE.impact ? 1 + 0.7 * sm(4.55, CUE.impact, t) : 1 + 0.7 * Math.exp(-(t - CUE.impact) / 0.45); }
   function spread(t) {
-    if (t >= 8) return 1 + 0.3 * Math.sin(2 * Math.PI * t / 17);
+    if (t >= S1E) return 1 + 0.3 * Math.sin(2 * Math.PI * t / 17);
     if (t < CUE.igniteEnd) return 1;
     if (t < CUE.widenEnd) return lerp(1, 1.75, sm(CUE.igniteEnd, CUE.widenEnd, t));
     return lerp(1.75, 0.4, sm(CUE.widenEnd, CUE.closeEnd, t));
   }
   function beamAngle(b, t) {
-    const ampMod = t >= 8 ? 0.8 : t < CUE.igniteEnd ? 1 : t < CUE.closeEnd ? 0.55 : 0.07;
+    const ampMod = t >= S1E ? 0.8 : t < CUE.igniteEnd ? 1 : t < CUE.closeEnd ? 0.55 : 0.07;
     const sweep = b.fan * spread(t) + b.A * ampMod * Math.sin(2 * Math.PI * b.f * t + b.ph);
-    let c = t < 8 ? sm(CUE.convStart, CUE.impact, t) : 0.65 * sm(106, 109, t);
+    let c = t < S1E ? sm(CUE.convStart, CUE.impact, t) : 0.65 * sm(LASTS, LASTS + 3, t);
     return lerp(sweep, b.conv + 0.03 * Math.sin(t * 1.3 + b.ph), c);
   }
   function beamI(b, t) {
-    if (t >= 8) return 0.8 + 0.2 * Math.sin(2 * Math.PI * (0.11 + b.f * 0.3) * t + b.ph);
+    if (t >= S1E) return 0.8 + 0.2 * Math.sin(2 * Math.PI * (0.11 + b.f * 0.3) * t + b.ph);
     const on = sm(0.15 + b.idx * 0.1, 0.85 + b.idx * 0.1, t);
     return Math.max(b.idx === 0 ? 0.45 : 0, on) * (0.85 + 0.15 * Math.sin(2 * Math.PI * b.f * 3 * t + b.ph));
   }
-  function goldMix(b, t) { if (!b.gold) return 0; return t < 8 ? sm(3.4, 5.0, t) : 0.45; }
+  function goldMix(b, t) { if (!b.gold) return 0; return t < S1E ? sm(3.4, 5.0, t) : 0.45; }
 
   let cv, ctx;
   function render(t) {
