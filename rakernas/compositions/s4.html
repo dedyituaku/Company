@@ -10,25 +10,25 @@
     #s4-chips .chip { height: 60px; font-size: 26px; padding: 0 22px 0 10px; gap: 12px; }
     #s4-chips .chip .ic { width: 40px; height: 40px; }
     #s4-chips .chip .ic svg { width: 24px; height: 24px; }
-    .s4-p { top: 410px; height: 558px; }
-    #s4-p1 { left: 192px; width: 960px; } #s4-p2 { left: 1176px; width: 552px; }
+    .s4-p { top: 396px; height: 576px; }
+    #s4-p1 { left: 260px; width: 1400px; }
     .s4-row { display: flex; align-items: flex-end; gap: 22px; margin-top: 10px; }
-    .s4-yr { font-weight: 700; font-size: 28px; line-height: 34px; color: var(--mute); } .s4-yr.a { color: var(--gold); }
-    .s4-prev { font-weight: 700; font-size: 44px; line-height: 120px; color: var(--mute); text-decoration: line-through; text-decoration-thickness: 3px; font-variant-numeric: tabular-nums; }
-    .s4-arrow { font-size: 44px; line-height: 120px; color: var(--gold); font-weight: 800; }
-    .s4-nw { display: flex; align-items: baseline; height: 120px; white-space: nowrap; }
-    .s4-p .bignum { font-size: 120px; line-height: 120px; }
-    .s4-p .unit { font-size: 48px; }
+    .s4-yr { font-weight: 700; font-size: 32px; line-height: 38px; color: var(--mute); } .s4-yr.a { color: var(--gold); }
+    .s4-prev { font-weight: 700; font-size: 64px; line-height: 150px; color: var(--mute); font-variant-numeric: tabular-nums; }
+    .s4-arrow { font-size: 64px; line-height: 150px; color: var(--gold); font-weight: 800; }
+    .s4-nw { display: flex; align-items: baseline; height: 150px; white-space: nowrap; }
+    .s4-p .bignum { font-size: 150px; line-height: 150px; }
+    .s4-p .unit { font-size: 64px; }
     .s4-tagw { margin-left: auto; align-self: center; }
-    .s4-meter { position: absolute; left: 40px; right: 40px; top: 306px; }
+    .s4-meter { position: absolute; left: 40px; right: 40px; top: 308px; }
     .s4-p .plabel { letter-spacing: 0.08em; }
     .s4-mrow { margin-bottom: 14px; }
-    .s4-mlab { font-weight: 700; font-size: 28px; line-height: 34px; color: var(--mute); } .s4-mlab.a { color: var(--gold); }
-    .s4-track { height: 40px; border-radius: 20px; background: rgba(255,255,255,0.08); position: relative; }
-    .s4-fill { height: 100%; border-radius: 20px; }
-    #s4-target { position: absolute; top: -10px; bottom: -10px; width: 0; border-left: 3px dashed #fff; }
-    #s4-tlab { position: absolute; top: -40px; transform: translateX(-50%); font-weight: 700; font-size: 28px; color: #fff; white-space: nowrap; }
-    #s4-mt { position: relative; height: 44px; }
+    .s4-mlab { font-weight: 700; font-size: 32px; line-height: 38px; color: var(--mute); } .s4-mlab.a { color: var(--gold); }
+    .s4-track { height: 52px; border-radius: 26px; background: rgba(255,255,255,0.08); position: relative; }
+    .s4-fill { height: 100%; border-radius: 26px; }
+    #s4-target { position: absolute; top: -8px; bottom: -8px; width: 0; border-left: 5px dashed #fff; }
+    #s4-tlab { position: absolute; top: -44px; transform: translateX(-50%); font-weight: 800; font-size: 34px; color: #fff; white-space: nowrap; }
+    #s4-mt { position: relative; height: 48px; }
       </style>
   <div id="root" data-composition-id="s4" data-width="1920" data-height="1080">
     <div id="s4-fg">
@@ -56,18 +56,6 @@
         </div>
       </div>
 
-      <div id="s4-p2" class="panel s4-p">
-        <div class="plabel" id="s4-l2"></div>
-        <div class="s4-row">
-          <div><div class="s4-yr s4-yb"></div><div class="s4-prev" id="s4-prev2"></div></div><span class="s4-arrow">→</span>
-          <div><div class="s4-yr a s4-ya"></div><div class="s4-nw"><span class="bignum" id="s4-n2"></span></div></div>
-        </div>
-        <div style="margin-top:12px"><span class="tag" id="s4-d2"></span></div>
-        <div class="s4-meter" style="top:318px">
-          <div class="s4-mrow"><div class="s4-mlab s4-yb"></div><div class="s4-track"><div class="s4-fill" id="s4-f2a" style="background:linear-gradient(90deg,#3b4d6b,#7a8fb0)"></div></div></div>
-          <div class="s4-mrow"><div class="s4-mlab a s4-ya"></div><div class="s4-track"><div class="s4-fill" id="s4-f2b" style="background:linear-gradient(90deg,#d4a537,#f0c35a)"></div></div></div>
-        </div>
-      </div>
       <div id="s4-dummy" class="dummy" style="display:none"></div>
     </div>
   </div>
@@ -80,22 +68,18 @@
     qa(".s4-ya").forEach((e) => (e.textContent = M.yearAfter));
     if (M.showDummyMarkers) { const d = q("#s4-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
 
-    const c = D.costVsPlan, dc = dec(c.before, c.after), p = D.costPerRecovery, dp = dec(p.before, p.after);
+    const c = D.costVsPlan, dc = dec(c.before, c.after);
     const sign = (e) => (e.after < e.before ? "▼ " : "▲ ");
     const goodCls = (e) => ((e.better === "down") === (e.after < e.before) ? "up" : "bad");
-    q("#s4-l1").textContent = c.label; q("#s4-l2").textContent = p.label;
+    q("#s4-l1").textContent = c.label;
     q("#s4-prev1").textContent = fmt(c.before, dc) + c.unit; q("#s4-n1").textContent = fmt(c.before, dc); q("#s4-u1").textContent = c.unit;
     q("#s4-d1").textContent = sign(c) + fmt(Math.abs(c.after - c.before), dc) + " pp"; q("#s4-d1").classList.add(goodCls(c));
-    q("#s4-prev2").textContent = fmt(p.before, dp); q("#s4-n2").textContent = fmt(p.before, dp);
-    q("#s4-d2").textContent = sign(p) + fmt(Math.abs(((p.after - p.before) / p.before) * 100), 0) + "% (" + p.unit + ")"; q("#s4-d2").classList.add(goodCls(p));
     q("#s4-tlab").textContent = "Target " + fmt(c.target, 0) + c.unit;
 
     // skala bar 1: 0..130% ; bar 2: 0..max
-    const SC = 130, trackW = 880, w1a = (c.before / SC) * 100, w1b = (c.after / SC) * 100;
+    const SC = 130, trackW = 1320, w1a = (c.before / SC) * 100, w1b = (c.after / SC) * 100;
     const tx = (c.target / SC) * trackW;
     q("#s4-tlab").style.left = tx + "px"; q("#s4-target").style.left = tx + "px";
-    const mx = Math.max(p.before, p.after);
-    const w2a = (p.before / mx) * 100, w2b = (p.after / mx) * 100;
 
     const tl = gsap.timeline({ paused: true });
     tl.fromTo("#s4-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.3);
@@ -112,12 +96,6 @@
     tl.fromTo("#s4-f1b", { width: "0%" }, { width: w1b + "%", duration: 1.8, ease: "power2.inOut" }, 6.4);
     tl.fromTo("#s4-d1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 8.3);
 
-    tl.fromTo("#s4-p2", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 9.6);
-    tl.fromTo("#s4-f2a", { width: "0%" }, { width: w2a + "%", duration: 0.9, ease: "power3.out" }, 10.6);
-    const c2 = { v: p.before };
-    tl.to(c2, { v: p.after, duration: 1.6, ease: "power2.inOut", onUpdate() { q("#s4-n2").textContent = fmt(c2.v, dp); } }, 11.2);
-    tl.fromTo("#s4-f2b", { width: "0%" }, { width: w2b + "%", duration: 1.6, ease: "power2.inOut" }, 11.2);
-    tl.fromTo("#s4-d2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 12.9);
     window.__timelines["s4"] = tl;
   </script>
 </template>

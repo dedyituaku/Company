@@ -1,0 +1,440 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 9
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "duration": 112,
+    "samples": [
+      6.222,
+      18.667,
+      31.111,
+      43.556,
+      56,
+      68.444,
+      80.889,
+      93.333,
+      105.778
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 0,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 2,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.29:1; WCAG AA requires 3:1.",
+        "text": "02",
+        "fg": "rgb(47,128,237)",
+        "bg": "rgb(81,112,164)",
+        "ratio": 1.29,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(171,204,248)",
+        "large": true,
+        "selector": "div > div:nth-of-type(9) > div > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/s7.html",
+        "bbox": {
+          "x": 740.280029296875,
+          "y": 293,
+          "width": 415,
+          "height": 64
+        },
+        "time": 105.778,
+        "times": [
+          105.778
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.99:1; WCAG AA requires 3:1.",
+        "text": "Improve how we recover and resolve",
+        "fg": "rgb(47,128,237)",
+        "bg": "rgb(57,83,128)",
+        "ratio": 1.99,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(106,164,242)",
+        "large": true,
+        "selector": "div > div:nth-of-type(9) > div > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/s7.html",
+        "bbox": {
+          "x": 740.280029296875,
+          "y": 533,
+          "width": 415,
+          "height": 76
+        },
+        "time": 105.778,
+        "times": [
+          105.778
+        ]
+      }
+    ],
+    "enabled": true,
+    "samples": [
+      6.222,
+      31.111,
+      56,
+      80.889,
+      105.778
+    ],
+    "checked": 100,
+    "passed": 98
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 2,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 4 text elements stay under it for 0.5 s or more, the smallest \"Data Segmentation\" at 25 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Data Segmentation",
+        "selector": "#s3-chips > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/s3.html",
+        "bbox": {
+          "x": 268.51,
+          "y": 269.52,
+          "width": 255.44,
+          "height": 31.18
+        },
+        "time": 21.129,
+        "times": [
+          21.129,
+          21.503,
+          21.876,
+          22.25
+        ],
+        "fontPx": 25.34,
+        "floorPx": 28,
+        "seconds": 18.884,
+        "elements": [
+          {
+            "selector": "#s3-chips > div:nth-of-type(1)",
+            "text": "Data Segmentation",
+            "fontPx": 25.34,
+            "time": 21.129,
+            "seconds": 18.884
+          },
+          {
+            "selector": "#s3-chips > div:nth-of-type(2)",
+            "text": "Handling Process",
+            "fontPx": 25.85,
+            "time": 21.503,
+            "seconds": 18.51
+          },
+          {
+            "selector": "#s3-chips > div:nth-of-type(3)",
+            "text": "Recovery Channel",
+            "fontPx": 25.96,
+            "time": 21.876,
+            "seconds": 18.137
+          },
+          {
+            "selector": "#s3-chips > div:nth-of-type(4)",
+            "text": "Collection System",
+            "fontPx": 26,
+            "time": 22.25,
+            "seconds": 17.763
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 4 text elements stay under it for 0.5 s or more, the smallest \"Debt Sale WO\" at 26 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Debt Sale WO",
+        "selector": "#s4-chips > div:nth-of-type(4)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/s4.html",
+        "bbox": {
+          "x": 1536.96,
+          "y": 334.46,
+          "width": 185.61,
+          "height": 31.63
+        },
+        "time": 43.566,
+        "times": [
+          42.444,
+          42.818,
+          43.192,
+          43.566
+        ],
+        "fontPx": 25.7,
+        "floorPx": 28,
+        "seconds": 14.584,
+        "elements": [
+          {
+            "selector": "#s4-chips > div:nth-of-type(4)",
+            "text": "Debt Sale WO",
+            "fontPx": 25.7,
+            "time": 43.566,
+            "seconds": 14.584
+          },
+          {
+            "selector": "#s4-chips > div:nth-of-type(3)",
+            "text": "Inventory Selling Channel",
+            "fontPx": 25.96,
+            "time": 43.192,
+            "seconds": 14.958
+          },
+          {
+            "selector": "#s4-chips > div:nth-of-type(1)",
+            "text": "Field Collector Capacity",
+            "fontPx": 26,
+            "time": 42.444,
+            "seconds": 15.706
+          },
+          {
+            "selector": "#s4-chips > div:nth-of-type(2)",
+            "text": "NPL-WO Segmentation",
+            "fontPx": 26,
+            "time": 42.818,
+            "seconds": 15.332
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.1869999999999976,
+    "samples": 599
+  },
+  "audio": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 9,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene1.mp3 is silent for the whole part this clip plays (0-3.2 s of the file).",
+        "selector": "#vo-1",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 1,
+        "timeRange": [
+          1,
+          4.2
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene2.mp3 is silent for the whole part this clip plays (0-5.5 s of the file).",
+        "selector": "#vo-2",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 9,
+        "timeRange": [
+          9,
+          14.5
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene3.mp3 is silent for the whole part this clip plays (0-9.5 s of the file).",
+        "selector": "#vo-3",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 21,
+        "timeRange": [
+          21,
+          30.5
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene4.mp3 is silent for the whole part this clip plays (0-7 s of the file).",
+        "selector": "#vo-4",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 41,
+        "timeRange": [
+          41,
+          48
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene5.mp3 is silent for the whole part this clip plays (0-6.8 s of the file).",
+        "selector": "#vo-5",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 59,
+        "timeRange": [
+          59,
+          65.8
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene6.mp3 is silent for the whole part this clip plays (0-4.5 s of the file).",
+        "selector": "#vo-6",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 77,
+        "timeRange": [
+          77,
+          81.5
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene7.mp3 is silent for the whole part this clip plays (0-15 s of the file).",
+        "selector": "#vo-7",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 87,
+        "timeRange": [
+          87,
+          102
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/vo/scene8.mp3 is silent for the whole part this clip plays (0-3 s of the file).",
+        "selector": "#vo-8",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 107,
+        "timeRange": [
+          107,
+          110
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      },
+      {
+        "code": "audio_clip_silent",
+        "severity": "warning",
+        "message": "assets/music/bgm-placeholder.mp3 is silent for the whole part this clip plays (0-112 s of the file).",
+        "selector": "#bgm",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "timeRange": [
+          0,
+          112
+        ],
+        "fixHint": "Check the file has sound there, or move data-media-start to where it does."
+      }
+    ]
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

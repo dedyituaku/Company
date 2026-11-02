@@ -18,3 +18,8 @@ Garis tren delinquency adalah ilustrasi yang diturunkan dari before/after, bukan
 
 ## Logo asli
 Taruh file di `assets/logo/bfi-logo.png` lalu `node build.mjs`; scene 8 otomatis memakainya dan kotak "LOGO PLACEHOLDER" hilang.
+
+## v4 - lighting, KPI, SFX
+- **Lighting panggung:** `lib/rig.js` (canvas 2D additive, 16 beam, deterministik). Cue konvergensi/impact = detik 5.0 (`CUE.impact`); versi redup dipakai di scene 6-8. Bila scene 1 di-retime, ubah `CUE` di file itu dan `data-start` teks di `compositions/s1.html`.
+- **Logo:** `assets/logo/bfi-logo.png` dipasang di panel putih membulat (proporsi asli). Catatan: isi file sebenarnya berformat WebP (ekstensi .png); Chromium tetap membacanya.
+- **SFX = PLACEHOLDER SINTETIS** (semua file di `assets/sfx/`, dibuat `node make-sfx.mjs` dengan FFmpeg lavfi): `whoosh-a/b`, `boom`, `riser`, `tick-run`, `chime`, `swell`. Ganti dengan SFX berlisensi (nama file sama) sebelum rilis. Penempatan di timeline ada di `data.json > sfx.events` (build.mjs menulis `<audio id="sfx-N">` ke index.html; puncak bunyi 1 frame setelah momen visual).

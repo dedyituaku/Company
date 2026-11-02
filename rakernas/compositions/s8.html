@@ -2,15 +2,16 @@
   <style>
     #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; color: #fff; }
     #s8-all { position: absolute; inset: 0; }
-    #s8-glow { position: absolute; left: 960px; top: 400px; width: 1100px; height: 700px; margin: -350px 0 0 -550px; border-radius: 50%;
+    #s8-glow { position: absolute; left: 960px; top: 320px; width: 1100px; height: 700px; margin: -350px 0 0 -550px; border-radius: 50%;
       background: radial-gradient(ellipse, rgba(47,128,237,0.38) 0%, rgba(212,165,55,0.16) 42%, rgba(212,165,55,0) 70%); opacity: 0; }
-    #s8-wrap { position: absolute; left: 0; right: 0; top: 230px; text-align: center; }
-    #s8-logo { display: inline-flex; align-items: center; justify-content: center; width: 560px; height: 280px; }
-    #s8-logo img { max-width: 560px; max-height: 280px; object-fit: contain; filter: drop-shadow(0 0 28px rgba(255,255,255,0.35)); }
-    #s8-logo.ph { flex-direction: column; border: 3px dashed #ffd36b; border-radius: 28px; background: rgba(10,22,40,.6); }
+    #s8-wrap { position: absolute; left: 0; right: 0; top: 120px; text-align: center; }
+    #s8-logo { display: inline-flex; align-items: center; justify-content: center; width: 400px; height: 400px; }
+    #s8-logo.real { border-radius: 40px; overflow: hidden; background: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,0.25), 0 0 70px rgba(120,175,255,0.55), 0 0 160px rgba(47,128,237,0.35); }
+    #s8-logo img { display: block; width: 400px; height: 400px; object-fit: contain; }
+    #s8-logo.ph { width: 560px; height: 280px; flex-direction: column; border: 3px dashed #ffd36b; border-radius: 28px; background: rgba(10,22,40,.6); }
     #s8-logo.ph b { font-weight: 900; font-size: 120px; letter-spacing: 0.04em; line-height: 1; }
     #s8-logo.ph i { font-style: normal; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; color: #ffd36b; margin-top: 10px; }
-    #s8-rule { width: 160px; height: 4px; margin: 46px auto 40px; background: linear-gradient(90deg,#d4a537,#2f80ed); border-radius: 2px; }
+    #s8-rule { width: 160px; height: 4px; margin: 44px auto 36px; background: linear-gradient(90deg,#d4a537,#2f80ed); border-radius: 2px; }
     #s8-tag { display: inline-block; font-weight: 800; font-size: 58px; letter-spacing: -0.01em; padding: 14px 32px; border-radius: 16px; }
     #s8-tag.dummy-on { border: 3px dashed #ffd36b; color: #ffd36b; }
     #s8-note { margin-top: 18px; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; color: #ffd36b; }
@@ -30,6 +31,7 @@
     const D = window.RAKERNAS_DATA, M = D.meta, q = (s) => document.querySelector(s);
     const logo = q("#s8-logo");
     if (M.logoExists) {
+      logo.classList.add("real");
       logo.innerHTML = '<img id="s8-logo-img" src="' + M.logoFile + '" alt="BFI">';
     } else {
       logo.classList.add("ph");

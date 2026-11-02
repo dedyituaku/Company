@@ -11,7 +11,7 @@ window.RAKERNAS_DATA = {
     "logoFile": "assets/logo/bfi-logo.png",
     "tagline": "[ISI TAGLINE RAKERNAS]",
     "taglineIsDummy": true,
-    "logoExists": false
+    "logoExists": true
   },
   "delq30": {
     "label": "Delinquency 30+",
@@ -55,20 +55,6 @@ window.RAKERNAS_DATA = {
     "unit": "%",
     "target": 100,
     "better": "down"
-  },
-  "costPerRecovery": {
-    "label": "Cost per Rp Recovery",
-    "before": 100,
-    "after": 88,
-    "unit": "indeks",
-    "better": "down"
-  },
-  "certifiedManager": {
-    "label": "Manager Tersertifikasi",
-    "before": 40,
-    "after": 85,
-    "unit": "%",
-    "better": "up"
   },
   "incentiveGrowth": 18,
   "initiatives2027": [
@@ -189,7 +175,7 @@ window.RAKERNAS_DATA = {
         "scene": 5,
         "file": "assets/vo/scene5.mp3",
         "start": 59,
-        "dur": 7.5
+        "dur": 6.8
       },
       {
         "scene": 6,
@@ -216,5 +202,229 @@ window.RAKERNAS_DATA = {
       "low": 0.14,
       "ramp": 0.3
     }
+  },
+  "avgKpiManager": {
+    "label": "Rata-rata KPI Manager",
+    "before": 96,
+    "after": 104,
+    "unit": "%",
+    "better": "up"
+  },
+  "sfx": {
+    "_catatan": "SFX SINTETIS = PLACEHOLDER (make-sfx.mjs). at = detik saat momen visual; build.mjs menaruh puncak bunyi 1 frame setelahnya. Waktu mengikuti animasi di compositions/*.html - ubah bila scene di-retime.",
+    "files": {
+      "whoosh-a": {
+        "dur": 0.9,
+        "peak": 0.49
+      },
+      "whoosh-b": {
+        "dur": 0.8,
+        "peak": 0.39
+      },
+      "boom": {
+        "dur": 1.8,
+        "peak": 0.03
+      },
+      "riser": {
+        "dur": 2.7,
+        "peak": 2.6
+      },
+      "tick-run": {
+        "dur": 2,
+        "peak": 0
+      },
+      "chime": {
+        "dur": 1.54,
+        "peak": 0.11
+      },
+      "swell": {
+        "dur": 4.62,
+        "peak": 2.34
+      }
+    },
+    "events": [
+      {
+        "f": "riser",
+        "at": 5,
+        "vol": 0.32,
+        "note": "naik sebelum konvergensi lampu scene 1"
+      },
+      {
+        "f": "boom",
+        "at": 5,
+        "vol": 0.5,
+        "note": "impact konvergensi + teks 3 Key Initiatives 2026"
+      },
+      {
+        "f": "whoosh-a",
+        "at": 8,
+        "vol": 0.3,
+        "note": "flash putih / transisi scene"
+      },
+      {
+        "f": "whoosh-b",
+        "at": 20,
+        "vol": 0.3,
+        "note": "flash putih / transisi scene"
+      },
+      {
+        "f": "whoosh-a",
+        "at": 40,
+        "vol": 0.3,
+        "note": "flash putih / transisi scene"
+      },
+      {
+        "f": "whoosh-b",
+        "at": 58,
+        "vol": 0.3,
+        "note": "flash putih / transisi scene"
+      },
+      {
+        "f": "whoosh-a",
+        "at": 76,
+        "vol": 0.3,
+        "note": "flash putih / transisi scene"
+      },
+      {
+        "f": "whoosh-b",
+        "at": 86,
+        "vol": 0.3,
+        "note": "flash putih / transisi scene"
+      },
+      {
+        "f": "whoosh-a",
+        "at": 106,
+        "vol": 0.3,
+        "note": "flash putih / transisi scene"
+      },
+      {
+        "f": "riser",
+        "at": 76,
+        "vol": 0.28,
+        "note": "naik sebelum scene 6"
+      },
+      {
+        "f": "boom",
+        "at": 80,
+        "vol": 0.5,
+        "note": "READY FOR NEW CHALLENGES 2027 muncul"
+      },
+      {
+        "f": "tick-run",
+        "at": 24.1,
+        "dur": 1.5,
+        "vol": 0.14,
+        "note": "counter berjalan - s3 kartu 1"
+      },
+      {
+        "f": "tick-run",
+        "at": 25.2,
+        "dur": 1.5,
+        "vol": 0.14,
+        "note": "counter berjalan - s3 kartu 2"
+      },
+      {
+        "f": "tick-run",
+        "at": 26.3,
+        "dur": 1.5,
+        "vol": 0.14,
+        "note": "counter berjalan - s3 kartu 3"
+      },
+      {
+        "f": "tick-run",
+        "at": 27.5,
+        "dur": 1.5,
+        "vol": 0.14,
+        "note": "counter berjalan - s3 kartu 4"
+      },
+      {
+        "f": "tick-run",
+        "at": 28.6,
+        "dur": 1.5,
+        "vol": 0.14,
+        "note": "counter berjalan - s3 kartu 5"
+      },
+      {
+        "f": "tick-run",
+        "at": 46.4,
+        "dur": 1.8,
+        "vol": 0.14,
+        "note": "counter berjalan - s4 rasio cost"
+      },
+      {
+        "f": "tick-run",
+        "at": 63.9,
+        "dur": 2,
+        "vol": 0.14,
+        "note": "counter berjalan - s5 ring KPI"
+      },
+      {
+        "f": "tick-run",
+        "at": 69.2,
+        "dur": 1.8,
+        "vol": 0.14,
+        "note": "counter berjalan - s5 insentif"
+      },
+      {
+        "f": "chime",
+        "at": 25.6,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s3 kartu 1"
+      },
+      {
+        "f": "chime",
+        "at": 26.7,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s3 kartu 2"
+      },
+      {
+        "f": "chime",
+        "at": 27.8,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s3 kartu 3"
+      },
+      {
+        "f": "chime",
+        "at": 29,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s3 kartu 4"
+      },
+      {
+        "f": "chime",
+        "at": 30.1,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s3 kartu 5"
+      },
+      {
+        "f": "chime",
+        "at": 48.2,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s4 rasio cost"
+      },
+      {
+        "f": "chime",
+        "at": 65.9,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s5 ring KPI"
+      },
+      {
+        "f": "chime",
+        "at": 71,
+        "vol": 0.22,
+        "note": "nilai akhir 2026* tercapai - s5 insentif"
+      },
+      {
+        "f": "chime",
+        "at": 107.3,
+        "vol": 0.22,
+        "note": "logo muncul"
+      },
+      {
+        "f": "swell",
+        "at": 108.8,
+        "vol": 0.26,
+        "note": "swell closing logo"
+      }
+    ]
   }
 };
