@@ -11,7 +11,7 @@
 // Aturan: ELEVENLABS_API_KEY dibaca dari rakernas/.env (atau environment). Key tidak pernah dicetak.
 // Bila API tidak bisa dijangkau / key tidak ada / key ditolak, skrip BERHENTI dengan pesan jelas dan
 // tidak menyentuh file audio maupun data.json (tidak ada audio palsu).
-import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, mkdtempSync, rmSync, readdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -28,13 +28,15 @@ const die = (msg, code = 1) => { console.error("\n[generate-audio] " + msg + "\n
 
 // ---------- konfigurasi ----------
 const data = JSON.parse(readFileSync("data.json", "utf8"));
+const V = data.voice || {};
 const EL = {
-  voiceId: "onwK4e9ZLuTAKqWW03F9", voiceName: "Daniel - Steady Broadcaster (pria, formal, ala penyiar)",
-  modelId: "eleven_multilingual_v2", languageCode: "id",
-  stability: 0.5, similarityBoost: 0.75, style: 0, speed: 1.0, useSpeakerBoost: true,
-  outputFormat: "mp3_44100_128", gapAfterVo: 1.0,
+  modelId: "eleven_multilingual_v2", languageCode: "id", outputFormat: "mp3_44100_128", gapAfterVo: 0.4,
   ...(data.elevenlabs || {}),
+  voiceId: V.id, voiceName: V.name || V.id, speed: V.speed ?? 0.95,
+  stability: V.stability ?? 0.65, similarityBoost: V.similarityBoost ?? 0.75, style: V.style ?? 0.1, useSpeakerBoost: V.speakerBoost ?? true,
 };
+const needVoice = !args.includes("--dry") && (want("vo") || args.includes("--voice-test") || args.includes("--test-pron"));
+if (needVoice && !EL.voiceId) die("data.json > voice.id kosong. Isi voice.id (dan voice.speed) dulu; skrip tidak memilih suara sendiri.");
 
 function loadEnv() {
   if (!existsSync(".env")) return;
@@ -214,6 +216,47 @@ if (args.includes("--test-pron")) {
   process.exit(0);
 }
 
+const saveEL = () => { const { voiceId, voiceName, speed, stability, similarityBoost, style, useSpeakerBoost, ...rest } = EL; return rest; };
+
+// ---------- pasca-proses suara narator (halus; TANPA pitch shift) ----------
+// high-pass 70 Hz, low-shelf (+dB sekitar 150 Hz) untuk nada lebih dalam, de-esser ringan, kompresor lembut.
+function postVo(inp, out) {
+  const P = data.voice?.post || {};
+  const de = P.deEsser || {}, cp = P.compressor || {};
+  const chain = [
+    `highpass=f=${P.highpassHz ?? 70}`,
+    `bass=g=${P.lowShelfDb ?? 2.5}:f=${P.lowShelfHz ?? 150}:w=0.7`,
+    `deesser=i=${de.intensity ?? 0.3}:m=${de.maxReduction ?? 0.5}:f=${de.freq ?? 0.5}`,
+    `acompressor=threshold=${(10 ** ((cp.thresholdDb ?? -18) / 20)).toFixed(4)}:ratio=${cp.ratio ?? 2}:attack=${cp.attackMs ?? 20}:release=${cp.releaseMs ?? 250}:makeup=${(10 ** ((cp.makeupDb ?? 1.5) / 20)).toFixed(3)}`,
+    "alimiter=limit=0.95",
+  ].join(",");
+  const r = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", inp, "-af", chain, "-ar", "44100", "-b:a", "192k", out], { encoding: "utf8" });
+  if (r.status !== 0) throw new Error("pasca-proses VO gagal: " + r.stderr);
+}
+
+// ---------- cuplikan uji suara: node generate-audio.mjs --voice-test ----------
+// Dua kalimat (S1 + satu kalimat S3 berisi WO dan Lor) -> preview/voice-test.mp3 (sudah lewat pasca-proses). Tidak menyentuh VO scene.
+if (args.includes("--voice-test")) {
+  const vt = JSON.parse(readFileSync("voice-test.json", "utf8"));
+  const sc = vo.scenes.map((x) => ({ n: x.n, tpl: x.tpl }));
+  const pick = (n, from, to) => { const tpl = sc.find((x) => x.n === n).tpl; return tpl; };
+  const rendered = [renderScene({ ...vo.scenes.find((x) => x.n === 1) }, vo.pron).clean, renderScene({ n: 3, lead: 0, min: 0, tpl: vt.s3Sentence }, vo.pron).clean];
+  const text = rendered.join(" ");
+  const locators = ensureDictionary();
+  const body = { text, model_id: EL.modelId, voice_settings: voiceSettings() };
+  if (locators.length) body.pronunciation_dictionary_locators = locators;
+  const r = api("POST", `/v1/text-to-speech/${EL.voiceId}?output_format=${EL.outputFormat}`, body);
+  if (r.status !== 200) die(`Uji suara gagal (HTTP ${r.status}): ${detail(r)}\nSuara ${EL.voiceId}: bila ini suara library, paket free tidak bisa memakainya lewat API.`, 7);
+  mkdirSync("preview", { recursive: true });
+  const rawf = join(tmp, "voice-test-raw.mp3"); writeFileSync(rawf, r.buf);
+  postVo(rawf, "preview/voice-test.mp3");
+  const st = api("POST", "/v1/speech-to-text", undefined, [`file=@preview/voice-test.mp3`, "model_id=scribe_v1", "tag_audio_events=false"]);
+  console.log(`preview/voice-test.mp3: ${ffprobeDur("preview/voice-test.mp3").toFixed(2)} dtk, ${text.length} karakter, voice ${EL.voiceId}, speed ${EL.speed}, stability ${EL.stability}, similarity ${EL.similarityBoost}, style ${EL.style}`);
+  console.log(`  teks dikirim: ${text}`);
+  console.log(`  transkripsi : ${st.status === 200 ? JSON.parse(st.buf.toString("utf8")).text : "(STT gagal)"}`);
+  process.exit(0);
+}
+
 // ---------- 1. VOICE OVER ----------
 const audio = data.audio || (data.audio = {});
 const sceneId = (n) => "s" + n;
@@ -236,8 +279,10 @@ if (want("vo")) {
     const r = api("POST", `/v1/text-to-speech/${EL.voiceId}/with-timestamps?output_format=${EL.outputFormat}`, body);
     if (r.netFail || r.status !== 200) die(`TTS scene ${s.n} gagal (HTTP ${r.status}): ${r.netFail ? r.err : detail(r)}\nScene sebelumnya mungkin sudah tertulis; data.json belum diubah.`, 5);
     const j = JSON.parse(r.buf.toString("utf8"));
-    const file = `assets/vo/scene${s.n}.mp3`;
-    writeFileSync(file, Buffer.from(j.audio_base64, "base64"));
+    const file = `assets/vo/scene${s.n}.mp3`, rawFile = `assets/vo/raw/scene${s.n}.mp3`;
+    mkdirSync("assets/vo/raw", { recursive: true });
+    writeFileSync(rawFile, Buffer.from(j.audio_base64, "base64"));
+    postVo(rawFile, file);   // pasca-proses halus; durasi tidak berubah (tanpa pitch/tempo)
     const dur = ffprobeDur(file); voDur[sceneId(s.n)] = +dur.toFixed(3);
     const al = j.alignment || j.normalized_alignment, A = al.characters.join("");
     const st = al.character_start_times_seconds, en = al.character_end_times_seconds;
@@ -265,7 +310,7 @@ if (want("vo")) {
   data.vo.slots = slots;
   Object.assign(audio, { generated: true, lead, dur, voDur, cues, script,
     chars: { vo: totalChars }, voice: { id: EL.voiceId, name: EL.voiceName, model: EL.modelId } });
-  data.elevenlabs = { ...EL };
+  data.elevenlabs = saveEL();
   writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
   console.log(`\nTiming baru: total ${data.timing.total} dtk -> ` + scenes.map((x) => `${x.id} ${x.start}-${x.end}`).join(", "));
 } else if (!audio.generated) {
@@ -340,19 +385,37 @@ if (want("music")) {
         if (t >= sc.s5.end - 12) return "build";
         return "calm";
       };
-      const stems = [];
+      const stems = [], used = new Set();
+      const poolFor = (role) => readdirSync("assets/music/stems").filter((x) => x.endsWith(`-${role}.mp3`)).sort();
       for (let i = 0; i < n; i++) {
         const tc = i * step + SEG / 2, role = i === n - 1 && tc >= sc.s7.start ? "resolve" : roleAt(tc, i);
-        const f = `assets/music/stems/stem${String(i + 1).padStart(2, "0")}-${role}.mp3`;
-        if (!existsSync(f) || FORCE) {
+        // pakai ulang stem yang sudah ada untuk peran ini (hemat kredit); buat baru hanya bila belum ada satu pun
+        const pool = poolFor(role), free = pool.find((x) => !used.has(x));
+        let f;
+        if (!FORCE && free) f = `assets/music/stems/${free}`;
+        else if (!FORCE && pool.length) f = `assets/music/stems/${pool[i % pool.length]}`;
+        else {
+          f = `assets/music/stems/stem${String(i + 1).padStart(2, "0")}-${role}.mp3`;
           process.stdout.write(`  stem ${i + 1}/${n} (${role}, ${SEG} dtk) ... `);
           let rr = api("POST", `/v1/sound-generation?output_format=${EL.outputFormat}`, { text: M.prompts[role], duration_seconds: SEG, prompt_influence: 0.6 });
           if (rr.status === 422) { rr = api("POST", `/v1/sound-generation?output_format=${EL.outputFormat}`, { text: M.prompts[role], duration_seconds: 22, prompt_influence: 0.6 }); }
-          if (rr.status !== 200) { console.log("GAGAL"); die(`Stem musik gagal (HTTP ${rr.status}): ${detail(rr)}. Stem yang sudah jadi tersimpan; jalankan ulang --only=music untuk melanjutkan.`, 6); }
+          if (rr.status !== 200) { console.log("GAGAL"); notes.push(`Stem ${role} gagal (HTTP ${rr.status}): ${detail(rr)}`); stems.length = 0; stems.push("FAIL"); break; }
           writeFileSync(f, rr.buf); console.log("ok");
         }
-        stems.push(f);
+        used.add(f.split("/").pop()); stems.push(f);
       }
+      if (stems[0] === "FAIL") {
+        // (d) cadangan terakhir: pad sinematik sintetis FFmpeg (PLACEHOLDER)
+        const T = total.toFixed(2);
+        const sines = [[110, 0.16], [220, 0.12], [261.63, 0.10], [329.63, 0.10], [392, 0.06], [55, 0.20]];
+        const ins = sines.flatMap(([f]) => ["-f", "lavfi", "-i", `sine=f=${f}:d=${T}`]);
+        const mix = sines.map(([, v], i) => `[${i}:a]volume=${v}[s${i}]`).join(";") + ";" + sines.map((_, i) => `[s${i}]`).join("") + `amix=inputs=${sines.length}:normalize=0,tremolo=f=0.12:d=0.35,lowpass=f=1800,aecho=0.8:0.6:900|1700:0.35|0.25,highpass=f=40,loudnorm=I=-22:TP=-3[out]`;
+        const pr = spawnSync("ffmpeg", ["-v", "error", "-y", ...ins, "-filter_complex", mix, "-map", "[out]", "-ar", "44100", "-b:a", "192k", outFile], { encoding: "utf8" });
+        if (pr.status !== 0) die("Pad cadangan gagal:\n" + pr.stderr);
+        audio.sources.music[M.name] = "placeholder-ffmpeg-pad";
+        notes.push("Musik: semua sumber API gagal; memakai pad sintetis FFmpeg (PLACEHOLDER).");
+        console.log(`  -> ${outFile}: pad sintetis FFmpeg (PLACEHOLDER)`);
+      } else {
       // samakan level tiap stem, gabung dengan acrossfade, potong sepanjang video
       const inputs = stems.flatMap((f) => ["-i", f]);
       const norm = stems.map((_, i) => `[${i}:a]aresample=44100,aformat=channel_layouts=stereo,loudnorm=I=-22:TP=-3:LRA=7[n${i}]`);
@@ -364,11 +427,12 @@ if (want("music")) {
       audio.sources.music[M.name] = "elevenlabs-sound-generation-stems";
       audio.musicStems = stems;
       console.log(`  -> ${outFile}: ${stems.length} stem digabung, acrossfade ${XF} dtk`);
+      }
     }
     audio.musicDur = { ...(audio.musicDur || {}), [M.name]: +ffprobeDur(outFile).toFixed(2) };
   }
 }
-data.elevenlabs = { ...EL };
+data.elevenlabs = saveEL();
 audio.notes = notes;
 writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
 

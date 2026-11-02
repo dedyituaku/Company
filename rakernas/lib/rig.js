@@ -48,14 +48,36 @@
   // ---- debu (seeded)
   const dust = []; for (let i = 0; i < 110; i++) dust.push({ x: rnd() * W, y: 60 + rnd() * 860, vx: (rnd() - 0.5) * 9, vy: -3 - rnd() * 6, r: 1.1 + rnd() * 1.9, ph: rnd() * 6.28 });
 
-  // ---- envelope
-  function G(t) { // intensitas global rig
-    if (t < CUE.s1End - 0.1) return 1;
-    if (t < S1E + 0.35) return 1 - sm(S1E - 0.1, S1E + 0.35, t);
-    if (t < 75.9) return 0;
-    let g = 0.3 * sm(75.9, 76.4, t);
-    if (t > 107) g = lerp(g, 0.42, sm(107, 110, t));
-    if (t > TOT - 1.2) g *= 1 - 0.7 * sm(TOT - 1.2, TOT, t);
+  // ---- intensitas lampu: SATU layer permanen (canvas ini hidup dari detik 0 sampai akhir video, tidak dibuat/dihancurkan per scene).
+  // Intensitas diatur oleh satu timeline GSAP terpisah di bawah ini: keyframe halus, easing sine, tiap perubahan >= 1,5 dtk
+  // (kecuali hentakan "READY FOR NEW CHALLENGES"). Semua waktu diambil dari data.json (timing + cue VO), tidak ada detik yang di-hardcode.
+  const LS = { I: 1, pulse: 0 };
+  const LEVEL = { s1: 1.0, calm: 0.28, build: 0.55, s6: 0.70, s7: 0.45, s8: 0.60 };   // persen intensitas per bagian
+  const VIS = 0.7;   // kurva visual: nilai redup (25-30%) tetap jelas terlihat
+  const lightTl = (function () {
+    const tl = gsap.timeline({ paused: true });
+    if (!TM) return tl;
+    const sc = (id) => TM.scenes.find((x) => x.id === id);
+    const cue = window.RAKERNAS_DATA.audio && window.RAKERNAS_DATA.audio.cues || {};
+    const s1 = sc("s1"), s5 = sc("s5"), s6 = sc("s6"), s7 = sc("s7"), s8 = sc("s8");
+    const E = "sine.inOut";
+    let cur = LEVEL.s1;
+    const ramp = (to, at, dur) => { tl.fromTo(LS, { I: cur }, { I: to, duration: Math.max(1.5, dur), ease: E, immediateRender: false }, at); cur = to; };
+    tl.set(LS, { I: LEVEL.s1, pulse: 0 }, 0);
+    ramp(LEVEL.calm, s1.end - 0.5, 2.0);               // S1 -> S2: redup halus (selesai 1,5 dtk setelah masuk scene 2)
+    ramp(LEVEL.build, s5.end - 4.0, 4.0);              // akhir S5: naik bertahap menuju S6
+    ramp(LEVEL.s6, s5.end, 1.8);                        // S6
+    const r = s6.start + ((cue.s6 && cue.s6.r) || 3.6);   // hentakan saat "READY FOR NEW CHALLENGES 2027"
+    tl.fromTo(LS, { pulse: 0 }, { pulse: 0.3, duration: 0.22, ease: "sine.out", immediateRender: false }, r - 0.05);
+    tl.to(LS, { pulse: 0, duration: 1.8, ease: E }, r + 0.17);
+    ramp(LEVEL.s7, s6.end - 1.0, 2.5);                  // S7
+    ramp(LEVEL.s8, s7.end - 1.0, 2.5);                  // S8 (beam memusat ke logo)
+    return tl;
+  })();
+  function G(t) {
+    lightTl.time(Math.max(0, t), false);
+    let g = Math.pow(Math.min(1, Math.max(0, LS.I + LS.pulse)), VIS);
+    if (t > TOT - 2.5) g *= 1 - 0.7 * sm(TOT - 2.5, TOT, t);   // penutup video
     return g;
   }
   function boost(t) { return t < CUE.impact ? 1 + 0.7 * sm(4.55, CUE.impact, t) : 1 + 0.7 * Math.exp(-(t - CUE.impact) / 0.45); }

@@ -14,10 +14,11 @@
 
 [PRONUNCIATION]
 # Substitusi teks SEBELUM dikirim ke TTS (layar tidak berubah). Urutan: paling spesifik dulu.
-# "Wo" dan "Lor" ditulis langsung sebagai kata (bukan WO/LOR) di naskah; aliasnya diatur lewat ElevenLabs
-# pronunciation dictionary (data.json > elevenlabs.pronunciation).
-NPL-Wo = en-pe-el Wo
-KPI = key-pi-ai
+# WO dibaca per huruf bahasa Indonesia "wé-o"; NPL-WO "en-pe-el wé-o"; KPI "ka-pe-i". "Lor" tetap kata (alias lewat ElevenLabs
+# pronunciation dictionary: data.json > elevenlabs.pronunciation). Layar tetap WO/KPI.
+NPL-WO = en-pe-el wé-o
+WO = wé-o
+KPI = ka-pe-i
 
 [SCENE 1 | lead=5.5 | min=8]
 [[y]]{{meta.yearAfter}}. [[k]]Three key initiatives.
@@ -26,7 +27,7 @@ KPI = key-pi-ai
 Di awal tahun, kita menetapkan tiga prioritas: [[c1]]meningkatkan efektivitas collection, [[c2]]mengoptimalkan cost, dan [[c3]]memperkuat kapabilitas manpower.
 
 [SCENE 3 | lead=0.5 | min=12]
-Pertama, Collection Effectiveness. [[c1]]Delinquency tiga puluh plus {{dir:delq30|turun|naik}} dari {{delq30.before}} persen [[m1]]menjadi {{delq30.after}} persen. [[c2]]Delinquency sembilan puluh plus {{dir:delq90|membaik|memburuk}} dari {{delq90.before}} persen [[m2]]menjadi {{delq90.after}} persen. [[c3]]Wo In {{dir:woIn|turun|naik}} dari {{woIn.before}} [[m3]]menjadi {{woIn.after}} miliar rupiah. [[c4]]Wo Recovery {{dir:woRecovery|turun|naik}} dari {{woRecovery.before}} [[m4]]menjadi {{woRecovery.after}} miliar rupiah. [[c5]]Dan Lor {{dir:lor|membaik|memburuk}} dari {{lor.before}} persen [[m5]]menjadi {{lor.after}} persen. [[f]]Seluruh angka {{meta.yearAfter}} adalah proyeksi sampai akhir tahun.
+Pertama, Collection Effectiveness. [[c1]]Delinquency tiga puluh plus {{dir:delq30|turun|naik}} dari {{delq30.before}} persen [[m1]]menjadi {{delq30.after}} persen. [[c2]]Delinquency sembilan puluh plus {{dir:delq90|membaik|memburuk}} dari {{delq90.before}} persen [[m2]]menjadi {{delq90.after}} persen. [[c3]]WO In {{dir:woIn|turun|naik}} dari {{woIn.before}} [[m3]]menjadi {{woIn.after}} miliar rupiah. [[c4]]WO Recovery {{dir:woRecovery|turun|naik}} dari {{woRecovery.before}} [[m4]]menjadi {{woRecovery.after}} miliar rupiah. [[c5]]Dan Lor {{dir:lor|membaik|memburuk}} dari {{lor.before}} persen [[m5]]menjadi {{lor.after}} persen. [[f]]Seluruh angka {{meta.yearAfter}} adalah proyeksi sampai akhir tahun.
 
 [SCENE 4 | lead=0.5 | min=10]
 Kedua, Collection Cost Optimization. [[p]]Realisasi cost terhadap plan berada di [[m]]{{costVsPlan.after}} persen, {{dir:costVsPlan|lebih baik|lebih tinggi}} dari {{costVsPlan.before}} persen di tahun sebelumnya. Cost terealisasi sesuai plan, secara efektif dan efisien.
@@ -38,7 +39,7 @@ Ketiga, Manpower Capability. [[k]]Rata-rata KPI manager {{dir:avgKpiManager|turu
 [[y]]{{meta.yearAfter}} telah kita selesaikan. [[r]]Siap menghadapi tantangan {{meta.yearAfter+1}}.
 
 [SCENE 7 | lead=0.5 | min=12]
-Sebagai penguatan strategi {{meta.yearAfter}}, berikut ini Key Initiatives {{meta.yearAfter+1}}. [[c1]]Pertama, {{txt:initiatives2027.0.title}}: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. [[c2]]Kedua, {{txt:initiatives2027.1.title}}: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-Wo, legal action, dan optimalisasi channel penjualan aset. [[c3]]Ketiga, {{txt:initiatives2027.2.title}}: memperkuat siapa yang mengeksekusi, dan seberapa efisien.
+Sebagai penguatan strategi {{meta.yearAfter}}, berikut ini Key Initiatives {{meta.yearAfter+1}}. [[c1]]Pertama, {{txt:initiatives2027.0.title}}: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. [[c2]]Kedua, {{txt:initiatives2027.1.title}}: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. [[c3]]Ketiga, {{txt:initiatives2027.2.title}}: memperkuat siapa yang mengeksekusi, dan seberapa efisien.
 
 [SCENE 8 | lead=1.0 | min=6]
 Bersama, kita melangkah menuju {{meta.yearAfter+1}} dengan optimis.

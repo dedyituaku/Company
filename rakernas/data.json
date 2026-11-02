@@ -197,7 +197,7 @@
     ],
     "duck": {
       "high": 1,
-      "db": -9,
+      "db": -8,
       "attack": 0.2,
       "release": 0.8
     },
@@ -497,15 +497,8 @@
     "sfxUnderVo": 0.45
   },
   "elevenlabs": {
-    "voiceId": "onwK4e9ZLuTAKqWW03F9",
-    "voiceName": "Daniel - Steady Broadcaster (pria, formal, ala penyiar)",
     "modelId": "eleven_multilingual_v2",
     "languageCode": "id",
-    "stability": 0.5,
-    "similarityBoost": 0.75,
-    "style": 0,
-    "speed": 1,
-    "useSpeakerBoost": true,
     "outputFormat": "mp3_44100_128",
     "gapAfterVo": 0.4,
     "_catatan": "Konfigurasi generate-audio.mjs. Ganti voiceId/voiceName untuk mengganti suara narator (daftar: GET /v1/voices), lalu: node generate-audio.mjs --only=vo && node build.mjs. Pengaturan SFX/musik juga bisa diubah di sini (sfx[], music[]).",
@@ -543,8 +536,8 @@
     ],
     "music": {
       "_catatan": "SATU bed kontinu assets/music/bgm.mp3. Dicoba via Music API (1 track); bila paket tidak mendukung -> stem Sound Effects API digabung acrossfade (crossfade dtk, minimal 3). Intensitas naik-turun lewat 'intensity' (kunci waktu relatif scene); ducking VO diatur di vo.duck.",
-      "name": "bgm",
-      "level": 0.6,
+      "name": "bgm-main",
+      "level": 1.4,
       "crossfade": 4,
       "stemSeconds": 30,
       "fadeIn": 2,
@@ -560,38 +553,38 @@
         {
           "scene": "s1",
           "t": 0,
-          "v": 0.3
+          "v": 0.55
         },
         {
           "scene": "s1",
           "t": 5,
-          "v": 0.9
+          "v": 0.95
         },
         {
           "scene": "s1",
           "t": "sceneEnd",
-          "v": 0.75
+          "v": 0.8
         },
         {
           "scene": "s2",
           "t": 4,
-          "v": 0.45
+          "v": 0.72
         },
         {
           "scene": "s5",
           "t": "sceneEnd",
           "off": -9,
-          "v": 0.45
+          "v": 0.72
         },
         {
           "scene": "s5",
           "t": "sceneEnd",
-          "v": 0.75
+          "v": 0.8
         },
         {
           "scene": "s6",
           "t": "r",
-          "v": 0.9
+          "v": 0.85
         },
         {
           "scene": "s7",
@@ -606,7 +599,7 @@
         {
           "scene": "s8",
           "t": 3,
-          "v": 0.55
+          "v": 0.7
         },
         {
           "scene": "s8",
@@ -617,20 +610,11 @@
     },
     "pronunciation": [
       {
-        "from": "Wo",
-        "alias": "wo,"
-      },
-      {
         "from": "Lor",
         "alias": "lor"
       }
     ],
-    "_pronunciation": "Dictionary ElevenLabs (alias). 'Wo' ditulis Wo di teks TTS lalu dialiaskan 'wo,' (jeda mikro agar 'Wo In' tidak menyatu jadi 'woin'); 'Lor' dibaca kata. Dibuat ulang otomatis bila aturan berubah.",
-    "dictionary": {
-      "id": "VpzzLpdp7NKmoOGpzt1b",
-      "versionId": "wPan4l9QGLfXSInjJmWe",
-      "hash": "ab88df3114"
-    }
+    "_pronunciation": "Dictionary ElevenLabs (alias). WO/NPL-WO/KPI diganti di teks TTS lewat vo.txt [PRONUNCIATION] (wé-o, en-pe-el wé-o, ka-pe-i); 'Lor' dibaca sebagai kata."
   },
   "audio": {
     "_catatan": "Diisi otomatis oleh generate-audio.mjs (generated=true). Nilai awal di bawah = timing brief lama agar proyek tetap bisa dirender sebelum audio dibuat. cues = detik DI DALAM scene tempat kata penanda [[...]] di vo.txt diucapkan; dipakai compositions/sN.html.",
@@ -729,7 +713,7 @@
         "logo-swell": "elevenlabs"
       },
       "music": {
-        "bgm": "elevenlabs-sound-generation-stems"
+        "bgm-main": "elevenlabs-sound-generation-stems"
       }
     },
     "voDur": {
@@ -763,7 +747,34 @@
       "assets/music/stems/stem07-resolve.mp3"
     ],
     "musicDur": {
-      "bgm": 160.63
+      "bgm-main": 160.63
+    }
+  },
+  "voice": {
+    "_catatan": "Narator: ganti id/speed di sini lalu: node generate-audio.mjs --only=vo && node build.mjs. id kosong = skrip berhenti (tidak memilih suara sendiri). Pasca-proses: low-shelf, high-pass, de-esser, kompresor lembut (tanpa pitch shift).",
+    "id": "I7sakys8pBZ1Z5f0UhT9",
+    "name": "Putri Maharani (My Voices)",
+    "speed": 0.92,
+    "stability": 0.65,
+    "similarityBoost": 0.75,
+    "style": 0.1,
+    "speakerBoost": true,
+    "post": {
+      "highpassHz": 70,
+      "lowShelfDb": 2.5,
+      "lowShelfHz": 150,
+      "deEsser": {
+        "intensity": 0.3,
+        "maxReduction": 0.5,
+        "freq": 0.5
+      },
+      "compressor": {
+        "thresholdDb": -18,
+        "ratio": 2,
+        "attackMs": 20,
+        "releaseMs": 250,
+        "makeupDb": 1.5
+      }
     }
   }
 }

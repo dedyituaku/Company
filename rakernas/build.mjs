@@ -11,7 +11,7 @@ writeFileSync("data.js", "window.RAKERNAS_DATA = " + JSON.stringify(d, null, 2) 
 
 let html = readFileSync("index.html", "utf8");
 const setAttrs = (id, s, dur) => {
-  html = html.replace(new RegExp(`(<div id="${id}"[^>]*?)data-start="[^"]*" data-duration="[^"]*"`), `$1data-start="${s}" data-duration="${dur}"`);
+  html = html.replace(new RegExp(`(<(?:div|canvas) id="${id}"[^>]*?)data-start="[^"]*" data-duration="[^"]*"`), `$1data-start="${s}" data-duration="${dur}"`);
 };
 // root + layer sepanjang video
 html = html.replace(/(data-composition-id="main" data-start="0" )data-duration="[^"]*"/, `$1data-duration="${total}"`);
@@ -98,8 +98,8 @@ const tset = new Set([0, +musicDur.toFixed(2)]);
 for (let t = 1; t < musicDur; t += 1) tset.add(t);
 kf.forEach((k) => { if (k.t >= 0 && k.t <= musicDur) tset.add(k.t); });
 for (const t of duckBreaks()) if (t > 0 && t < musicDur) tset.add(+t.toFixed(2));
-const mpts = [...tset].sort((x, y) => x - y).map((t) => ({ t: +t.toFixed(2), v: +(MU.level * inten(t) * duckGain(t, lowGain)).toFixed(4) }));
-const bgmTag = `      <audio id="bgm" class="clip" src="${musicIsApi ? `assets/music/${MU.name}.mp3` : "assets/music/bgm-placeholder.mp3"}" data-start="0" data-duration="${+musicDur.toFixed(2)}" data-track-index="6" data-volume="1" data-fade-in="${MU.fadeIn}" data-fade-out="${MU.fadeOut}" data-automation="${laneAttr(mpts)}"></audio>`;
+const mpts = [...tset].sort((x, y) => x - y).map((t) => ({ t: +t.toFixed(2), v: +(inten(t) * duckGain(t, lowGain)).toFixed(4) }));
+const bgmTag = `      <audio id="bgm" class="clip" src="${musicIsApi ? `assets/music/${MU.name}.mp3` : "assets/music/bgm-placeholder.mp3"}" data-start="0" data-duration="${+musicDur.toFixed(2)}" data-track-index="6" data-volume="${MU.level}" data-fade-in="${MU.fadeIn}" data-fade-out="${MU.fadeOut}" data-automation="${laneAttr(mpts)}"></audio>`;
 html = html.replace(/(<!-- BGM:BEGIN[^\n]*\n)[\s\S]*?([ \t]*<!-- BGM:END -->)/, `$1${bgmTag}\n$2`);
 const low = +lowGain.toFixed(3), pts = mpts;
 writeFileSync("index.html", html);
