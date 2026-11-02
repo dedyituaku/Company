@@ -1,0 +1,74 @@
+[
+  {
+    "id": "final-wo-in",
+    "text": "Wo In turun dari delapan puluh menjadi enam puluh lima miliar rupiah.",
+    "rules": [
+      {
+        "from": "Wo In",
+        "alias": "wo, in"
+      },
+      {
+        "from": "Wo",
+        "alias": "wo"
+      },
+      {
+        "from": "Lor",
+        "alias": "lor"
+      }
+    ]
+  },
+  {
+    "id": "final-wo-recovery",
+    "text": "Wo Recovery naik dari seratus lima puluh menjadi seratus sembilan puluh miliar rupiah.",
+    "rules": [
+      {
+        "from": "Wo In",
+        "alias": "wo, in"
+      },
+      {
+        "from": "Wo",
+        "alias": "wo"
+      },
+      {
+        "from": "Lor",
+        "alias": "lor"
+      }
+    ]
+  },
+  {
+    "id": "final-lor",
+    "text": "Dan Lor membaik dari tiga belas koma tujuh persen menjadi delapan persen.",
+    "rules": [
+      {
+        "from": "Wo In",
+        "alias": "wo, in"
+      },
+      {
+        "from": "Wo",
+        "alias": "wo"
+      },
+      {
+        "from": "Lor",
+        "alias": "lor"
+      }
+    ]
+  },
+  {
+    "id": "final-npl",
+    "text": "melalui debt sale, eksekusi en-pe-el Wo, legal action.",
+    "rules": [
+      {
+        "from": "Wo In",
+        "alias": "wo, in"
+      },
+      {
+        "from": "Wo",
+        "alias": "wo"
+      },
+      {
+        "from": "Lor",
+        "alias": "lor"
+      }
+    ]
+  }
+]

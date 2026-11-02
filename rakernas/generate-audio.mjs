@@ -126,13 +126,14 @@ if (!KEY) die("ELEVENLABS_API_KEY tidak ditemukan (rakernas/.env atau environmen
 const tmp = mkdtempSync(join(tmpdir(), "rk-audio-"));
 process.on("exit", () => { try { rmSync(tmp, { recursive: true, force: true }); } catch {} });
 let seq = 0;
-function api(method, path, body) {
+function api(method, path, body, form) {
   const out = join(tmp, `resp-${++seq}.bin`);
   let cfg = `url = "https://api.elevenlabs.io${path}"\nrequest = "${method}"\nheader = "xi-api-key: ${KEY}"\nwrite-out = "%{http_code}"\noutput = "${out}"\n`;
   if (body !== undefined) {
     const bf = join(tmp, `body-${seq}.json`); writeFileSync(bf, JSON.stringify(body));
     cfg += `header = "Content-Type: application/json"\ndata-binary = "@${bf}"\n`;
   }
+  if (form) for (const f of form) cfg += `form = "${f}"\n`;
   const r = spawnSync("curl", ["-sS", "--max-time", "240", "-K", "-"], { input: cfg, encoding: "utf8" });
   const status = parseInt(r.stdout, 10) || 0;
   const buf = existsSync(out) ? readFileSync(out) : Buffer.alloc(0);
@@ -170,21 +171,67 @@ function analyze(file) {
   return { dur: +dur.toFixed(3), peak: +at.toFixed(2) };
 }
 
+// ---------- pronunciation dictionary (alias rules) ----------
+// data.json > elevenlabs.pronunciation = [{ from: "Wo", alias: "..." }]. Dibuat ulang hanya bila aturan berubah (hash).
+import { createHash } from "node:crypto";
+function ensureDictionary() {
+  const rules = EL.pronunciation || [];
+  if (!rules.length) return [];
+  const hash = createHash("sha1").update(JSON.stringify(rules)).digest("hex").slice(0, 10);
+  if (EL.dictionary?.hash === hash && EL.dictionary.id) return [{ pronunciation_dictionary_id: EL.dictionary.id, version_id: EL.dictionary.versionId }];
+  const r = api("POST", "/v1/pronunciation-dictionaries/add-from-rules", {
+    name: `rakernas-${hash}`, description: "Rakernas: pelafalan Wo / Lor",
+    rules: rules.map((x) => ({ type: "alias", string_to_replace: x.from, alias: x.alias, case_sensitive: true, word_boundaries: true })),
+  });
+  if (r.status !== 200) { console.warn(`PERINGATAN: pronunciation dictionary gagal (HTTP ${r.status}: ${detail(r)}); lanjut tanpa dictionary.`); EL.dictionaryError = detail(r); return []; }
+  const j = JSON.parse(r.buf.toString("utf8"));
+  EL.dictionary = { id: j.id, versionId: j.version_id, hash };
+  console.log(`Pronunciation dictionary dibuat: ${j.id} (${rules.map((x) => x.from + "->" + x.alias).join(", ")})`);
+  return [{ pronunciation_dictionary_id: j.id, version_id: j.version_id }];
+}
+const voiceSettings = () => ({ stability: EL.stability, similarity_boost: EL.similarityBoost, style: EL.style, use_speaker_boost: EL.useSpeakerBoost, speed: EL.speed });
+
+// ---------- uji pelafalan: node generate-audio.mjs --test-pron ----------
+// Membuat cuplikan pendek, lalu mentranskripsi balik dengan ElevenLabs Speech-to-Text untuk memeriksa apakah kata terbaca sebagai KATA (bukan dieja).
+if (args.includes("--test-pron")) {
+  const tests = JSON.parse(readFileSync("pron-tests.json", "utf8"));
+  for (const t of tests) {
+    const text = t.text, locs = t.dict ? [{ pronunciation_dictionary_id: t.dict.id, version_id: t.dict.versionId }] : [];
+    let loc = locs;
+    if (t.rules) { // dictionary sementara untuk uji
+      const d = api("POST", "/v1/pronunciation-dictionaries/add-from-rules", { name: "rk-test-" + Date.now() % 100000, rules: t.rules.map((x) => ({ type: "alias", string_to_replace: x.from, alias: x.alias, case_sensitive: true, word_boundaries: true })) });
+      if (d.status === 200) { const j = JSON.parse(d.buf.toString("utf8")); loc = [{ pronunciation_dictionary_id: j.id, version_id: j.version_id }]; } else { console.log(`  (dictionary uji gagal: ${detail(d)})`); }
+    }
+    const body = { text, model_id: EL.modelId, voice_settings: voiceSettings() };
+    if (loc.length) body.pronunciation_dictionary_locators = loc;
+    const r = api("POST", `/v1/text-to-speech/${EL.voiceId}?output_format=${EL.outputFormat}`, body);
+    if (r.status !== 200) { console.log(`[${t.id}] TTS gagal: ${detail(r)}`); continue; }
+    const f = join(tmp, `${t.id}.mp3`); writeFileSync(f, r.buf);
+    const st = api("POST", "/v1/speech-to-text", undefined, [`file=@${f}`, "model_id=scribe_v1", "tag_audio_events=false"]);
+    let tr = st.status === 200 ? JSON.parse(st.buf.toString("utf8")).text : `(STT gagal HTTP ${st.status}: ${detail(st)})`;
+    console.log(`[${t.id}] ${text.length} karakter | ${ffprobeDur(f).toFixed(2)} dtk | dict: ${t.rules ? t.rules.map((x) => x.from + "->" + x.alias).join(",") : "-"}\n   kirim : ${text}\n   dengar: ${tr}`);
+  }
+  process.exit(0);
+}
+
 // ---------- 1. VOICE OVER ----------
 const audio = data.audio || (data.audio = {});
 const sceneId = (n) => "s" + n;
 if (want("vo")) {
   mkdirSync("assets/vo", { recursive: true });
   const voDur = {}, cuesVo = {};
+  const locators = ensureDictionary();
   for (const s of SCENES) {
     process.stdout.write(`VO scene ${s.n}: ${s.chars} karakter ... `);
     const prev = SCENES.find((x) => x.n === s.n - 1), next = SCENES.find((x) => x.n === s.n + 1);
     const body = {
       text: s.clean, model_id: EL.modelId,
-      voice_settings: { stability: EL.stability, similarity_boost: EL.similarityBoost, style: EL.style, use_speaker_boost: EL.useSpeakerBoost, speed: EL.speed },
+      voice_settings: voiceSettings(),
     };
-    if (prev) body.previous_text = prev.clean.slice(-200);
-    if (next) body.next_text = next.clean.slice(0, 200);
+    if (locators.length) body.pronunciation_dictionary_locators = locators;
+    // request stitching: konteks scene sebelum/sesudah agar intonasi menyambung
+    if (prev) body.previous_text = prev.clean.slice(-300);
+    if (next) body.next_text = next.clean.slice(0, 300);
     if (EL.languageCode && /v2_5|flash|turbo/.test(EL.modelId)) body.language_code = EL.languageCode; // multilingual_v2 mendeteksi bahasa dari teks
     const r = api("POST", `/v1/text-to-speech/${EL.voiceId}/with-timestamps?output_format=${EL.outputFormat}`, body);
     if (r.netFail || r.status !== 200) die(`TTS scene ${s.n} gagal (HTTP ${r.status}): ${r.netFail ? r.err : detail(r)}\nScene sebelumnya mungkin sudah tertulis; data.json belum diubah.`, 5);
@@ -226,64 +273,102 @@ if (want("vo")) {
 }
 
 // ---------- 2. SOUND EFFECTS ----------
-const SFX = data.elevenlabs?.sfx || EL.sfx || [
-  { name: "opening-hit", duration: 6, prompt: "epic cinematic orchestral hit, deep sub boom, brass stab, cymbal swell, long reverb tail" },
-  { name: "initiatives-2027-hit", duration: 5, prompt: "heroic cinematic impact with rising shimmer" },
-  { name: "whoosh", duration: 1.2, prompt: "smooth cinematic whoosh transition, short airy sweep" },
-  { name: "riser", duration: 3, prompt: "cinematic tension riser building to a hit, rising synth and noise swell" },
-  { name: "chime", duration: 1.5, prompt: "soft bright positive success chime, single glassy bell with gentle shimmer" },
-  { name: "logo-swell", duration: 5, prompt: "uplifting cinematic logo reveal swell, warm rising pad with shimmer resolving gently" },
-];
+// Mentah dari API disimpan di assets/sfx/raw/NAMA.mp3 (tidak dibuat ulang bila sudah ada); versi olahan (fade in singkat,
+// reverb + ekor panjang untuk hit besar) ditulis ke assets/sfx/NAMA.mp3 dan itu yang dipakai timeline.
+const SFX = EL.sfx;
+const TAIL = { "opening-hit": 2.5, "initiatives-2027-hit": 2.5, "logo-swell": 2.0, chime: 1.0, whoosh: 0.4, riser: 0 };
+const REVERB = { "opening-hit": "0.8:0.6:90|180|330|520:0.35|0.28|0.2|0.12", "initiatives-2027-hit": "0.8:0.6:90|180|330|520:0.35|0.28|0.2|0.12", "logo-swell": "0.8:0.6:120|260|420:0.3|0.22|0.14", chime: "0.8:0.6:70|150:0.25|0.15" };
 audio.sources = audio.sources || { sfx: {}, music: {} };
+audio.sources.music = audio.sources.music || {};
 data.sfx.files = data.sfx.files || {};
 const notes = [];
+function processSfx(name, raw, out) {
+  const rawDur = ffprobeDur(raw), tail = TAIL[name] ?? 0.5, total = rawDur + tail;
+  const fo = Math.min(total, tail + 0.9);
+  const chain = ["afade=t=in:d=0.012:curve=qsin", tail > 0 ? `apad=pad_dur=${tail}` : null, REVERB[name] ? `aecho=${REVERB[name]}` : null,
+    `afade=t=out:st=${(total - fo).toFixed(3)}:d=${fo.toFixed(3)}:curve=qsin`, "alimiter=limit=0.89"].filter(Boolean).join(",");
+  const r = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", raw, "-af", chain, "-t", total.toFixed(3), "-ar", "44100", "-b:a", "192k", out], { encoding: "utf8" });
+  if (r.status !== 0) throw new Error("ffmpeg SFX " + name + ": " + r.stderr);
+}
 if (want("sfx")) {
-  mkdirSync("assets/sfx", { recursive: true });
+  mkdirSync("assets/sfx/raw", { recursive: true });
   for (const x of SFX) {
-    const file = `assets/sfx/${x.name}.mp3`;
-    if (existsSync(file) && !FORCE && audio.sources.sfx[x.name] === "elevenlabs") { console.log(`SFX ${x.name}: sudah ada (lewati; --force untuk ulang)`); continue; }
-    process.stdout.write(`SFX ${x.name} (${x.duration} dtk) ... `);
-    const r = api("POST", `/v1/sound-generation?output_format=${EL.outputFormat}`, { text: x.prompt, duration_seconds: x.duration, prompt_influence: 0.5 });
-    if (r.netFail || r.status !== 200) {
-      const why = r.netFail ? r.err : `HTTP ${r.status}: ${detail(r)}`;
-      console.log("GAGAL -> tetap placeholder sintetis (" + why + ")");
-      audio.sources.sfx[x.name] = "placeholder"; notes.push(`SFX ${x.name}: ${why}`); continue;
+    const raw = `assets/sfx/raw/${x.name}.mp3`, file = `assets/sfx/${x.name}.mp3`;
+    if (!existsSync(raw) || FORCE) {
+      process.stdout.write(`SFX ${x.name} (${x.duration} dtk) ... `);
+      const r = api("POST", `/v1/sound-generation?output_format=${EL.outputFormat}`, { text: x.prompt, duration_seconds: x.duration, prompt_influence: 0.5 });
+      if (r.netFail || r.status !== 200) {
+        const why = r.netFail ? r.err : `HTTP ${r.status}: ${detail(r)}`;
+        console.log("GAGAL -> tetap placeholder sintetis (" + why + ")");
+        audio.sources.sfx[x.name] = "placeholder"; notes.push(`SFX ${x.name}: ${why}`); continue;
+      }
+      writeFileSync(raw, r.buf); console.log("ok");
     }
-    writeFileSync(file, r.buf);
+    processSfx(x.name, raw, file);
     data.sfx.files[x.name] = { file: `${x.name}.mp3`, ...analyze(file) };
     audio.sources.sfx[x.name] = "elevenlabs";
-    console.log(`ok (${data.sfx.files[x.name].dur} dtk, puncak ${data.sfx.files[x.name].peak} dtk)`);
+    console.log(`SFX ${x.name}: olah (fade in + reverb/ekor) -> ${data.sfx.files[x.name].dur} dtk, puncak ${data.sfx.files[x.name].peak} dtk`);
   }
-  audio.chars = { ...(audio.chars || {}), sfxSeconds: SFX.filter((x) => audio.sources.sfx[x.name] === "elevenlabs").reduce((a, x) => a + x.duration, 0) };
 }
 
-// ---------- 3. MUSIK ----------
-const sceneSpan = (ids) => { const a = data.timing.scenes.filter((s) => ids.includes(s.id)); return a[a.length - 1].end - a[0].start; };
-const MUSIC = data.elevenlabs?.music || EL.music || [
-  { name: "bgm-opening", scenes: ["s1", "s2"], prompt: "instrumental cinematic epic build, no vocals, slow rising strings and low percussion, dark and powerful, gradual crescendo" },
-  { name: "bgm-achievement", scenes: ["s3", "s4", "s5"], prompt: "instrumental corporate inspiring background music, 95 BPM, no vocals, soft pulsing synth and light piano, no dominant melody, leaves room for a voice-over, steady and optimistic" },
-  { name: "bgm-2027", scenes: ["s6", "s7", "s8"], prompt: "instrumental heroic cinematic music, no vocals, triumphant brass and strings, builds steadily to a powerful climax, uplifting and ambitious" },
-];
+// ---------- 3. MUSIK: SATU bed kontinu assets/music/bgm.mp3 ----------
+// Urutan: (a) Music API satu track sepanjang video; (b) bila paket tidak mendukung -> beberapa stem dari endpoint Sound Effects
+// (instrumental ambient, tiap stem <= 30 dtk) digabung dengan acrossfade >= 3 dtk (mis. 4 dtk), lalu dipotong tepat sepanjang video.
+const M = EL.music;
 if (want("music")) {
-  mkdirSync("assets/music", { recursive: true });
-  for (const m of MUSIC) {
-    const file = `assets/music/${m.name}.mp3`;
-    if (existsSync(file) && !FORCE && audio.sources.music[m.name] === "elevenlabs") { console.log(`Musik ${m.name}: sudah ada (lewati; --force untuk ulang)`); continue; }
-    const len = Math.min(600, Math.max(10, Math.ceil(sceneSpan(m.scenes) + 2)));
-    process.stdout.write(`Musik ${m.name} (${len} dtk) ... `);
-    const r = api("POST", `/v1/music?output_format=${EL.outputFormat}`, { prompt: m.prompt, music_length_ms: len * 1000, force_instrumental: true, model_id: "music_v1" });
-    if (r.netFail || r.status !== 200) {
-      const why = r.netFail ? r.err : `HTTP ${r.status}: ${detail(r)}`;
-      console.log("GAGAL -> tetap placeholder (" + why + ")");
-      audio.sources.music[m.name] = "placeholder"; notes.push(`Musik ${m.name}: ${why}`); continue;
+  mkdirSync("assets/music/stems", { recursive: true });
+  const total = data.timing.total, outFile = `assets/music/${M.name}.mp3`;
+  const sc = Object.fromEntries(data.timing.scenes.map((x) => [x.id, x]));
+  const need = Math.ceil(total + 1);
+  const already = existsSync(outFile) && audio.sources.music[M.name] && audio.sources.music[M.name] !== "placeholder" && ffprobeDur(outFile) >= total - 0.5;
+  if (already && !FORCE) console.log(`Musik ${M.name}: sudah ada (${audio.musicDur?.[M.name] ?? "?"} dtk); lewati (--force untuk ulang)`);
+  else {
+    process.stdout.write(`Musik: Music API satu track ${need} dtk ... `);
+    const r = api("POST", `/v1/music?output_format=${EL.outputFormat}`, { prompt: M.prompts.calm, music_length_ms: need * 1000, force_instrumental: true, model_id: "music_v1" });
+    if (r.status === 200) {
+      writeFileSync(outFile, r.buf); audio.sources.music[M.name] = "elevenlabs-music"; console.log("ok");
+    } else {
+      console.log(`tidak tersedia (HTTP ${r.status}: ${detail(r)})`);
+      notes.push(`Music API tidak tersedia di paket (HTTP ${r.status}): ${detail(r)}. Bed dibuat dari stem Sound Effects API + acrossfade.`);
+      const XF = M.crossfade, SEG = M.stemSeconds, step = SEG - XF;
+      const n = Math.ceil((need - XF) / step);
+      // peran tiap stem menurut posisi pada timeline
+      const roleAt = (t, i) => {
+        if (i === 0) return "open";
+        if (t >= sc.s8.start) return "resolve";
+        if (t >= sc.s7.start) return "heroic";
+        if (t >= sc.s5.end - 12) return "build";
+        return "calm";
+      };
+      const stems = [];
+      for (let i = 0; i < n; i++) {
+        const tc = i * step + SEG / 2, role = i === n - 1 && tc >= sc.s7.start ? "resolve" : roleAt(tc, i);
+        const f = `assets/music/stems/stem${String(i + 1).padStart(2, "0")}-${role}.mp3`;
+        if (!existsSync(f) || FORCE) {
+          process.stdout.write(`  stem ${i + 1}/${n} (${role}, ${SEG} dtk) ... `);
+          let rr = api("POST", `/v1/sound-generation?output_format=${EL.outputFormat}`, { text: M.prompts[role], duration_seconds: SEG, prompt_influence: 0.6 });
+          if (rr.status === 422) { rr = api("POST", `/v1/sound-generation?output_format=${EL.outputFormat}`, { text: M.prompts[role], duration_seconds: 22, prompt_influence: 0.6 }); }
+          if (rr.status !== 200) { console.log("GAGAL"); die(`Stem musik gagal (HTTP ${rr.status}): ${detail(rr)}. Stem yang sudah jadi tersimpan; jalankan ulang --only=music untuk melanjutkan.`, 6); }
+          writeFileSync(f, rr.buf); console.log("ok");
+        }
+        stems.push(f);
+      }
+      // samakan level tiap stem, gabung dengan acrossfade, potong sepanjang video
+      const inputs = stems.flatMap((f) => ["-i", f]);
+      const norm = stems.map((_, i) => `[${i}:a]aresample=44100,aformat=channel_layouts=stereo,loudnorm=I=-22:TP=-3:LRA=7[n${i}]`);
+      let chain = "", last = "n0";
+      for (let i = 1; i < stems.length; i++) { chain += `;[${last}][n${i}]acrossfade=d=${XF}:c1=qsin:c2=qsin[x${i}]`; last = `x${i}`; }
+      const fc = norm.join(";") + chain + `;[${last}]atrim=0:${total.toFixed(3)},asetpts=N/SR/TB[out]`;
+      const j = spawnSync("ffmpeg", ["-v", "error", "-y", ...inputs, "-filter_complex", fc, "-map", "[out]", "-ar", "44100", "-b:a", "192k", outFile], { encoding: "utf8" });
+      if (j.status !== 0) die("Penggabungan stem gagal:\n" + j.stderr);
+      audio.sources.music[M.name] = "elevenlabs-sound-generation-stems";
+      audio.musicStems = stems;
+      console.log(`  -> ${outFile}: ${stems.length} stem digabung, acrossfade ${XF} dtk`);
     }
-    writeFileSync(file, r.buf);
-    audio.sources.music[m.name] = "elevenlabs";
-    audio.musicDur = { ...(audio.musicDur || {}), [m.name]: +ffprobeDur(file).toFixed(2) };
-    console.log("ok " + audio.musicDur[m.name] + " dtk");
+    audio.musicDur = { ...(audio.musicDur || {}), [M.name]: +ffprobeDur(outFile).toFixed(2) };
   }
 }
-data.elevenlabs = { ...EL, sfx: SFX, music: MUSIC };
+data.elevenlabs = { ...EL };
 audio.notes = notes;
 writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
 
@@ -291,7 +376,7 @@ writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
 const after = api("GET", "/v1/user/subscription");
 if (after.status === 200 && usageBefore) {
   const u = JSON.parse(after.buf.toString("utf8"));
-  console.log(`\nPemakaian kredit run ini: ${u.character_count - usageBefore.character_count} (sisa ${u.character_limit - u.character_count} dari ${u.character_limit})`);
+  console.log(`\nPemakaian kredit run ini: ${u.character_count - usageBefore.character_count} (total ${u.character_count}/${u.character_limit}, sisa ${u.character_limit - u.character_count})`);
 }
 console.log(`Karakter VO: ${totalChars}. Selesai - jalankan: node build.mjs`);
-if (notes.length) console.log("\nCatatan (masih placeholder):\n - " + notes.join("\n - "));
+if (notes.length) console.log("\nCatatan:\n - " + notes.join("\n - "));

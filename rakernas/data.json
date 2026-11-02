@@ -90,116 +90,119 @@
   ],
   "timing": {
     "_catatan": "Detik pada timeline utama. Ubah juga data-start/data-duration host di index.html jika durasi scene diubah.",
-    "total": 164.51,
+    "total": 160.58,
     "scenes": [
       {
         "id": "s1",
         "start": 0,
-        "end": 9.84
+        "end": 9.61
       },
       {
         "id": "s2",
-        "start": 9.84,
-        "end": 23.15
+        "start": 9.61,
+        "end": 21.4
       },
       {
         "id": "s3",
-        "start": 23.15,
-        "end": 69.17
+        "start": 21.4,
+        "end": 64.1
       },
       {
         "id": "s4",
-        "start": 69.17,
-        "end": 88.62
+        "start": 64.1,
+        "end": 81.9
       },
       {
         "id": "s5",
-        "start": 88.62,
-        "end": 106.35
+        "start": 81.9,
+        "end": 98.34
       },
       {
         "id": "s6",
-        "start": 106.35,
-        "end": 115.24
+        "start": 98.34,
+        "end": 106.9
       },
       {
         "id": "s7",
-        "start": 115.24,
-        "end": 156.76
+        "start": 106.9,
+        "end": 153.72
       },
       {
         "id": "s8",
-        "start": 156.76,
-        "end": 164.51
+        "start": 153.72,
+        "end": 160.58
       }
     ],
     "flashAt": [
-      9.84,
-      23.15,
-      69.17,
-      88.62,
-      106.35,
-      115.24,
-      156.76
+      9.61,
+      21.4,
+      64.1,
+      81.9,
+      98.34,
+      106.9,
+      153.72
     ]
   },
   "vo": {
-    "_catatan": "Slot VO per scene diisi otomatis oleh generate-audio.mjs (start = awal scene + lead; dur = durasi file). duck: musik turun 'db' dB saat VO (ramp dtk). duck:false = tanpa ducking.",
+    "_catatan": "Slot VO per scene diisi otomatis oleh generate-audio.mjs. duck: musik turun 'db' dB saat VO (attack/release dtk, kurva cosine halus). fadeIn/fadeOut = fade tiap klip VO.",
     "slots": [
       {
         "scene": 1,
         "file": "assets/vo/scene1.mp3",
-        "start": 5,
-        "dur": 3.84
+        "start": 5.5,
+        "dur": 3.709
       },
       {
         "scene": 2,
         "file": "assets/vo/scene2.mp3",
-        "start": 10.84,
-        "dur": 11.311
+        "start": 10.11,
+        "dur": 10.893
       },
       {
         "scene": 3,
         "file": "assets/vo/scene3.mp3",
-        "start": 24.15,
-        "dur": 44.016
+        "start": 21.9,
+        "dur": 41.796
       },
       {
         "scene": 4,
         "file": "assets/vo/scene4.mp3",
-        "start": 70.17,
-        "dur": 17.45
+        "start": 64.6,
+        "dur": 16.901
       },
       {
         "scene": 5,
         "file": "assets/vo/scene5.mp3",
-        "start": 89.62,
-        "dur": 15.726
+        "start": 82.4,
+        "dur": 15.543
       },
       {
         "scene": 6,
         "file": "assets/vo/scene6.mp3",
-        "start": 106.95,
-        "dur": 7.288
+        "start": 98.74,
+        "dur": 7.758
       },
       {
         "scene": 7,
         "file": "assets/vo/scene7.mp3",
-        "start": 116.24,
-        "dur": 39.523
+        "start": 107.4,
+        "dur": 45.923
       },
       {
         "scene": 8,
         "file": "assets/vo/scene8.mp3",
-        "start": 158.26,
-        "dur": 5.251
+        "start": 154.72,
+        "dur": 5.46
       }
     ],
     "duck": {
-      "high": 0.42,
-      "db": -10,
-      "ramp": 0.3
-    }
+      "high": 1,
+      "db": -9,
+      "attack": 0.2,
+      "release": 0.8
+    },
+    "fadeIn": 0.15,
+    "fadeOut": 0.25
   },
   "avgKpiManager": {
     "label": "Rata-rata KPI Manager",
@@ -209,7 +212,7 @@
     "better": "up"
   },
   "sfx": {
-    "_catatan": "SFX: file API ElevenLabs (assets/sfx/NAMA.mp3, dibuat generate-audio.mjs) bila ada; kalau tidak, build.mjs memakai placeholder sintetis lewat 'fallback'. Event: scene + t (nama cue di data.audio.cues atau detik di dalam scene) + off (offset detik); puncak bunyi jatuh 1 frame setelah momen visual. vol = data-volume (dijaga rendah agar tidak menutup VO).",
+    "_catatan": "SFX: file API ElevenLabs (assets/sfx/NAMA.mp3, dibuat generate-audio.mjs) bila ada; kalau tidak, build.mjs memakai placeholder sintetis lewat 'fallback'. Event: scene + t (nama cue di data.audio.cues atau detik di dalam scene) + off (offset detik); puncak bunyi jatuh 1 frame setelah momen visual. vol = data-volume (dijaga rendah agar tidak menutup VO). SFX yang bertumpuk VO otomatis diturunkan (sfxUnderVo) oleh build.mjs.",
     "files": {
       "whoosh-a": {
         "dur": 0.9,
@@ -226,7 +229,7 @@
       "riser": {
         "file": "riser.mp3",
         "dur": 3.03,
-        "peak": 1.78
+        "peak": 1.8
       },
       "tick-run": {
         "dur": 2,
@@ -234,8 +237,8 @@
       },
       "chime": {
         "file": "chime.mp3",
-        "dur": 1.515,
-        "peak": 0
+        "dur": 2.56,
+        "peak": 0.02
       },
       "swell": {
         "dur": 4.62,
@@ -243,23 +246,23 @@
       },
       "opening-hit": {
         "file": "opening-hit.mp3",
-        "dur": 6.034,
+        "dur": 8.568,
         "peak": 0.2
       },
       "initiatives-2027-hit": {
         "file": "initiatives-2027-hit.mp3",
-        "dur": 5.042,
-        "peak": 0.28
+        "dur": 7.576,
+        "peak": 0.38
       },
       "whoosh": {
         "file": "whoosh.mp3",
-        "dur": 1.228,
-        "peak": 0.24
+        "dur": 1.646,
+        "peak": 0.26
       },
       "logo-swell": {
         "file": "logo-swell.mp3",
-        "dur": 5.042,
-        "peak": 1.56
+        "dur": 7.079,
+        "peak": 1.78
       }
     },
     "events": [
@@ -490,7 +493,8 @@
       "riser": "riser",
       "chime": "chime",
       "logo-swell": "swell"
-    }
+    },
+    "sfxUnderVo": 0.45
   },
   "elevenlabs": {
     "voiceId": "onwK4e9ZLuTAKqWW03F9",
@@ -503,7 +507,7 @@
     "speed": 1,
     "useSpeakerBoost": true,
     "outputFormat": "mp3_44100_128",
-    "gapAfterVo": 1,
+    "gapAfterVo": 0.4,
     "_catatan": "Konfigurasi generate-audio.mjs. Ganti voiceId/voiceName untuk mengganti suara narator (daftar: GET /v1/voices), lalu: node generate-audio.mjs --only=vo && node build.mjs. Pengaturan SFX/musik juga bisa diubah di sini (sfx[], music[]).",
     "sfx": [
       {
@@ -537,121 +541,183 @@
         "prompt": "uplifting cinematic logo reveal swell, warm rising pad with shimmer resolving gently"
       }
     ],
-    "music": [
+    "music": {
+      "_catatan": "SATU bed kontinu assets/music/bgm.mp3. Dicoba via Music API (1 track); bila paket tidak mendukung -> stem Sound Effects API digabung acrossfade (crossfade dtk, minimal 3). Intensitas naik-turun lewat 'intensity' (kunci waktu relatif scene); ducking VO diatur di vo.duck.",
+      "name": "bgm",
+      "level": 0.6,
+      "crossfade": 4,
+      "stemSeconds": 30,
+      "fadeIn": 2,
+      "fadeOut": 3,
+      "prompts": {
+        "open": "dark cinematic ambient build, low drone and slow strings rising in tension, instrumental, no vocals, no melody, no drums",
+        "calm": "ambient corporate inspiring background music, soft warm synth pad and light piano, gentle pulse around 95 BPM, instrumental, no vocals, no drums, no dominant melody, leaves space for narration",
+        "build": "cinematic rising tension, strings and soft percussion building anticipation, instrumental, no vocals, steadily growing",
+        "heroic": "heroic triumphant orchestral music, powerful brass and strings, building to a climax, instrumental, no vocals",
+        "resolve": "calm resolving cinematic ambient pad, warm strings fading gently, hopeful, instrumental, no vocals, no drums"
+      },
+      "intensity": [
+        {
+          "scene": "s1",
+          "t": 0,
+          "v": 0.3
+        },
+        {
+          "scene": "s1",
+          "t": 5,
+          "v": 0.9
+        },
+        {
+          "scene": "s1",
+          "t": "sceneEnd",
+          "v": 0.75
+        },
+        {
+          "scene": "s2",
+          "t": 4,
+          "v": 0.45
+        },
+        {
+          "scene": "s5",
+          "t": "sceneEnd",
+          "off": -9,
+          "v": 0.45
+        },
+        {
+          "scene": "s5",
+          "t": "sceneEnd",
+          "v": 0.75
+        },
+        {
+          "scene": "s6",
+          "t": "r",
+          "v": 0.9
+        },
+        {
+          "scene": "s7",
+          "t": "c2",
+          "v": 1
+        },
+        {
+          "scene": "s7",
+          "t": "sceneEnd",
+          "v": 1
+        },
+        {
+          "scene": "s8",
+          "t": 3,
+          "v": 0.55
+        },
+        {
+          "scene": "s8",
+          "t": "sceneEnd",
+          "v": 0.4
+        }
+      ]
+    },
+    "pronunciation": [
       {
-        "name": "bgm-opening",
-        "scenes": [
-          "s1",
-          "s2"
-        ],
-        "prompt": "instrumental cinematic epic build, no vocals, slow rising strings and low percussion, dark and powerful, gradual crescendo"
+        "from": "Wo",
+        "alias": "wo,"
       },
       {
-        "name": "bgm-achievement",
-        "scenes": [
-          "s3",
-          "s4",
-          "s5"
-        ],
-        "prompt": "instrumental corporate inspiring background music, 95 BPM, no vocals, soft pulsing synth and light piano, no dominant melody, leaves room for a voice-over, steady and optimistic"
-      },
-      {
-        "name": "bgm-2027",
-        "scenes": [
-          "s6",
-          "s7",
-          "s8"
-        ],
-        "prompt": "instrumental heroic cinematic music, no vocals, triumphant brass and strings, builds steadily to a powerful climax, uplifting and ambitious"
+        "from": "Lor",
+        "alias": "lor"
       }
-    ]
+    ],
+    "_pronunciation": "Dictionary ElevenLabs (alias). 'Wo' ditulis Wo di teks TTS lalu dialiaskan 'wo,' (jeda mikro agar 'Wo In' tidak menyatu jadi 'woin'); 'Lor' dibaca kata. Dibuat ulang otomatis bila aturan berubah.",
+    "dictionary": {
+      "id": "VpzzLpdp7NKmoOGpzt1b",
+      "versionId": "wPan4l9QGLfXSInjJmWe",
+      "hash": "ab88df3114"
+    }
   },
   "audio": {
     "_catatan": "Diisi otomatis oleh generate-audio.mjs (generated=true). Nilai awal di bawah = timing brief lama agar proyek tetap bisa dirender sebelum audio dibuat. cues = detik DI DALAM scene tempat kata penanda [[...]] di vo.txt diucapkan; dipakai compositions/sN.html.",
     "generated": true,
     "lead": {
-      "s1": 5,
-      "s2": 1,
-      "s3": 1,
-      "s4": 1,
-      "s5": 1,
-      "s6": 0.6,
-      "s7": 1,
-      "s8": 1.5
+      "s1": 5.5,
+      "s2": 0.5,
+      "s3": 0.5,
+      "s4": 0.5,
+      "s5": 0.5,
+      "s6": 0.4,
+      "s7": 0.5,
+      "s8": 1
     },
     "dur": {
-      "s1": 9.84,
-      "s2": 13.31,
-      "s3": 46.02,
-      "s4": 19.45,
-      "s5": 17.73,
-      "s6": 8.89,
-      "s7": 41.52,
-      "s8": 7.75
+      "s1": 9.61,
+      "s2": 11.79,
+      "s3": 42.7,
+      "s4": 17.8,
+      "s5": 16.44,
+      "s6": 8.56,
+      "s7": 46.82,
+      "s8": 6.86
     },
     "cues": {
       "s1": {
-        "y": 5,
-        "k": 7.125,
-        "end": 8.808
+        "y": 5.5,
+        "k": 7.485,
+        "end": 9.169
       },
       "s2": {
-        "c1": 4.843,
-        "c2": 7.281,
-        "c3": 9.22,
-        "end": 12.285
+        "c1": 4.32,
+        "c2": 6.955,
+        "c3": 8.778,
+        "end": 11.367
       },
       "s3": {
-        "c1": 3.415,
-        "m1": 7.803,
-        "c2": 10.474,
-        "m2": 15.918,
-        "c3": 18.531,
-        "m3": 22.072,
-        "c4": 24.765,
-        "m4": 29.096,
-        "c5": 32.741,
-        "m5": 36.735,
-        "f": 38.72,
-        "end": 44.978
+        "c1": 3.658,
+        "m1": 7.884,
+        "c2": 10.856,
+        "m2": 15.279,
+        "c3": 17.636,
+        "m3": 20.295,
+        "c4": 23.267,
+        "m4": 27.017,
+        "c5": 30.442,
+        "m5": 34.505,
+        "f": 36.49,
+        "end": 42.249
       },
       "s4": {
-        "p": 4.332,
-        "m": 6.7,
-        "end": 18.415
+        "p": 4.238,
+        "m": 6.595,
+        "end": 17.358
       },
       "s5": {
-        "k": 4.471,
-        "b": 7.177,
-        "m": 9.046,
-        "i": 11.762,
-        "im": 13.875,
-        "end": 16.697
+        "k": 3.704,
+        "b": 6.816,
+        "m": 8.952,
+        "i": 11.936,
+        "im": 13.944,
+        "end": 16.011
       },
       "s6": {
-        "y": 0.6,
-        "r": 4.141,
-        "end": 7.845
+        "y": 0.4,
+        "r": 4.127,
+        "end": 8.109
       },
       "s7": {
-        "c1": 3.485,
-        "c2": 15.78,
-        "c3": 31.279,
-        "end": 40.474
+        "c1": 9.01,
+        "c2": 21.572,
+        "c3": 35.899,
+        "end": 46.383
       },
       "s8": {
-        "end": 6.701
+        "end": 6.433
       }
     },
     "script": {
-      "s1": "dua ribu dua puluh enam. Tiga Key Initiatives.",
+      "s1": "dua ribu dua puluh enam. Three key initiatives.",
       "s2": "Di awal tahun, kita menetapkan tiga prioritas: meningkatkan efektivitas collection, mengoptimalkan cost, dan memperkuat kapabilitas manpower.",
-      "s3": "Pertama, Collection Effectiveness. Delinquency tiga puluh plus turun dari empat koma lima persen menjadi tiga koma delapan persen. Delinquency sembilan puluh plus membaik dari satu koma enam persen menjadi satu koma tiga persen. WO In turun dari delapan puluh menjadi enam puluh lima miliar rupiah. WO Recovery naik dari seratus lima puluh menjadi seratus sembilan puluh miliar rupiah. Dan LOR membaik dari tiga belas koma tujuh persen menjadi delapan persen. Seluruh angka dua ribu dua puluh enam adalah proyeksi sampai akhir tahun.",
+      "s3": "Pertama, Collection Effectiveness. Delinquency tiga puluh plus turun dari empat koma lima persen menjadi tiga koma delapan persen. Delinquency sembilan puluh plus membaik dari satu koma enam persen menjadi satu koma tiga persen. Wo In turun dari delapan puluh menjadi enam puluh lima miliar rupiah. Wo Recovery naik dari seratus lima puluh menjadi seratus sembilan puluh miliar rupiah. Dan Lor membaik dari tiga belas koma tujuh persen menjadi delapan persen. Seluruh angka dua ribu dua puluh enam adalah proyeksi sampai akhir tahun.",
       "s4": "Kedua, Collection Cost Optimization. Realisasi cost terhadap plan berada di sembilan puluh tujuh persen, lebih baik dari seratus empat persen di tahun sebelumnya. Cost terealisasi sesuai plan, secara efektif dan efisien.",
       "s5": "Ketiga, Manpower Capability. Rata-rata KPI manager naik dari sembilan puluh enam persen menjadi seratus empat persen. Dan insentif manager meningkat delapan belas persen.",
       "s6": "dua ribu dua puluh enam telah kita selesaikan. Siap menghadapi tantangan dua ribu dua puluh tujuh.",
-      "s7": "Tahun depan, tiga arah baru. Pertama, Collection Effectiveness Transformation: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation: memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
-      "s8": "Bersama, kita melangkah menuju dua ribu dua puluh tujuh."
+      "s7": "Sebagai penguatan strategi dua ribu dua puluh enam, berikut ini Key Initiatives dua ribu dua puluh tujuh. Pertama, Collection Effectiveness Transformation: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-Wo, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation: memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
+      "s8": "Bersama, kita melangkah menuju dua ribu dua puluh tujuh dengan optimis."
     },
     "sources": {
       "sfx": {
@@ -663,24 +729,21 @@
         "logo-swell": "elevenlabs"
       },
       "music": {
-        "bgm-opening": "placeholder",
-        "bgm-achievement": "placeholder",
-        "bgm-2027": "placeholder"
+        "bgm": "elevenlabs-sound-generation-stems"
       }
     },
     "voDur": {
-      "s1": 3.84,
-      "s2": 11.311,
-      "s3": 44.016,
-      "s4": 17.45,
-      "s5": 15.726,
-      "s6": 7.288,
-      "s7": 39.523,
-      "s8": 5.251
+      "s1": 3.709,
+      "s2": 10.893,
+      "s3": 41.796,
+      "s4": 16.901,
+      "s5": 15.543,
+      "s6": 7.758,
+      "s7": 45.923,
+      "s8": 5.46
     },
     "chars": {
-      "vo": 1791,
-      "sfxSeconds": 21.7
+      "vo": 1857
     },
     "voice": {
       "id": "onwK4e9ZLuTAKqWW03F9",
@@ -688,9 +751,19 @@
       "model": "eleven_multilingual_v2"
     },
     "notes": [
-      "Musik bgm-opening: HTTP 402: Music API is not available for free users. Please upgrade to a paid plan to use the API.",
-      "Musik bgm-achievement: HTTP 402: Music API is not available for free users. Please upgrade to a paid plan to use the API.",
-      "Musik bgm-2027: HTTP 402: Music API is not available for free users. Please upgrade to a paid plan to use the API."
-    ]
+      "Music API tidak tersedia di paket (HTTP 402): Music API is not available for free users. Please upgrade to a paid plan to use the API.. Bed dibuat dari stem Sound Effects API + acrossfade."
+    ],
+    "musicStems": [
+      "assets/music/stems/stem01-open.mp3",
+      "assets/music/stems/stem02-calm.mp3",
+      "assets/music/stems/stem03-calm.mp3",
+      "assets/music/stems/stem04-build.mp3",
+      "assets/music/stems/stem05-heroic.mp3",
+      "assets/music/stems/stem06-heroic.mp3",
+      "assets/music/stems/stem07-resolve.mp3"
+    ],
+    "musicDur": {
+      "bgm": 160.63
+    }
   }
 }

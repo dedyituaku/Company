@@ -10,15 +10,15 @@
   <div id="root" data-composition-id="s1" data-width="1920" data-height="1080">
     <div id="s1-shade"></div>
     <div id="s1-text">
-      <div id="s1-l" class="clip" data-start="5" data-duration="4.84">3 Key Initiatives</div>
-      <div id="s1-year" class="clip" data-start="5" data-duration="4.84">2026</div>
+      <div id="s1-l" class="clip" data-start="5" data-duration="4.61">3 Key Initiatives</div>
+      <div id="s1-year" class="clip" data-start="5" data-duration="4.61">2026</div>
     </div>
   </div>
   <script>
     // lighting panggung digambar oleh lib/rig.js (canvas di index.html); impact/konvergensi pada t = 5.0
     const C = (window.RAKERNAS_DATA.audio.cues.s1), DUR = window.RAKERNAS_DATA.audio.dur.s1;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
-    const Y = Math.max(C.y, 5.0), K = Math.max(C.k, Y + 0.3);   // tahun muncul saat diucapkan (>= impact 5.0); judul saat "Tiga Key Initiatives"
+    const Y = 5.0, K = Math.max(C.k, Y + 0.3);   // tahun muncul saat diucapkan (>= impact 5.0); judul saat "Tiga Key Initiatives"
     tl.fromTo("#s1-shade", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 4.9);
     tl.fromTo("#s1-l", { opacity: 0, scale: 1.12, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.45, ease: "power4.out" }, K);
     tl.fromTo("#s1-year", { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power4.out" }, Y);

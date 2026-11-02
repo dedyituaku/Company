@@ -12,7 +12,7 @@
   function mulberry32(a) { return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   const rnd = mulberry32(7);
 
-  // ---- 16 beam di 3 baris truss
+  // ---- 16 beam (sumber cahaya di atas frame)
   const rows = [{ y: 40, xs: [180, 444, 708, 972, 1236, 1500, 1740].slice(0, 6) }, { y: 112, xs: [300, 564, 828, 1092, 1356, 1620] }, { y: 184, xs: [560, 827, 1093, 1360] }];
   rows[0].xs = [170, 430, 690, 1230, 1490, 1750];
   const beams = [];
@@ -44,9 +44,6 @@
     ice: [sprite(60, 8, "215,235,255", 0.95), sprite(160, 36, "120,175,255", 0.45)],
     gold: [sprite(70, 9, "255,226,150", 0.95), sprite(170, 38, "212,165,55", 0.55)],
   };
-  // pola piksel LED
-  const pix = document.createElement("canvas"); pix.width = pix.height = 8;
-  { const g = pix.getContext("2d"); g.fillStyle = "rgba(2,6,16,0.55)"; g.fillRect(0, 7, 8, 1); g.fillRect(7, 0, 1, 8); }
 
   // ---- debu (seeded)
   const dust = []; for (let i = 0; i < 110; i++) dust.push({ x: rnd() * W, y: 60 + rnd() * 860, vx: (rnd() - 0.5) * 9, vy: -3 - rnd() * 6, r: 1.1 + rnd() * 1.9, ph: rnd() * 6.28 });
@@ -93,14 +90,6 @@
     bg.addColorStop(0, "#10244a"); bg.addColorStop(0.55, "#0a1628"); bg.addColorStop(1, "#050c19");
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-    // truss (siluet)
-    ctx.strokeStyle = `rgba(70,105,170,${0.35 * g})`; ctx.fillStyle = "#04070f"; ctx.lineWidth = 1.5;
-    [[40, 0, W], [112, 120, 1800], [184, 500, 1420]].forEach(([y, x0, x1]) => {
-      ctx.fillRect(x0, y - 12, x1 - x0, 12); ctx.beginPath();
-      for (let x = x0; x < x1; x += 34) { ctx.moveTo(x, y - 12); ctx.lineTo(x + 17, y); ctx.lineTo(x + 34, y - 12); }
-      ctx.stroke(); ctx.strokeRect(x0, y - 12, x1 - x0, 12);
-    });
-
     // haze volumetrik
     ctx.globalCompositeOperation = "lighter";
     for (let i = 0; i < 5; i++) {
@@ -132,53 +121,6 @@
       sg.addColorStop(0, `rgba(255,255,255,${I})`); sg.addColorStop(0.18, `rgba(${col},${0.7 * I})`); sg.addColorStop(1, `rgba(${col},0)`);
       ctx.fillStyle = sg; ctx.fillRect(b.x - rr, b.y + 12 - rr, rr * 2, rr * 2);
     });
-
-    // light pool di lantai
-    beams.forEach((b) => {
-      const hx = b.x + Math.tan(b._th) * (930 - b.y);
-      if (hx < -200 || hx > W + 200) return;
-      const gm = goldMix(b, t), col = gm > 0.5 ? "240,200,110" : "110,165,255", rx = 120 * b.ws;
-      ctx.save(); ctx.translate(hx, 940); ctx.scale(1, 0.18);
-      const pg = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
-      pg.addColorStop(0, `rgba(${col},${Math.min(0.6, b._I * 0.45)})`); pg.addColorStop(1, `rgba(${col},0)`);
-      ctx.fillStyle = pg; ctx.fillRect(-rx, -rx, rx * 2, rx * 2); ctx.restore();
-    });
-
-    // LED panel kiri-kanan (pola radial biru)
-    [[70, 520, 330, 360], [1520, 520, 330, 360]].forEach(([x, y, w, h], pi) => {
-      const cx = x + w / 2, cy = y + h / 2, pb = g * (0.75 + 0.25 * (bo - 1));
-      ctx.globalCompositeOperation = "lighter";
-      const bl = ctx.createRadialGradient(cx, cy, 20, cx, cy, 330);
-      bl.addColorStop(0, `rgba(47,128,237,${0.3 * pb})`); bl.addColorStop(1, "rgba(47,128,237,0)");
-      ctx.fillStyle = bl; ctx.fillRect(cx - 330, cy - 330, 660, 660);
-      ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-      const pg = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.75);
-      pg.addColorStop(0, `rgba(120,185,255,${0.85 * pb})`); pg.addColorStop(0.45, `rgba(47,128,237,${0.6 * pb})`); pg.addColorStop(1, `rgba(10,40,110,${0.45 * pb})`);
-      ctx.fillStyle = pg; ctx.fillRect(x, y, w, h);
-      ctx.lineWidth = 3;
-      for (let r = 20; r < 300; r += 42) {
-        const a = 0.18 + 0.22 * (0.5 + 0.5 * Math.sin(2 * Math.PI * (t * 0.45 * (pi ? -1 : 1) - r / 160)));
-        ctx.strokeStyle = `rgba(200,225,255,${a * pb})`; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.283); ctx.stroke();
-      }
-      ctx.lineWidth = 2;
-      for (let k = 0; k < 14; k++) { const a0 = k / 14 * 6.283 + t * 0.12 * (pi ? -1 : 1); ctx.strokeStyle = `rgba(160,205,255,${0.2 * pb})`; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a0) * 300, cy + Math.sin(a0) * 300); ctx.stroke(); }
-      ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = ctx.createPattern(pix, "repeat"); ctx.fillRect(x, y, w, h);
-      ctx.restore();
-      ctx.strokeStyle = `rgba(110,160,235,${0.5 * g})`; ctx.lineWidth = 3; ctx.strokeRect(x, y, w, h);
-    });
-
-    // lantai + siluet panggung
-    ctx.globalCompositeOperation = "source-over";
-    const fl = ctx.createLinearGradient(0, 872, 0, H);
-    fl.addColorStop(0, "rgba(3,7,16,0.55)"); fl.addColorStop(1, "rgba(1,3,8,0.97)");
-    ctx.fillStyle = fl; ctx.fillRect(0, 872, W, H - 872);
-    ctx.fillStyle = `rgba(110,165,255,${0.28 * g})`; ctx.fillRect(0, 872, W, 2);
-    ctx.fillStyle = "#03060d";
-    // speaker stack kiri-kanan (tepi) + monitor lantai
-    [[0, 760, 64, 130], [0, 640, 64, 120], [W - 64, 760, 64, 130], [W - 64, 640, 64, 120]].forEach(([x, y, w, h]) => {
-      ctx.fillRect(x, y, w, h); ctx.fillStyle = `rgba(100,150,230,${0.3 * g})`; ctx.fillRect(x, y, w, 2); ctx.fillStyle = "#03060d";
-    });
-    for (let i = 0; i < 7; i++) { const x = 360 + i * 190; ctx.beginPath(); ctx.moveTo(x, 880); ctx.lineTo(x + 70, 880); ctx.lineTo(x + 52, 858); ctx.lineTo(x + 18, 858); ctx.closePath(); ctx.fill(); }
 
     // debu terang saat melewati beam
     ctx.globalCompositeOperation = "lighter";
