@@ -3,6 +3,7 @@
 #
 # Sintaks:
 #   {{path}}            angka dari data.json dibaca dalam kata ("3.8" -> "tiga koma delapan"). Contoh {{delq30.after}}
+#   {{path|dN}}         angka dibulatkan N desimal ({{lor.before|d0}}: 14.04 -> "empat belas")
 #   {{path+N}}          angka + N (mis. {{meta.yearAfter+1}} -> tahun berikutnya). "2026*" dibaca 2026.
 #   {{dir:key|a|b}}     kata arah: a bila data[key].after < before, b bila lebih besar. Contoh {{dir:delq30|turun|naik}}
 #   {{txt:path}}        teks dari data.json ("&" dibaca "and"). Contoh {{txt:initiatives2027.0.title}}
@@ -27,10 +28,10 @@ KPI = ka-pe-i
 Di awal tahun, kita menetapkan tiga prioritas: [[c1]]meningkatkan efektivitas collection, [[c2]]mengoptimalkan cost, dan [[c3]]memperkuat kapabilitas manpower.
 
 [SCENE 3 | lead=0.5 | min=12]
-Pertama, Collection Effectiveness. [[c1]]Delinquency tiga puluh plus {{dir:delq30|turun|naik}} dari {{delq30.before}} persen [[m1]]menjadi {{delq30.after}} persen. [[c2]]Delinquency sembilan puluh plus {{dir:delq90|membaik|memburuk}} dari {{delq90.before}} persen [[m2]]menjadi {{delq90.after}} persen. [[c3]]WO In {{dir:woIn|turun|naik}} dari {{woIn.before}} [[m3]]menjadi {{woIn.after}} miliar rupiah. [[c4]]WO Recovery {{dir:woRecovery|turun|naik}} dari {{woRecovery.before}} [[m4]]menjadi {{woRecovery.after}} miliar rupiah. [[c5]]Dan Lor {{dir:lor|membaik|memburuk}} dari {{lor.before}} persen [[m5]]menjadi {{lor.after}} persen. [[f]]Seluruh angka {{meta.yearAfter}} adalah proyeksi sampai akhir tahun.
+Pertama, Collection Effectiveness. [[c1]]Delinquency sembilan puluh plus {{dir:delq90|membaik|memburuk}} dari {{delq90.before}} persen [[m1]]menjadi {{delq90.after}} persen. [[c2]]Delinquency tiga puluh plus [[m2]]berada di {{delq30.after}} persen, mendekati budget. [[c3]]Rata-rata WO Recovery per bulan {{dir:woRecovery|turun|naik}} dari {{woRecovery.before}} [[m3]]menjadi {{woRecovery.after}} miliar rupiah. [[c4]]WO In [[m4]]berada di bawah budget. [[c5]]Dan Lor {{dir:lor|membaik|memburuk}} dari {{lor.before|d0}} persen [[m5]]menjadi {{lor.after}} persen. [[f]]Seluruh angka {{meta.yearAfter}} adalah performa sampai {{txt:meta.ytdMonth}}.
 
 [SCENE 4 | lead=0.5 | min=10]
-Kedua, Collection Cost Optimization. [[p]]Realisasi cost terhadap plan berada di [[m]]{{costVsPlan.after}} persen, {{dir:costVsPlan|lebih baik|lebih tinggi}} dari {{costVsPlan.before}} persen di tahun sebelumnya. Cost terealisasi sesuai plan, secara efektif dan efisien.
+Kedua, Collection Cost Optimization. [[p]]Realisasi cost sampai {{txt:meta.ytdMonth}} berada di [[m]]{{costVsPlan.after}} persen dari plan, dan [[b]]cost of credit {{dir:cocYtd|turun|naik}} dari {{cocYtd.before}} persen [[mc]]menjadi {{cocYtd.after}} persen. Cost terealisasi sesuai plan, secara efektif dan efisien.
 
 [SCENE 5 | lead=0.5 | min=12]
 Ketiga, Manpower Capability. [[k]]Rata-rata KPI manager {{dir:avgKpiManager|turun|naik}} dari [[b]]{{avgKpiManager.before}} persen [[m]]menjadi {{avgKpiManager.after}} persen. Dan [[i]]insentif manager meningkat [[im]]{{incentiveGrowth}} persen.

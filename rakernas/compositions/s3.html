@@ -10,7 +10,8 @@
     #s3-chips .chip .ic svg { width: 24px; height: 24px; }
     #s3-cards { position: absolute; left: 192px; top: 334px; width: 1536px; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px 24px; }
     .s3-card { width: 496px; height: 306px; border-radius: 26px; padding: 22px 28px; background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)), rgba(5,12,28,0.5); border: 1.5px solid rgba(255,255,255,0.14); position: relative; }
-    .s3-row { display: flex; align-items: flex-end; gap: 16px; margin-top: 12px; }
+    .s3-row { display: flex; align-items: flex-end; gap: 16px; margin-top: 6px; }
+    .s3-card .plabel { letter-spacing: 0.06em; line-height: 32px; height: 64px; }
     .s3-yr { font-weight: 700; font-size: 28px; line-height: 34px; color: var(--mute); }
     .s3-ya { color: var(--gold); }
     .s3-prev { font-weight: 700; font-size: 40px; line-height: 100px; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -18,8 +19,8 @@
     .s3-nw { white-space: nowrap; display: flex; align-items: baseline; height: 100px; }
     .s3-card .bignum { font-size: 92px; line-height: 100px; }
     .s3-card .unit { font-size: 36px; margin: 0 4px; }
-    .s3-d { margin-top: 14px; }
-    .s3-tag { font-size: 28px; }
+    .s3-d { margin-top: 8px; }
+    .s3-tag { font-size: 28px; letter-spacing: 0.01em; white-space: nowrap; }
   </style>
   <div id="root" data-composition-id="s3" data-width="1920" data-height="1080">
     <div id="s3-fg">
@@ -85,7 +86,7 @@
     const dec = (...v) => Math.max(...v.map((x) => (String(x).split(".")[1] || "").length));
     const fmt = (v, d) => v.toFixed(d).replace(".", ",");
     const q = (s, r) => (r || document).querySelector(s);
-    if (M.showDummyMarkers) { const d = q("#s3-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
+    if (M.showDummyMarkers && (M.dummyScenes || []).includes("s3")) { const d = q("#s3-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
 
     const C = (window.RAKERNAS_DATA.audio.cues.s3), DUR = window.RAKERNAS_DATA.audio.dur.s3;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
@@ -94,7 +95,20 @@
       tl.fromTo(c, { opacity: 0, y: 20, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 1.0 + i * 0.35));
     tl.fromTo("#s3-fg", { x: 12 }, { x: -12, duration: DUR, ease: "none" }, 0);
 
-        document.querySelectorAll(".s3-card").forEach((card, i) => {
+        // urutan kartu mengikuti urutan disebut di VO (data.json > scene3.order)
+    { const wrap = q("#s3-cards"); (D.scene3 && D.scene3.order || []).forEach((k) => { const el = wrap.querySelector('[data-k="' + k + '"]'); if (el) wrap.appendChild(el); }); }
+    // chip per KPI dari data.json: budget (amber netral) | vsBudget | delta | pct. Hijau hanya bila benar-benar membaik.
+    const chipFor = (e, d, u1, u2) => {
+      const delta = e.after - e.before, improved = (e.better === "down") === (delta < 0), arrow = delta < 0 ? "▼ " : "▲ ";
+      const bd = e.budget !== undefined ? dec(e.budget) : 0;
+      switch (e.chip.mode) {
+        case "budget": return { text: "Budget " + fmt(e.budget, bd) + e.unit, tone: "neutral" };
+        case "vsBudget": { const below = e.after < e.budget; return { text: (below ? "Di bawah budget " : "Di atas budget ") + fmt(e.budget, bd) + e.unit, tone: below === (e.better === "down") ? "up" : "bad" }; }
+        case "pct": return { text: (e.chip.value >= 0 ? "▲ +" : "▼ -") + fmt(Math.abs(e.chip.value), 1) + "%", tone: improved ? "up" : "bad" };
+        default: return { text: arrow + (e.unit === "%" ? fmt(Math.abs(delta), d) + " pp" : (u1 ? u1 + " " : "") + fmt(Math.abs(delta), d) + (u2 ? " " + u2 : "")), tone: improved ? "up" : "bad" };
+      }
+    };
+    document.querySelectorAll(".s3-card").forEach((card, i) => {
       const e = D[card.dataset.k], d = dec(e.before, e.after), t0 = C["c" + (i + 1)], tm = C["m" + (i + 1)];   // kartu muncul saat nama disebut; counter jalan saat "menjadi"
       const [u1, u2] = e.unit.includes(" ") ? e.unit.split(" ") : ["", e.unit];
       q(".s3-lab", card).textContent = e.label;
@@ -103,10 +117,9 @@
       q(".s3-u1", card).textContent = u1; q(".s3-u2", card).textContent = u2;
       q(".s3-prev", card).textContent = fmt(e.before, d);
       const n = q(".s3-n", card); n.textContent = fmt(e.before, d);
-      const delta = e.after - e.before, good = (e.better === "down") === (delta < 0);
-      const tag = q(".s3-tag", card);
-      tag.textContent = (delta < 0 ? "▼ " : "▲ ") + (e.unit === "%" ? fmt(Math.abs(delta), d) + " pp" : (u1 ? u1 + " " : "") + fmt(Math.abs(delta), d) + (u2 ? " " + u2 : ""));
-      tag.classList.add(good ? "up" : "bad");
+      const tag = q(".s3-tag", card), ch = chipFor(e, d, u1, u2);
+      tag.textContent = ch.text;
+      tag.classList.add(ch.tone);
       const cnt = { v: e.before };
       tl.fromTo(card, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, t0);
       tl.to(cnt, { v: e.after, duration: 1.5, ease: "power2.inOut", onUpdate() { n.textContent = fmt(cnt.v, d); } }, tm);

@@ -118,9 +118,9 @@ const mmss = (t) => `${String(Math.floor(t / 60)).padStart(2, "0")}:${(t % 60).t
 const VISUAL = {
   s1: "Lighting panggung menyala dan konvergen; impact + judul '3 Key Initiatives' lalu tahun.",
   s2: "Tiga kartu prioritas muncul bergantian sesuai kata yang disebut.",
-  s3: "Key Initiative 1: lima kartu KPI (Delinq 30+, 90+, WO In, WO Recovery, LOR) muncul saat namanya disebut; counter berjalan tepat saat 'menjadi', tag selisih menyusul.",
-  s4: "Key Initiative 2: panel realisasi cost vs plan; bar dan counter turun ke angka akhir saat disebut.",
-  s5: "Key Initiative 3: ring KPI manager naik ke angka akhir saat disebut; lalu panel insentif.",
+  s3: "Key Initiative 1: lima kartu KPI (Delinq 90+, 30+, WO Recovery, WO In, LOR) muncul saat namanya disebut; counter berjalan saat angka disebut; chip: amber netral untuk Budget, hijau hanya untuk yang membaik. DATA AKTUAL.",
+  s4: "Key Initiative 2: satu kartu besar Realisasi Cost vs Plan (angka, bar, garis Target), lalu chip COC YTD. DATA AKTUAL.",
+  s5: "Key Initiative 3: ring KPI manager naik ke angka akhir saat disebut; lalu panel insentif. DATA DUMMY.",
   s6: "'Telah Kita Selesaikan' lalu kilatan dan 'Ready for New Challenges'.",
   s7: "Tiga kartu Key Initiatives 2027 muncul saat 'Pertama/Kedua/Ketiga'; ketiganya menyala bersama di akhir.",
   s8: "Logo dan tagline, fade out.",
@@ -137,6 +137,11 @@ const cueRows = scenes.map((s) => {
   const list = Object.entries(c).filter(([k]) => k !== "end").map(([k, v]) => `${k} ${mmss(s.start + v)}`).join(", ");
   return `- **Scene ${s.id.slice(1)}**: ${list || "-"}`;
 });
+const f2 = (v, n) => (v === undefined ? "-" : v.toFixed(n).replace(".", ","));
+const dd = (k) => { const e = d[k]; const n = Math.max(...[e.before, e.after].filter((x) => x !== undefined).map((x) => (String(x).split(".")[1] || "").length)); return n; };
+const kpiRows = ["delq90", "delq30", "woRecovery", "woIn", "lor"].map((k) => { const e = d[k], n = dd(k); return `| ${e.label} | ${f2(e.before, n)} | ${f2(e.after, n)} | ${e.unit} | ${e.budget !== undefined ? f2(e.budget, 2) : "-"} | ${e.chip.mode === "budget" ? "Budget (amber netral)" : e.chip.mode === "vsBudget" ? (e.after < e.budget ? "Di bawah budget (hijau)" : "Di atas budget (merah)") : e.chip.mode === "pct" ? `+${f2(e.chip.value, 1)}% (hijau)` : `${f2(Math.abs(e.after - e.before), n)} pp (${(e.better === "down") === (e.after < e.before) ? "hijau" : "merah"})`} |`; });
+kpiRows.push(`| ${d.costVsPlan.label} | - | ${f2(d.costVsPlan.after, 0)} | ${d.costVsPlan.unit} | target ${f2(d.costVsPlan.target, 0)} | bar di bawah garis target |`);
+kpiRows.push(`| ${d.cocYtd.label} | ${f2(d.cocYtd.before, 2)} | ${f2(d.cocYtd.after, 2)} | ${d.cocYtd.unit} | - | ${(d.cocYtd.better === "down") === (d.cocYtd.after < d.cocYtd.before) ? "hijau (membaik)" : "merah"} |`);
 const notes = `# Speaker Notes - Opening Rakernas
 
 Digenerate otomatis oleh \`node build.mjs\` dari data.json (jangan edit tangan; ubah vo.txt / data.json lalu generate ulang).
@@ -148,6 +153,16 @@ ${rows.join("\n")}
 
 ## Titik sinkron (kapan indikator muncul, waktu video)
 ${cueRows.join("\n")}
+
+## Data aktual scene 3-4 (sumber: ${d.meta.source.file}, sheet ${d.meta.source.sheet})
+${d.meta.source.catatan}
+
+| KPI | 2025 (Des) | 2026* (YTD ${d.meta.ytdMonth}) | Satuan | Budget/Target | Chip |
+|-----|-----------|------------------|--------|---------------|------|
+${kpiRows.join("\n")}
+
+Footnote layar (scene 3-5): ${d.meta.footnote}
+Scene 5 (KPI manager, insentif) masih DUMMY.
 
 Catatan: durasi scene = durasi VO + lead + jeda 1 dtk (minimal sesuai animasi). Angka di naskah diambil dari data.json dan dibaca dengan kata.
 `;

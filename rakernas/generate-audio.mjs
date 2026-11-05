@@ -23,6 +23,8 @@ const args = process.argv.slice(2);
 const DRY = args.includes("--dry"), FORCE = args.includes("--force");
 const onlyArg = args.find((a) => a.startsWith("--only="));
 const ONLY = onlyArg ? onlyArg.slice(7).split(",") : null;
+const scArg = args.find((a) => a.startsWith("--scenes="));
+const SCENE_SET = scArg ? scArg.slice(9).split(",").map(Number) : null;   // generate VO hanya scene ini (hemat kredit); scene lain dipakai apa adanya
 const want = (k) => !ONLY || ONLY.includes(k);
 const die = (msg, code = 1) => { console.error("\n[generate-audio] " + msg + "\n"); process.exit(code); };
 
@@ -59,11 +61,12 @@ function renderExpr(expr) {
     const v = get(m[1]); if (v == null) throw new Error(`data.json tidak punya "${m[1]}"`);
     return String(v).replace(/\s*&\s*/g, " and ");
   }
-  if ((m = /^([\w.]+?)(?:\+(\d+))?$/.exec(expr))) {
+  if ((m = /^([\w.]+?)(?:\+(\d+))?(?:\|d(\d+))?$/.exec(expr))) {
     const raw = get(m[1]); if (raw == null) throw new Error(`data.json tidak punya "${m[1]}"`);
     const num = parseFloat(String(raw).replace(",", ".")); if (Number.isNaN(num)) throw new Error(`"${m[1]}" bukan angka: ${raw}`);
     const total = num + (m[2] ? +m[2] : 0);
     // pertahankan desimal asli (8.0 tetap "delapan", 3.8 -> "tiga koma delapan")
+    if (m[3] !== undefined) return numWords(total.toFixed(+m[3]));
     return numWords(Number.isInteger(total) ? total : String(total));
   }
   throw new Error(`ekspresi tidak dikenal: {{${expr}}}`);
@@ -158,7 +161,8 @@ let usageBefore = null;
   }
 }
 if (usageBefore) console.log(`Paket ElevenLabs: ${usageBefore.tier} | kredit terpakai ${usageBefore.character_count}/${usageBefore.character_limit}`);
-if (usageBefore && want("vo") && usageBefore.character_limit - usageBefore.character_count < totalChars)
+const needChars = SCENE_SET ? SCENES.filter((x) => SCENE_SET.includes(x.n)).reduce((a, x) => a + x.chars, 0) : totalChars;
+if (usageBefore && want("vo") && usageBefore.character_limit - usageBefore.character_count < needChars)
   die(`Kuota karakter tidak cukup: perlu ~${totalChars}, sisa ${usageBefore.character_limit - usageBefore.character_count}.`, 4);
 
 const ffprobeDur = (f) => parseFloat(spawnSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f], { encoding: "utf8" }).stdout);
@@ -279,6 +283,14 @@ if (want("vo")) {
   const voDur = {}, cuesVo = {};
   const locators = ensureDictionary();
   for (const s of SCENES) {
+    if (SCENE_SET && !SCENE_SET.includes(s.n)) {
+      // scene tidak digenerate ulang: pakai durasi + cue yang sudah tersimpan (cue tersimpan = cue VO + lead)
+      const id = sceneId(s.n);
+      voDur[id] = audio.voDur[id];
+      cuesVo[id] = Object.fromEntries(Object.entries(audio.cues[id]).map(([k, v]) => [k, +(v - audio.lead[id]).toFixed(3)]));
+      console.log(`VO scene ${s.n}: dilewati (tetap file lama, ${voDur[id]} dtk)`);
+      continue;
+    }
     process.stdout.write(`VO scene ${s.n}: ${s.chars} karakter ... `);
     const prev = SCENES.find((x) => x.n === s.n - 1), next = SCENES.find((x) => x.n === s.n + 1);
     const body = {

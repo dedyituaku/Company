@@ -1,56 +1,82 @@
 {
-  "_catatan": "SUMBER TUNGGAL angka & teks yang bisa diganti. Setelah edit jalankan: node build.mjs (membuat data.js, sinkron slot audio, ducking musik, deteksi logo). Semua angka di bawah ini DUMMY. better = arah yang dianggap perbaikan (down/up).",
+  "_catatan": "SUMBER TUNGGAL angka & teks yang bisa diganti. Setelah edit jalankan: node build.mjs (data.js, sinkron audio, ducking musik). Scene 3 dan 4 memakai DATA AKTUAL (lihat meta.source); scene 5 (KPI manager & insentif) masih DUMMY. better = arah yang dianggap perbaikan (down/up). chip.mode: budget (amber netral) | vsBudget | delta | pct.",
   "meta": {
     "showDummyMarkers": true,
     "dummyBadgeText": "DATA DUMMY",
     "yearBefore": "2025",
     "yearAfter": "2026*",
-    "footnote": "*Projection EOY",
+    "footnote": "*Performance YTD Oktober 2026. 2025 = posisi Des 2025.",
     "logoText": "BFI",
     "logoNote": "LOGO PLACEHOLDER",
     "logoFile": "assets/logo/bfi-logo.png",
     "tagline": "[ISI TAGLINE RAKERNAS]",
-    "taglineIsDummy": true
+    "taglineIsDummy": true,
+    "ytdMonth": "Oktober",
+    "dummyScenes": [
+      "s5"
+    ],
+    "source": {
+      "file": "COC 202610R1",
+      "sheet": "BFI_ALL",
+      "catatan": "2025 = posisi Des 2025; 2026* = performa YTD Oktober 2026. Angka scene 3-4 diberikan dari sheet BFI_ALL; scene 5 masih dummy."
+    }
   },
   "delq30": {
     "label": "Delinquency 30+",
-    "before": 4.5,
-    "after": 3.8,
+    "before": 3.44,
+    "after": 3.73,
     "unit": "%",
-    "better": "down"
+    "budget": 3.68,
+    "better": "down",
+    "chip": {
+      "mode": "budget"
+    }
   },
   "delq90": {
     "label": "Delinquency 90+",
-    "before": 1.6,
-    "after": 1.3,
+    "before": 1.41,
+    "after": 1.32,
     "unit": "%",
-    "better": "down"
+    "better": "down",
+    "chip": {
+      "mode": "delta"
+    }
   },
   "woIn": {
-    "label": "WO In",
-    "before": 80,
-    "after": 65,
-    "unit": "Rp M",
-    "better": "down"
+    "label": "WO In (% ENR, YTD)",
+    "before": 3.23,
+    "after": 3.51,
+    "unit": "%",
+    "budget": 3.71,
+    "better": "down",
+    "chip": {
+      "mode": "vsBudget"
+    }
   },
   "woRecovery": {
-    "label": "WO Recovery",
-    "before": 150,
-    "after": 190,
+    "label": "WO Recovery (rata-rata/bulan)",
+    "before": 19.6,
+    "after": 21.3,
     "unit": "Rp M",
-    "better": "up"
+    "better": "up",
+    "chip": {
+      "mode": "pct",
+      "value": 8.6
+    }
   },
   "lor": {
-    "label": "LOR",
-    "before": 13.7,
-    "after": 8,
+    "label": "LOR Selling (YTD)",
+    "before": 14.04,
+    "after": 7.44,
     "unit": "%",
-    "better": "down"
+    "better": "down",
+    "chip": {
+      "mode": "delta"
+    }
   },
   "costVsPlan": {
     "label": "Realisasi Cost vs Plan",
-    "before": 104,
-    "after": 97,
+    "after": 91,
     "unit": "%",
     "target": 100,
     "better": "down"
@@ -90,7 +116,7 @@
   ],
   "timing": {
     "_catatan": "Detik pada timeline utama. Ubah juga data-start/data-duration host di index.html jika durasi scene diubah.",
-    "total": 155.78,
+    "total": 158.71,
     "scenes": [
       {
         "id": "s1",
@@ -105,42 +131,42 @@
       {
         "id": "s3",
         "start": 21.64,
-        "end": 63.45
+        "end": 62.01
       },
       {
         "id": "s4",
-        "start": 63.45,
-        "end": 80.96
+        "start": 62.01,
+        "end": 83.89
       },
       {
         "id": "s5",
-        "start": 80.96,
-        "end": 95.42
+        "start": 83.89,
+        "end": 98.35
       },
       {
         "id": "s6",
-        "start": 95.42,
-        "end": 103.82
+        "start": 98.35,
+        "end": 106.75
       },
       {
         "id": "s7",
-        "start": 103.82,
-        "end": 149.47
+        "start": 106.75,
+        "end": 152.4
       },
       {
         "id": "s8",
-        "start": 149.47,
-        "end": 155.78
+        "start": 152.4,
+        "end": 158.71
       }
     ],
     "flashAt": [
       9.32,
       21.64,
-      63.45,
-      80.96,
-      95.42,
-      103.82,
-      149.47
+      62.01,
+      83.89,
+      98.35,
+      106.75,
+      152.4
     ]
   },
   "vo": {
@@ -166,22 +192,22 @@
         "scene": 3,
         "file": "assets/vo/scene3.mp3",
         "start": 22.14,
-        "dur": 40.908,
-        "lufs": -25,
-        "gain": 1.23
+        "dur": 39.471,
+        "lufs": -24.4,
+        "gain": 1.148
       },
       {
         "scene": 4,
         "file": "assets/vo/scene4.mp3",
-        "start": 63.95,
-        "dur": 16.614,
-        "lufs": -25.6,
-        "gain": 1.318
+        "start": 62.51,
+        "dur": 20.976,
+        "lufs": -25.7,
+        "gain": 1.334
       },
       {
         "scene": 5,
         "file": "assets/vo/scene5.mp3",
-        "start": 81.46,
+        "start": 84.39,
         "dur": 13.558,
         "lufs": -23,
         "gain": 0.977
@@ -189,7 +215,7 @@
       {
         "scene": 6,
         "file": "assets/vo/scene6.mp3",
-        "start": 95.82,
+        "start": 98.75,
         "dur": 7.602,
         "lufs": -24.5,
         "gain": 1.161
@@ -197,7 +223,7 @@
       {
         "scene": 7,
         "file": "assets/vo/scene7.mp3",
-        "start": 104.32,
+        "start": 107.25,
         "dur": 44.748,
         "lufs": -23.6,
         "gain": 1.047
@@ -205,7 +231,7 @@
       {
         "scene": 8,
         "file": "assets/vo/scene8.mp3",
-        "start": 150.47,
+        "start": 153.4,
         "dur": 4.911,
         "lufs": -23,
         "gain": 0.977
@@ -653,8 +679,8 @@
     "dur": {
       "s1": 9.32,
       "s2": 12.32,
-      "s3": 41.81,
-      "s4": 17.51,
+      "s3": 40.37,
+      "s4": 21.88,
       "s5": 14.46,
       "s6": 8.4,
       "s7": 45.65,
@@ -673,23 +699,25 @@
         "end": 11.878
       },
       "s3": {
-        "c1": 3.577,
-        "m1": 7.536,
-        "c2": 10.113,
-        "m2": 14.188,
-        "c3": 16.487,
-        "m3": 19.494,
-        "c4": 22.756,
-        "m4": 27.168,
-        "c5": 30.454,
-        "m5": 33.659,
-        "f": 35.748,
-        "end": 41.368
+        "c1": 3.565,
+        "m1": 8.348,
+        "c2": 11.053,
+        "m2": 12.888,
+        "c3": 16.881,
+        "m3": 22.129,
+        "c4": 26.042,
+        "m4": 26.773,
+        "c5": 28.607,
+        "m5": 31.126,
+        "f": 34.133,
+        "end": 39.927
       },
       "s4": {
-        "p": 4.157,
-        "m": 6.444,
-        "end": 17.079
+        "p": 4.227,
+        "m": 7.315,
+        "b": 10.392,
+        "mc": 13.375,
+        "end": 21.444
       },
       "s5": {
         "k": 3.913,
@@ -717,8 +745,8 @@
     "script": {
       "s1": "dua ribu dua puluh enam. Three key initiatives.",
       "s2": "Di awal tahun, kita menetapkan tiga prioritas: meningkatkan efektivitas collection, mengoptimalkan cost, dan memperkuat kapabilitas manpower.",
-      "s3": "Pertama, Collection Effectiveness. Delinquency tiga puluh plus turun dari empat koma lima persen menjadi tiga koma delapan persen. Delinquency sembilan puluh plus membaik dari satu koma enam persen menjadi satu koma tiga persen. WO In turun dari delapan puluh menjadi enam puluh lima miliar rupiah. WO Recovery naik dari seratus lima puluh menjadi seratus sembilan puluh miliar rupiah. Dan Lor membaik dari tiga belas koma tujuh persen menjadi delapan persen. Seluruh angka dua ribu dua puluh enam adalah proyeksi sampai akhir tahun.",
-      "s4": "Kedua, Collection Cost Optimization. Realisasi cost terhadap plan berada di sembilan puluh tujuh persen, lebih baik dari seratus empat persen di tahun sebelumnya. Cost terealisasi sesuai plan, secara efektif dan efisien.",
+      "s3": "Pertama, Collection Effectiveness. Delinquency sembilan puluh plus membaik dari satu koma empat satu persen menjadi satu koma tiga dua persen. Delinquency tiga puluh plus berada di tiga koma tujuh tiga persen, mendekati budget. Rata-rata WO Recovery per bulan naik dari sembilan belas koma enam menjadi dua puluh satu koma tiga miliar rupiah. WO In berada di bawah budget. Dan Lor membaik dari empat belas persen menjadi tujuh koma empat empat persen. Seluruh angka dua ribu dua puluh enam adalah performa sampai Oktober.",
+      "s4": "Kedua, Collection Cost Optimization. Realisasi cost sampai Oktober berada di sembilan puluh satu persen dari plan, dan cost of credit turun dari empat koma tiga dua persen menjadi tiga koma sembilan dua persen. Cost terealisasi sesuai plan, secara efektif dan efisien.",
       "s5": "Ketiga, Manpower Capability. Rata-rata KPI manager naik dari sembilan puluh enam persen menjadi seratus empat persen. Dan insentif manager meningkat delapan belas persen.",
       "s6": "dua ribu dua puluh enam telah kita selesaikan. Siap menghadapi tantangan dua ribu dua puluh tujuh.",
       "s7": "Sebagai penguatan strategi dua ribu dua puluh enam, berikut ini Key Initiatives dua ribu dua puluh tujuh. Pertama, Collection Effectiveness Transformation: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation: memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
@@ -740,22 +768,24 @@
     "voDur": {
       "s1": 3.422,
       "s2": 11.416,
-      "s3": 40.908,
-      "s4": 16.614,
+      "s3": 39.471,
+      "s4": 20.976,
       "s5": 13.558,
       "s6": 7.602,
       "s7": 44.748,
       "s8": 4.911
     },
     "chars": {
-      "vo": 1861
+      "vo": 1897
     },
     "voice": {
       "id": "I7sakys8pBZ1Z5f0UhT9",
       "name": "Putri Maharani (My Voices)",
       "model": "eleven_multilingual_v2"
     },
-    "notes": [],
+    "notes": [
+      "Music API tidak tersedia di paket (HTTP 0): dilewati (--no-music-api). Bed dibuat dari stem Sound Effects API + acrossfade."
+    ],
     "musicStems": [
       "assets/music/stems/stem01-open.mp3",
       "assets/music/stems/stem02-calm.mp3",
@@ -765,7 +795,7 @@
       "assets/music/stems/stem07-resolve.mp3"
     ],
     "musicDur": {
-      "bgm-main": 155.82
+      "bgm-main": 158.75
     },
     "voLufsTarget": -23.2
   },
@@ -795,5 +825,22 @@
         "makeupDb": 1.5
       }
     }
+  },
+  "cocYtd": {
+    "label": "COC YTD",
+    "before": 4.32,
+    "after": 3.92,
+    "unit": "%",
+    "better": "down"
+  },
+  "scene3": {
+    "_catatan": "Urutan kartu = urutan disebut di VO (vo.txt scene 3).",
+    "order": [
+      "delq90",
+      "delq30",
+      "woRecovery",
+      "woIn",
+      "lor"
+    ]
   }
 }
