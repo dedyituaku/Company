@@ -1,0 +1,240 @@
+{
+ "ticks": [
+  7.16,
+  7.32,
+  7.48,
+  7.64,
+  7.8,
+  7.96,
+  8.12,
+  8.28,
+  8.44,
+  8.6,
+  8.76,
+  8.92,
+  9.08,
+  9.24,
+  9.4,
+  9.56,
+  9.72,
+  9.88,
+  10.04,
+  10.2
+ ],
+ "subs": [
+  {
+   "t0": 0.3,
+   "t1": 2.741,
+   "text": "Apakah kesempatan untuk hidup di Indonesia"
+  },
+  {
+   "t0": 2.741,
+   "t1": 4.6,
+   "text": "bergantung pada tebalnya dompet?"
+  },
+  {
+   "t0": 5.3,
+   "t1": 5.998,
+   "text": "LA, 17 tahun."
+  },
+  {
+   "t0": 5.998,
+   "t1": 7.556,
+   "text": "Luka bakar sekitar 80 persen."
+  },
+  {
+   "t0": 7.556,
+   "t1": 9.813,
+   "text": "Ia dirawat intensif, lalu meninggal dunia."
+  },
+  {
+   "t0": 9.813,
+   "t1": 11.371,
+   "text": "Kasusnya kini diproses hukum."
+  },
+  {
+   "t0": 11.371,
+   "t1": 13.305,
+   "text": "Tapi ada pertanyaan yang tertinggal:"
+  },
+  {
+   "t0": 13.305,
+   "t1": 15.4,
+   "text": "apakah semua kesempatan sudah tersedia?"
+  },
+  {
+   "t0": 16.4,
+   "t1": 19.478,
+   "text": "Bagaimana jika sejak awal ia ditangani di burn center kelas dunia?"
+  },
+  {
+   "t0": 19.478,
+   "t1": 21.343,
+   "text": "Fasilitas, pengalaman tim, dan teknologi"
+  },
+  {
+   "t0": 21.343,
+   "t1": 22.742,
+   "text": "memang bisa memengaruhi hasil."
+  },
+  {
+   "t0": 22.742,
+   "t1": 24.374,
+   "text": "Tapi tidak ada yang bisa memastikan"
+  },
+  {
+   "t0": 24.374,
+   "t1": 25.4,
+   "text": "hasilnya akan berbeda."
+  },
+  {
+   "t0": 26.4,
+   "t1": 29.317,
+   "text": "Indonesia punya dokter dan rumah sakit berkompetensi tinggi."
+  },
+  {
+   "t0": 29.317,
+   "t1": 32.087,
+   "text": "Pertanyaannya: apakah unit luka bakar, spesialis, dan ICU"
+  },
+  {
+   "t0": 32.087,
+   "t1": 33.4,
+   "text": "bisa diakses secara merata?"
+  },
+  {
+   "t0": 34.4,
+   "t1": 37.456,
+   "text": "Pilihan fasilitas pasien JKN, asuransi swasta, dan pasien umum"
+  },
+  {
+   "t0": 37.456,
+   "t1": 38.097,
+   "text": "bisa berbeda."
+  },
+  {
+   "t0": 38.097,
+   "t1": 39.625,
+   "text": "Tapi itu tidak otomatis berarti"
+  },
+  {
+   "t0": 39.625,
+   "t1": 41.4,
+   "text": "kualitas keputusan medisnya berbeda."
+  },
+  {
+   "t0": 42.4,
+   "t1": 44.645,
+   "text": "Kasus ekstrem bisa butuh ICU panjang, operasi berulang,"
+  },
+  {
+   "t0": 44.645,
+   "t1": 45.543,
+   "text": "sampai dukungan organ."
+  },
+  {
+   "t0": 45.543,
+   "t1": 47.298,
+   "text": "Apakah skema pembiayaan kita cukup adaptif?"
+  },
+  {
+   "t0": 47.298,
+   "t1": 49.461,
+   "text": "Belum ada bukti tarif menyebabkan kematian siapa pun."
+  },
+  {
+   "t0": 49.461,
+   "t1": 50.4,
+   "text": "Tapi pertanyaannya sah."
+  },
+  {
+   "t0": 51.4,
+   "t1": 55.6,
+   "text": "Tiga kesenjangan: finansial, geografis, dan teknologi."
+  },
+  {
+   "t0": 56.4,
+   "t1": 59.635,
+   "text": "Yang perlu dibenahi: pusat rujukan khusus, sebaran spesialis,"
+  },
+  {
+   "t0": 59.635,
+   "t1": 61.014,
+   "text": "pembiayaan kasus kompleks,"
+  },
+  {
+   "t0": 61.014,
+   "t1": 63.4,
+   "text": "dan sistem rujukan cepat berbasis kompetensi."
+  },
+  {
+   "t0": 73.4,
+   "t1": 75.38,
+   "text": "Kesehatan adalah hak, bukan privilege."
+  },
+  {
+   "t0": 75.38,
+   "t1": 78.141,
+   "text": "Menurut kamu, sistem kesehatan kita sudah cukup adil?"
+  },
+  {
+   "t0": 78.141,
+   "t1": 79.6,
+   "text": "Save, share, dan diskusikan."
+  }
+ ],
+ "duration": 80,
+ "musicFadeStart": 64,
+ "scenes": [
+  {
+   "id": "s1",
+   "start": 0,
+   "dur": 5
+  },
+  {
+   "id": "s2",
+   "start": 5,
+   "dur": 11
+  },
+  {
+   "id": "s3",
+   "start": 16,
+   "dur": 10
+  },
+  {
+   "id": "s4",
+   "start": 26,
+   "dur": 8
+  },
+  {
+   "id": "s5",
+   "start": 34,
+   "dur": 8
+  },
+  {
+   "id": "s6",
+   "start": 42,
+   "dur": 9
+  },
+  {
+   "id": "s7",
+   "start": 51,
+   "dur": 5
+  },
+  {
+   "id": "s8",
+   "start": 56,
+   "dur": 8
+  },
+  {
+   "id": "s9",
+   "start": 64,
+   "dur": 9
+  },
+  {
+   "id": "s10",
+   "start": 73,
+   "dur": 7
+  }
+ ]
+}
