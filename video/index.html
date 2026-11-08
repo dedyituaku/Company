@@ -176,6 +176,7 @@
 </div>
 
 <script src="vendor/gsap.min.js"></script>
+<script src="narration.js" onerror="void 0"></script>
 <script>
 (function(){
   const Q = new URLSearchParams(location.search);
@@ -185,6 +186,11 @@
   const DUR = Object.assign({}, DEFAULT_DUR);
   (Q.get('dur')||'').split(',').filter(Boolean).forEach(p=>{const [k,v]=p.split(':');DUR[k]=parseFloat(v)});
 
+  const NA = window.NARRATION || null, LEAD = 0.4;   // narasi ElevenLabs (opsional); klip mulai LEAD dtk setelah awal scene
+  const nt = (id,i,f)=> (NA&&NA.subs[id]&&NA.subs[id][i]) ? LEAD+NA.subs[id][i].t0 : f;   // waktu mulai potongan ke-i
+  const ne = (id,i,f)=> (NA&&NA.subs[id]&&NA.subs[id][i]) ? LEAD+NA.subs[id][i].t1 : f;
+  if(NA){ const PAD={s9:2.0,s10:0.8}, MIN={s1:5,s7:4.5,s10:7.5};
+    Object.keys(NA.clip).forEach(id=>{ DUR[id]=+Math.max(MIN[id]||0, LEAD+NA.clip[id]+(PAD[id]??0.5)).toFixed(2); }); }
   const NARR = {
     s1:['Apakah kesempatan untuk hidup di Indonesia','bergantung pada tebalnya dompet?'],
     s2:['LA, 17 tahun.','Luka bakar sekitar 80 persen.','Ia dirawat intensif, lalu meninggal dunia.','Kasusnya kini diproses hukum.','Tapi ada pertanyaan yang tertinggal:','apakah semua kesempatan sudah tersedia?'],
@@ -212,16 +218,16 @@
   B.s1 = (d)=>{
     const tl = gsap.timeline(); const lines=$$('#s1 .ln');
     lines.forEach((el,i)=>tl.fromTo(el,{opacity:0,y:36},{opacity:1,y:0,duration:.5,ease:'power2.out'},0.4+i*.5));
-    tl.fromTo('#dompet',{color:'#F2F2F2'},{color:'#B01C24',duration:.6,ease:'power1.inOut'},d-1.4);
+    tl.fromTo('#dompet',{color:'#F2F2F2'},{color:'#B01C24',duration:.6,ease:'power1.inOut'},nt('s1',1,d-1.4)+0.2);
     return tl;
   };
 
   B.s2 = (d)=>{
-    const tl = gsap.timeline(); const o={v:0};
+    const tl = gsap.timeline(); const o={v:0}; const t0=nt('s2',1,2.0)+0.3;
     tl.fromTo('#s2 .title',{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'power2.out'},0.4);
-    tl.fromTo('#s2 .cap',{opacity:0},{opacity:1,duration:.5},1.4);
-    tl.fromTo('#num',{opacity:0,scale:.9},{opacity:1,scale:1,duration:.5,ease:'power2.out'},1.5);
-    const t0=2.0, cd=3.2, STEP=4;
+    tl.fromTo('#s2 .cap',{opacity:0},{opacity:1,duration:.5},Math.max(0.4,t0-0.6));
+    tl.fromTo('#num',{opacity:0,scale:.9},{opacity:1,scale:1,duration:.5,ease:'power2.out'},Math.max(0.5,t0-0.5));
+    const cd=3.2, STEP=4;
     tl.fromTo(o,{v:0},{v:80,duration:cd,ease:'none',onUpdate(){$('#num').textContent=Math.round(o.v)+'%'}},t0);
     tl.set('#num',{textContent:'80%'},t0+cd+0.01);
     for(let n=STEP;n<=80;n+=STEP) meta.ticks.push(+(cur+t0+cd*n/80).toFixed(3)); // tick halus
@@ -269,7 +275,7 @@
     const dots=$$('#s4 .dot');
     tl.fromTo(dots,{opacity:0},{opacity:1,duration:.4,stagger:{each:.012,from:'start'}},0.3);
     const on=dots.filter(e=>lit.has(+e.dataset.i));
-    tl.to(on,{backgroundColor:'#F2F2F2',scale:1.5,boxShadow:'0 0 22px rgba(242,242,242,.8)',duration:.6,stagger:.06,ease:'power2.out'},2.4);
+    tl.to(on,{backgroundColor:'#F2F2F2',scale:1.5,boxShadow:'0 0 22px rgba(242,242,242,.8)',duration:.6,stagger:.06,ease:'power2.out'},nt('s4',1,2.4));
     tl.fromTo('#s4 .tag',{opacity:0},{opacity:1,duration:.5},1.2);
     tl.fromTo('#s4 .src',{opacity:0},{opacity:1,duration:.5},0.8);
     return tl;
@@ -277,15 +283,16 @@
 
   B.s5 = (d)=>{
     const tl = gsap.timeline();
-    $$('#s5 .col').forEach((c,i)=>tl.fromTo(c,{opacity:0,y:40},{opacity:1,y:0,duration:.6,ease:'power2.out'},0.5+i*1.0));
-    tl.fromTo('#s5 .final',{opacity:0},{opacity:1,duration:1.4,ease:'power1.inOut'},d-3.0);
+    $$('#s5 .col').forEach((c,i)=>{const a=nt('s5',0,0.4),b=ne('s5',0,3.4);tl.fromTo(c,{opacity:0,y:40},{opacity:1,y:0,duration:.6,ease:'power2.out'},a+i*(b-a)/3);});
+    tl.fromTo('#s5 .final',{opacity:0},{opacity:1,duration:1.4,ease:'power1.inOut'},nt('s5',2,d-3.0));
     return tl;
   };
 
   B.s6 = (d)=>{
     const tl = gsap.timeline();
-    $$('#s6 .row').forEach((r,i)=>tl.fromTo(r,{opacity:0,x:-40},{opacity:1,x:0,duration:.5,ease:'power2.out'},0.4+i*.65));
-    tl.fromTo('#s6 .final',{opacity:0,y:20},{opacity:1,y:0,duration:.9,ease:'power2.out'},0.4+6*.65+0.7);
+    const a6=nt('s6',0,0.4), b6=ne('s6',0,3.5);
+    $$('#s6 .row').forEach((r,i)=>tl.fromTo(r,{opacity:0,x:-40},{opacity:1,x:0,duration:.5,ease:'power2.out'},i<5?a6+i*(b6-a6)/5:nt('s6',1,0.4+5*.65)));
+    tl.fromTo('#s6 .final',{opacity:0,y:20},{opacity:1,y:0,duration:.9,ease:'power2.out'},nt('s6',3,0.4+6*.65+0.7));
     tl.fromTo('#s6 .src',{opacity:0},{opacity:1,duration:.5},0.6);
     return tl;
   };
@@ -293,7 +300,7 @@
   B.s7 = (d)=>{
     const tl = gsap.timeline();
     $$('#s7 .item').forEach((it,i)=>{
-      const t=0.4+i*1.2;
+      const a7=nt('s7',0,0.4), b7=ne('s7',0,3.4), t=a7+i*(b7-a7)/3;
       tl.fromTo(it,{opacity:0,scale:2.4,transformOrigin:'0% 50%'},{opacity:1,scale:1,duration:.3,ease:'expo.out'},t);
       tl.fromTo('#s7 .wrap',{x:0},{x:14,duration:.035,yoyo:true,repeat:5,ease:'none'},t+0.2);
     });
@@ -301,9 +308,9 @@
   };
 
   B.s8 = (d)=>{
-    const tl = gsap.timeline(); const rows=$$('#s8 .row'); const step=(d-2.2)/4;
+    const tl = gsap.timeline(); const rows=$$('#s8 .row'); const T8=[nt('s8',0,0.4),(nt('s8',0,0.4)+ne('s8',0,2.4))/2,nt('s8',1,3.0),nt('s8',2,5.0)];
     rows.forEach((r,i)=>{
-      const t=0.4+i*step;
+      const t=T8[i];
       tl.fromTo(r,{opacity:0,x:-30},{opacity:1,x:0,duration:.5,ease:'power2.out'},t);
       tl.to($('.circ',r),{backgroundColor:'#B01C24',duration:.5,ease:'power1.inOut'},t+0.3);
     });
@@ -317,7 +324,8 @@
     const box=$('#s9text'); box.innerHTML='';
     txt.split(' ').forEach((w,i)=>{const s=document.createElement('span');s.className='w'+(i>=redFrom?' red':'');s.textContent=w;box.appendChild(s)});
     const ws=$$('#s9text .w');
-    tl.fromTo(ws,{opacity:0,y:14},{opacity:1,y:0,duration:.45,ease:'power1.out',stagger:.27},0.5);
+    if(NA&&NA.s9_words) ws.forEach((w,i)=>tl.fromTo(w,{opacity:0,y:14},{opacity:1,y:0,duration:.45,ease:'power1.out'},LEAD+NA.s9_words[i]));
+    else tl.fromTo(ws,{opacity:0,y:14},{opacity:1,y:0,duration:.45,ease:'power1.out',stagger:.27},0.5);
     meta.musicFadeStart = cur; // musik menghilang mulai awal S9
     return tl;
   };
@@ -325,8 +333,8 @@
   B.s10 = (d)=>{
     const tl = gsap.timeline();
     $$('#s10 .h > div').forEach((el,i)=>tl.fromTo(el,{opacity:0,y:30},{opacity:1,y:0,duration:.5,ease:'power2.out'},0.3+i*.35));
-    tl.fromTo('#s10 .qbox',{opacity:0,y:20},{opacity:1,y:0,duration:.6,ease:'power2.out'},2.9);
-    tl.fromTo('#s10 .cta',{opacity:0,y:20},{opacity:1,y:0,duration:.6,ease:'power2.out'},4.3);
+    tl.fromTo('#s10 .qbox',{opacity:0,y:20},{opacity:1,y:0,duration:.6,ease:'power2.out'},nt('s10',1,2.9));
+    tl.fromTo('#s10 .cta',{opacity:0,y:20},{opacity:1,y:0,duration:.6,ease:'power2.out'},nt('s10',2,4.3));
     tl.fromTo('#s10 .foot',{opacity:0},{opacity:1,duration:.8},1.2);
     return tl;
   };
@@ -343,7 +351,15 @@
     master.fromTo('#'+id,{opacity:0},{opacity:1,duration:FADE,ease:'none'},cur);
     master.to('#'+id,{opacity:0,duration:FADE,ease:'none'},cur+d-FADE);
     // subtitle: waktu dibagi proporsional panjang karakter di jendela narasi
-    const chunks = NARR[id]||[];
+    if(NA && NA.subs[id] && NA.subs[id].length){
+      NA.subs[id].forEach((c,k,arr)=>{
+        const a=cur+LEAD+c.t0, b=cur+LEAD+(arr[k+1]?Math.max(c.t1,arr[k+1].t0-0.02):c.t1+0.2);
+        const el=document.createElement('div'); el.className='sub'; el.textContent=c.text; subsBox.appendChild(el);
+        master.fromTo(el,{opacity:0},{opacity:1,duration:.1,ease:'none'},a);
+        master.to(el,{opacity:0,duration:.1,ease:'none'},b-0.1);
+        meta.subs.push({t0:+a.toFixed(3),t1:+b.toFixed(3),text:c.text});
+      });
+    } else { const chunks = NARR[id]||[];
     if(chunks.length){
       const [w0,w1] = NARR_WIN[id]; const total = chunks.reduce((a,c)=>a+c.length,0);
       let t = w0; const span = Math.min(w1,d-0.4)-w0;
@@ -355,8 +371,8 @@
         meta.subs.push({t0:+a.toFixed(3),t1:+b.toFixed(3),text:c});
         t += len;
       });
-    }
-    meta.scenes.push({id,start:cur,dur:d});
+    }}
+    meta.scenes.push({id,start:cur,dur:d,lead:LEAD});
     meta.duration += d;
   });
   master.set({}, {}, meta.duration); // tetapkan panjang timeline tanpa mengubah timeScale

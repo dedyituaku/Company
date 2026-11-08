@@ -16,7 +16,7 @@ const S = {
   s9: [['Ketika seorang anak berusia tujuh belas tahun menghadapi kondisi yang mengancam nyawanya, apakah kesempatan terbaik untuk bertahan hidup sudah tersedia baginya, tanpa memandang status ekonominya?','']],
   s10: [['Kesehatan adalah hak, bukan privilege.','Kesehatan adalah hak, bukan privilege.'],['Menurut kamu, sistem kesehatan kita sudah cukup adil?','Menurut kamu, sistem kesehatan kita sudah cukup adil?'],['Save, share, dan diskusikan.','Save, share, dan diskusikan.']]
 };
-const SETTINGS = { default: { stability: .6, similarity_boost: .75, style: 0, speed: .9 }, s9: { stability: .7, similarity_boost: .75, style: 0, speed: .8 } };
+const SETTINGS = { default: { stability: .6, similarity_boost: .75, style: 0, speed: 1.15 }, s9: { stability: .7, similarity_boost: .75, style: 0, speed: 1.0 } };
 (async () => {
   fs.mkdirSync('audio', { recursive: true });
   const out = { clip: {}, subs: {} };

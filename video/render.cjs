@@ -73,7 +73,14 @@ function synthAudio(meta, file) {
   const wav = path.join(frames, 'bed.wav'); synthAudio(meta, wav);
   const inputs = ['-framerate', String(FPS), '-i', path.join(frames, '%05d.jpg'), '-i', wav];
   let mapA = ['-map', '0:v', '-map', '1:a'];
-  if (narration) { inputs.push('-i', path.resolve(narration)); mapA = ['-filter_complex', '[1:a][2:a]amix=inputs=2:normalize=0:duration=first[a]', '-map', '0:v', '-map', '[a]']; }
+  // narasi: klip audio/sN.mp3 (hasil gen_tts.cjs) ditaruh di awal scene + lead; atau --audio file tunggal
+  const clips = meta.scenes.filter(s => fs.existsSync(path.join(__dirname, 'audio', s.id + '.mp3')));
+  if (clips.length) {
+    clips.forEach(s => inputs.push('-i', path.join(__dirname, 'audio', s.id + '.mp3')));
+    const ms = s => Math.round((s.start + s.lead) * 1000);
+    const fl = clips.map((s, k) => `[${k + 2}:a]adelay=${ms(s)}|${ms(s)},volume=1.6[n${k}]`).join(';');
+    mapA = ['-filter_complex', fl + ';' + clips.map((_, k) => `[n${k}]`).join('') + `amix=inputs=${clips.length}:normalize=0[nv];[1:a][nv]amix=inputs=2:normalize=0:duration=longest[a]`, '-map', '0:v', '-map', '[a]'];
+  } else if (narration) { inputs.push('-i', path.resolve(narration)); mapA = ['-filter_complex', '[1:a][2:a]amix=inputs=2:normalize=0:duration=first[a]', '-map', '0:v', '-map', '[a]']; }
   const r = spawnSync('ffmpeg', ['-y', ...inputs, ...mapA, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'medium', '-r', String(FPS),
     '-c:a', 'aac', '-b:a', '160k', '-t', String(meta.duration), '-movflags', '+faststart', out], { stdio: 'inherit' });
   if (r.status !== 0) process.exit(r.status);
