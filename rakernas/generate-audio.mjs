@@ -11,7 +11,7 @@
 // Aturan: ELEVENLABS_API_KEY dibaca dari rakernas/.env (atau environment). Key tidak pernah dicetak.
 // Bila API tidak bisa dijangkau / key tidak ada / key ditolak, skrip BERHENTI dengan pesan jelas dan
 // tidak menyentuh file audio maupun data.json (tidak ada audio palsu).
-import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, mkdtempSync, rmSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, mkdtempSync, rmSync, readdirSync, renameSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -92,34 +92,33 @@ function parseVo() {
   return { pron, scenes };
 }
 
+const TAG = /<break[^>]*\/>/g;   // tag jeda ElevenLabs dipakai apa adanya di teks TTS; dibuang dari teks tampil/konteks
 function renderScene(sc, pron) {
   let text = sc.tpl.replace(/\{\{([^}]+)\}\}/g, (_, e) => renderExpr(e.trim()));
-  // teks tampil (tanpa penanda) disimpan untuk speaker-notes; teks ucap memakai fonetik
-  const display = text.replace(/\[\[\w+\]\]/g, "").replace(/\s+/g, " ").trim();
+  // teks tampil (tanpa penanda & tag jeda) disimpan untuk speaker-notes; teks ucap memakai fonetik
+  const display = text.replace(/\[\[\w+\]\]/g, "").replace(TAG, "").replace(/\s+/g, " ").trim();
   for (const [from, to] of pron) text = text.replace(new RegExp(`(?<![A-Za-z])${from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z])`, "g"), to);
-  const markers = []; let clean = "";
+  const markers = []; let clean = "", stripped = "";
   for (const part of text.split(/(\[\[\w+\]\])/)) {
     const m = /^\[\[(\w+)\]\]$/.exec(part);
-    if (m) markers.push({ name: m[1], pos: clean.length }); else clean += part;
+    if (m) markers.push({ name: m[1], nws: clean.replace(/\s/g, "").length, nwsS: stripped.replace(/\s/g, "").length });
+    else { clean += part; stripped += part.replace(TAG, ""); }
   }
-  clean = clean.replace(/\s+/g, (s, off) => { return " "; });
-  return { n: sc.n, lead: sc.lead, min: sc.min, display, clean, markers };
+  const breakSec = [...clean.matchAll(/time="([\d.]+)s?"/g)].reduce((a, x) => a + parseFloat(x[1]), 0);
+  return { n: sc.n, lead: sc.lead, min: sc.min, display, clean, stripped, markers, breakSec };
 }
 
 const vo = parseVo();
 const SCENES = vo.scenes.map((s) => renderScene(s, vo.pron)).sort((a, b) => a.n - b.n);
 if (SCENES.length !== 8) die(`vo.txt harus berisi 8 scene, ditemukan ${SCENES.length}.`);
 // marker dihitung terhadap teks sebelum normalisasi spasi; hitung ulang dari clean yang dikirim
-for (const s of SCENES) {
-  // posisi marker dipetakan ulang: hapus spasi ganda tidak mengubah panjang karena template sudah satu spasi
-  s.chars = s.clean.length;
-}
+for (const s of SCENES) s.chars = s.clean.length;
 const totalChars = SCENES.reduce((a, s) => a + s.chars, 0);
 
 if (DRY) {
   console.log(`Mode --dry: tidak ada panggilan API.\nVoice: ${EL.voiceName} (${EL.voiceId}) | model ${EL.modelId}\n`);
   for (const s of SCENES) {
-    console.log(`SCENE ${s.n} (${s.chars} karakter, lead ${s.lead}s, min ${s.min}s)\n  ucap : ${s.clean}\n  marker: ${s.markers.map((m) => m.name + "@" + m.pos).join(", ") || "-"}\n`);
+    console.log(`SCENE ${s.n} (${s.chars} karakter, jeda ${s.breakSec.toFixed(1)}s, lead ${s.lead}s, min ${s.min}s)\n  ucap : ${s.clean}\n  marker: ${s.markers.map((m) => m.name).join(", ") || "-"}\n`);
   }
   console.log(`Total karakter TTS: ${totalChars}`);
   process.exit(0);
@@ -222,19 +221,28 @@ if (args.includes("--test-pron")) {
 
 const saveEL = () => { const { voiceId, voiceName, speed, stability, similarityBoost, style, useSpeakerBoost, ...rest } = EL; return rest; };
 
-// ---------- pasca-proses suara narator (halus; TANPA pitch shift) ----------
-// high-pass 70 Hz, low-shelf (+dB sekitar 150 Hz) untuk nada lebih dalam, de-esser ringan, kompresor lembut.
+// ---------- pasca-proses suara narator: kesan ballroom, dalam, tidak mentah ----------
+// high-pass, low-shelf, presence, de-esser ringan, kompresor 3:1, pitch turun <= 1 semitone (tempo tetap, rubberband),
+// reverb hall pendek (ekor ~1,2 dtk, 10-14% wet). Fade in/out klip diatur di index.html (data-fade-in/out).
+const SEMITONE_DOWN = (data.voice?.post?.pitchSemitones ?? 0.7);
 function postVo(inp, out) {
   const P = data.voice?.post || {};
-  const de = P.deEsser || {}, cp = P.compressor || {};
-  const chain = [
+  const de = P.deEsser || {}, cp = P.compressor || {}, rv = P.reverb || {};
+  const tail = rv.tailSec ?? 1.2, wet = rv.wet ?? 0.12;
+  const pitch = 2 ** (-Math.min(1, Math.abs(P.pitchSemitones ?? 0.7)) / 12);
+  const dry = [
+    `rubberband=pitch=${pitch.toFixed(5)}:tempo=1`,
     `highpass=f=${P.highpassHz ?? 70}`,
-    `bass=g=${P.lowShelfDb ?? 2.5}:f=${P.lowShelfHz ?? 150}:w=0.7`,
+    `bass=g=${P.lowShelfDb ?? 3}:f=${P.lowShelfHz ?? 150}:w=0.7`,
+    `equalizer=f=${P.presenceHz ?? 3000}:t=q:w=1:g=${P.presenceDb ?? 1.5}`,
     `deesser=i=${de.intensity ?? 0.3}:m=${de.maxReduction ?? 0.5}:f=${de.freq ?? 0.5}`,
-    `acompressor=threshold=${(10 ** ((cp.thresholdDb ?? -18) / 20)).toFixed(4)}:ratio=${cp.ratio ?? 2}:attack=${cp.attackMs ?? 20}:release=${cp.releaseMs ?? 250}:makeup=${(10 ** ((cp.makeupDb ?? 1.5) / 20)).toFixed(3)}`,
-    "alimiter=limit=0.95",
+    `acompressor=threshold=${(10 ** ((cp.thresholdDb ?? -20) / 20)).toFixed(4)}:ratio=${cp.ratio ?? 3}:attack=${cp.attackMs ?? 20}:release=${cp.releaseMs ?? 250}:makeup=${(10 ** ((cp.makeupDb ?? 2) / 20)).toFixed(3)}`,
+    `apad=pad_dur=${tail}`,
   ].join(",");
-  const r = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", inp, "-af", chain, "-ar", "44100", "-b:a", "192k", out], { encoding: "utf8" });
+  // hall pendek: banyak pantulan awal + ekor meluruh ~1,2 dtk, difilter lowpass supaya hangat
+  const echo = "aecho=0.8:0.88:28|47|71|103|149|211|293|397|521|673:0.42|0.37|0.32|0.28|0.24|0.2|0.16|0.13|0.1|0.07";
+  const fc = `[0:a]${dry},asplit=2[d][w];[w]${echo},lowpass=f=6500[wl];[d][wl]amix=inputs=2:weights=${(1 - wet).toFixed(2)} ${wet.toFixed(2)}:normalize=0,alimiter=limit=0.95[o]`;
+  const r = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", inp, "-filter_complex", fc, "-map", "[o]", "-ar", "44100", "-b:a", "192k", out], { encoding: "utf8" });
   if (r.status !== 0) throw new Error("pasca-proses VO gagal: " + r.stderr);
 }
 
@@ -278,51 +286,101 @@ function equalizeVo() {
 // ---------- 1. VOICE OVER ----------
 const audio = data.audio || (data.audio = {});
 const sceneId = (n) => "s" + n;
+
+// pemetaan penanda -> indeks karakter pada alignment (alignment bisa memuat / membuang tag <break>; dicocokkan lewat hitungan karakter non-spasi)
+function mapMarker(A, s, mk) {
+  const idxs = []; for (let i = 0; i < A.length; i++) if (!/\s/.test(A[i])) idxs.push(i);
+  const nA = idxs.length, nClean = s.clean.replace(/\s/g, "").length, nStr = s.stripped.replace(/\s/g, "").length;
+  let k, mode;
+  if (nA === nClean) { k = mk.nws; mode = "dengan-tag"; } else if (nA === nStr) { k = mk.nwsS; mode = "tanpa-tag"; } else { k = Math.round((mk.nwsS / nStr) * nA); mode = "proporsional"; }
+  return { idx: idxs[Math.min(k, idxs.length - 1)], mode };
+}
+
+// estimasi pitch (median F0, Hz) dengan autokorelasi sederhana pada frame bersuara
+function f0Median(file) {
+  const r = spawnSync("ffmpeg", ["-v", "error", "-i", file, "-ac", "1", "-ar", "8000", "-f", "f32le", "-"], { maxBuffer: 1 << 28 });
+  const x = new Float32Array(r.stdout.buffer, r.stdout.byteOffset, r.stdout.length >> 2), N = 512, H = 400, out = [];
+  for (let st = 0; st + N + 120 < x.length; st += H) {
+    let e = 0; for (let i = 0; i < N; i++) e += x[st + i] * x[st + i];
+    if (e / N < 1e-4) continue;   // senyap
+    let best = 0, bl = 0;
+    for (let lag = 23; lag <= 114; lag++) { let c = 0; for (let i = 0; i < N; i++) c += x[st + i] * x[st + i + lag]; if (c > best) { best = c; bl = lag; } }
+    if (bl && best / e > 0.55) out.push(8000 / bl);
+  }
+  out.sort((a, b) => a - b); return out.length ? out[Math.floor(out.length / 2)] : 0;
+}
+
+const metrics = {};   // metrik konsistensi per scene
+const voDur = {}, cuesVo = {};
+let ttsChars = 0, lastMapMode = "-";
+function genScene(s, locators) {
+  const prev = SCENES.find((x) => x.n === s.n - 1), next = SCENES.find((x) => x.n === s.n + 1);
+  const body = { text: s.clean, model_id: EL.modelId, voice_settings: voiceSettings() };   // eleven_multilingual_v2 saja
+  if (locators.length) body.pronunciation_dictionary_locators = locators;
+  // request stitching: konteks scene sebelum/sesudah agar intonasi menyambung
+  if (prev) body.previous_text = prev.stripped.slice(-300);
+  if (next) body.next_text = next.stripped.slice(0, 300);
+  const r = api("POST", `/v1/text-to-speech/${EL.voiceId}/with-timestamps?output_format=${EL.outputFormat}`, body);
+  ttsChars += s.chars;
+  if (r.netFail || r.status !== 200) return { error: `HTTP ${r.status}: ${r.netFail ? r.err : detail(r)}` };
+  const j = JSON.parse(r.buf.toString("utf8"));
+  const file = `assets/vo/scene${s.n}.mp3`, rawFile = `assets/vo/raw/scene${s.n}.mp3`;
+  mkdirSync("assets/vo/raw", { recursive: true });
+  writeFileSync(rawFile, Buffer.from(j.audio_base64, "base64"));
+  postVo(rawFile, file);
+  const rawDur = ffprobeDur(rawFile), dur = ffprobeDur(file);
+  const al = j.alignment || j.normalized_alignment, A = al.characters.join("");
+  const st = al.character_start_times_seconds, en = al.character_end_times_seconds;
+  const cues = {}; let mode = "-";
+  for (const mk of s.markers) {
+    const m = mapMarker(A, s, mk); mode = m.mode;
+    cues[mk.name] = +Math.min(st[Math.min(m.idx, st.length - 1)], rawDur).toFixed(3);
+  }
+  cues.end = +Math.max(en[en.length - 1], rawDur - 0.05).toFixed(3);
+  const id = sceneId(s.n);
+  voDur[id] = +dur.toFixed(3); cuesVo[id] = cues; lastMapMode = mode;
+  const speech = Math.max(1, rawDur - s.breakSec);
+  metrics[id] = { rawDur: +rawDur.toFixed(2), lufs: measureLufs(file), f0: +f0Median(rawFile).toFixed(1), rate: +(s.stripped.replace(/\s/g, "").length / speech).toFixed(2), map: mode };
+  return { ok: true };
+}
+const median = (a) => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)];
+function outliers() {
+  const ids = Object.keys(metrics), mf = median(ids.map((i) => metrics[i].f0)), mr = median(ids.map((i) => metrics[i].rate)), ml = median(ids.map((i) => metrics[i].lufs));
+  return ids.filter((i) => Math.abs(metrics[i].f0 / mf - 1) > 0.18 || Math.abs(metrics[i].rate / mr - 1) > 0.25 || Math.abs(metrics[i].lufs - ml) > 4).map((i) => ({ id: i, f0: metrics[i].f0 / mf - 1, rate: metrics[i].rate / mr - 1, lufs: metrics[i].lufs - ml }));
+}
+
 if (want("vo")) {
   mkdirSync("assets/vo", { recursive: true });
-  const voDur = {}, cuesVo = {};
   const locators = ensureDictionary();
   for (const s of SCENES) {
+    const id = sceneId(s.n);
     if (SCENE_SET && !SCENE_SET.includes(s.n)) {
-      // scene tidak digenerate ulang: pakai durasi + cue yang sudah tersimpan (cue tersimpan = cue VO + lead)
-      const id = sceneId(s.n);
       voDur[id] = audio.voDur[id];
       cuesVo[id] = Object.fromEntries(Object.entries(audio.cues[id]).map(([k, v]) => [k, +(v - audio.lead[id]).toFixed(3)]));
       console.log(`VO scene ${s.n}: dilewati (tetap file lama, ${voDur[id]} dtk)`);
       continue;
     }
     process.stdout.write(`VO scene ${s.n}: ${s.chars} karakter ... `);
-    const prev = SCENES.find((x) => x.n === s.n - 1), next = SCENES.find((x) => x.n === s.n + 1);
-    const body = {
-      text: s.clean, model_id: EL.modelId,
-      voice_settings: voiceSettings(),
-    };
-    if (locators.length) body.pronunciation_dictionary_locators = locators;
-    // request stitching: konteks scene sebelum/sesudah agar intonasi menyambung
-    if (prev) body.previous_text = prev.clean.slice(-300);
-    if (next) body.next_text = next.clean.slice(0, 300);
-    if (EL.languageCode && /v2_5|flash|turbo/.test(EL.modelId)) body.language_code = EL.languageCode; // multilingual_v2 mendeteksi bahasa dari teks
-    const r = api("POST", `/v1/text-to-speech/${EL.voiceId}/with-timestamps?output_format=${EL.outputFormat}`, body);
-    if (r.netFail || r.status !== 200) die(`TTS scene ${s.n} gagal (HTTP ${r.status}): ${r.netFail ? r.err : detail(r)}\nScene sebelumnya mungkin sudah tertulis; data.json belum diubah.`, 5);
-    const j = JSON.parse(r.buf.toString("utf8"));
-    const file = `assets/vo/scene${s.n}.mp3`, rawFile = `assets/vo/raw/scene${s.n}.mp3`;
-    mkdirSync("assets/vo/raw", { recursive: true });
-    writeFileSync(rawFile, Buffer.from(j.audio_base64, "base64"));
-    postVo(rawFile, file);   // pasca-proses halus; durasi tidak berubah (tanpa pitch/tempo)
-    const dur = ffprobeDur(file); voDur[sceneId(s.n)] = +dur.toFixed(3);
-    const al = j.alignment || j.normalized_alignment, A = al.characters.join("");
-    const st = al.character_start_times_seconds, en = al.character_end_times_seconds;
-    const cues = {};
-    for (const mk of s.markers) {
-      let p = A.length === s.clean.length ? mk.pos : Math.round((mk.pos / s.clean.length) * A.length);
-      while (p < A.length - 1 && /\s/.test(A[p])) p++;
-      cues[mk.name] = +Math.min(st[Math.min(p, st.length - 1)], dur).toFixed(3);
-    }
-    cues.end = +Math.max(en[en.length - 1], dur - 0.05).toFixed(3);
-    cuesVo[sceneId(s.n)] = cues;
-    console.log(`${dur.toFixed(2)} dtk, cue: ${Object.entries(cues).map(([k, v]) => k + "=" + v).join(" ")}`);
+    const g = genScene(s, locators);
+    if (g.error) die(`TTS scene ${s.n} gagal (${g.error})\nScene sebelumnya mungkin sudah tertulis; data.json belum diubah.`, 5);
+    const m = metrics[id];
+    console.log(`${voDur[id].toFixed(2)} dtk (suara ${m.rawDur}), F0 ${m.f0} Hz, tempo ${m.rate} huruf/dtk, ${m.lufs} LUFS, cue [${m.map}]: ${Object.entries(cuesVo[id]).map(([k, v]) => k + "=" + v).join(" ")}`);
   }
-  // timing: durasi scene = max(min animasi, lead + VO + jeda)
+  // konsistensi antar scene: scene yang jelas menyimpang digenerate ulang SATU kali saja
+  const retried = [], flagged = outliers();
+  if (flagged.length) console.log("\nKonsistensi: scene menyimpang -> " + flagged.map((f) => `${f.id} (F0 ${(f.f0 * 100).toFixed(0)}%, tempo ${(f.rate * 100).toFixed(0)}%, loudness ${f.lufs.toFixed(1)} LU)`).join("; "));
+  for (const f of flagged) {
+    const s = SCENES.find((x) => sceneId(x.n) === f.id); if (SCENE_SET && !SCENE_SET.includes(s.n)) continue;
+    const before = { ...metrics[f.id] };
+    process.stdout.write(`  generate ulang ${f.id} (1x) ... `);
+    const g = genScene(s, locators);
+    if (g.error) { console.log("gagal: " + g.error); continue; }
+    retried.push({ scene: f.id, before, after: { ...metrics[f.id] } });
+    console.log(`F0 ${before.f0}->${metrics[f.id].f0}, tempo ${before.rate}->${metrics[f.id].rate}, ${before.lufs}->${metrics[f.id].lufs} LUFS`);
+  }
+  const still = outliers().map((x) => x.id);
+  console.log("Konsistensi akhir: " + (still.length ? "masih menyimpang: " + still.join(", ") + " (tidak digenerate ulang lagi; maks. satu retry)" : "semua scene dalam rentang"));
+  // timing: durasi scene = max(min animasi, lead + VO (+ekor reverb) + jeda)
   let t = 0; const scenes = [], dur = {}, lead = {}, cues = {}, script = {}, slots = [];
   for (const s of SCENES) {
     const id = sceneId(s.n), d = +Math.max(s.min, s.lead + voDur[id] + EL.gapAfterVo).toFixed(2);
@@ -335,11 +393,13 @@ if (want("vo")) {
   data.timing.scenes = scenes; data.timing.total = +t.toFixed(2); data.timing.flashAt = scenes.slice(0, -1).map((x) => x.end);
   data.vo.slots = slots;
   Object.assign(audio, { generated: true, lead, dur, voDur, cues, script,
-    chars: { vo: totalChars }, voice: { id: EL.voiceId, name: EL.voiceName, model: EL.modelId } });
+    chars: { vo: totalChars, ttsSent: ttsChars }, voice: { id: EL.voiceId, name: EL.voiceName, model: EL.modelId },
+    consistency: { metrics, retried, outliersAfter: still } });
   equalizeVo();
   data.elevenlabs = saveEL();
   writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
   console.log(`\nTiming baru: total ${data.timing.total} dtk -> ` + scenes.map((x) => `${x.id} ${x.start}-${x.end}`).join(", "));
+  console.log(`Karakter dikirim ke TTS: ${ttsChars} (retry: ${retried.length} scene)`);
 } else if (want("vogain") && audio.generated) {
   equalizeVo(); writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
 } else if (!audio.generated) {
@@ -350,8 +410,8 @@ if (want("vo")) {
 // Mentah dari API disimpan di assets/sfx/raw/NAMA.mp3 (tidak dibuat ulang bila sudah ada); versi olahan (fade in singkat,
 // reverb + ekor panjang untuk hit besar) ditulis ke assets/sfx/NAMA.mp3 dan itu yang dipakai timeline.
 const SFX = EL.sfx;
-const TAIL = { "opening-hit": 2.5, "initiatives-2027-hit": 2.5, "logo-swell": 2.0, chime: 1.0, whoosh: 0.4, riser: 0 };
-const REVERB = { "opening-hit": "0.8:0.6:90|180|330|520:0.35|0.28|0.2|0.12", "initiatives-2027-hit": "0.8:0.6:90|180|330|520:0.35|0.28|0.2|0.12", "logo-swell": "0.8:0.6:120|260|420:0.3|0.22|0.14", chime: "0.8:0.6:70|150:0.25|0.15" };
+const TAIL = { "opening-hit": 2.5, "initiatives-2027-hit": 2.5, "logo-swell": 2.0, chime: 1.0, whoosh: 0.4, riser: 0, sparkle: 0.6, "card-swell": 0.8, fanfare: 1.6, "timpani-roll": 1.0, applause: 0.6, "tick-run": 0.1 };
+const REVERB = { "opening-hit": "0.8:0.6:90|180|330|520:0.35|0.28|0.2|0.12", "initiatives-2027-hit": "0.8:0.6:90|180|330|520:0.35|0.28|0.2|0.12", "logo-swell": "0.8:0.6:120|260|420:0.3|0.22|0.14", chime: "0.8:0.6:70|150:0.25|0.15", sparkle: "0.8:0.6:60|130:0.25|0.15", fanfare: "0.8:0.6:90|180|330|520:0.35|0.28|0.2|0.12", "card-swell": "0.8:0.6:100|220:0.25|0.15" };
 audio.sources = audio.sources || { sfx: {}, music: {} };
 audio.sources.music = audio.sources.music || {};
 data.sfx.files = data.sfx.files || {};
@@ -363,6 +423,14 @@ function processSfx(name, raw, out) {
     `afade=t=out:st=${(total - fo).toFixed(3)}:d=${fo.toFixed(3)}:curve=qsin`, "alimiter=limit=0.89"].filter(Boolean).join(",");
   const r = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", raw, "-af", chain, "-t", total.toFixed(3), "-ar", "44100", "-b:a", "192k", out], { encoding: "utf8" });
   if (r.status !== 0) throw new Error("ffmpeg SFX " + name + ": " + r.stderr);
+  // normalisasi puncak ke -3 dBFS: keluaran API sangat bervariasi (mis. chime hanya -28 dBFS) sehingga level di mix tidak terkendali
+  const vd = spawnSync("ffmpeg", ["-hide_banner", "-nostats", "-i", out, "-af", "volumedetect", "-f", "null", "-"], { encoding: "utf8" });
+  const peak = parseFloat(/max_volume:\s+(-?[\d.]+) dB/.exec(vd.stderr)?.[1]);
+  if (Number.isFinite(peak) && Math.abs(-3 - peak) > 0.4) {
+    const tmpOut = out.replace(/\.mp3$/, ".norm.mp3");
+    const n = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", out, "-af", `volume=${(-3 - peak).toFixed(2)}dB,alimiter=limit=0.89`, "-ar", "44100", "-b:a", "192k", tmpOut], { encoding: "utf8" });
+    if (n.status === 0) renameSync(tmpOut, out);
+  }
 }
 if (want("sfx")) {
   mkdirSync("assets/sfx/raw", { recursive: true });

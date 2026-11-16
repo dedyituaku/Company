@@ -38,7 +38,7 @@ const setTag = (id, attrs) => {
 
 // ---- VO: sinkron start/durasi + fade in 150 ms / out 250 ms ----
 for (const s of d.vo.slots) {
-  setTag(`vo-${s.scene}`, { "data-start": s.start, "data-duration": s.dur, "data-volume": s.gain ?? 1, "data-fade-in": d.vo.fadeIn ?? 0.15, "data-fade-out": d.vo.fadeOut ?? 0.25 });
+  setTag(`vo-${s.scene}`, { "data-start": s.start, "data-duration": +(s.dur - 0.04).toFixed(3), "data-volume": s.gain ?? 1, "data-fade-in": d.vo.fadeIn ?? 0.15, "data-fade-out": d.vo.fadeOut ?? 0.25 });
 }
 
 // ---- SFX ----
@@ -50,7 +50,7 @@ const sfxSrc = (name) => {
   return { src: `assets/sfx/${fb}.wav`, meta: d.sfx.files[fb], api: false };
 };
 const resolveAt = (e) => {
-  const rel = typeof e.t === "number" ? e.t : d.audio.cues[e.scene]?.[e.t];
+  const rel = typeof e.t === "number" ? e.t : e.t === "sceneEnd" ? d.audio.dur[e.scene] : d.audio.cues[e.scene]?.[e.t];
   if (rel == null) throw new Error(`SFX ${e.f}: cue "${e.t}" tidak ada di scene ${e.scene}`);
   return start[e.scene] + rel + (e.off || 0);
 };
@@ -154,7 +154,7 @@ ${rows.join("\n")}
 ## Titik sinkron (kapan indikator muncul, waktu video)
 ${cueRows.join("\n")}
 
-## Data aktual scene 3-4 (sumber: ${d.meta.source.file}, sheet ${d.meta.source.sheet})
+## Data aktual scene 3-4 (sumber: ${d.meta.source.file}, sheet ${d.meta.source.sheet}, ${d.meta.source.baseline})
 ${d.meta.source.catatan}
 
 | KPI | 2025 (Des) | 2026* (YTD ${d.meta.ytdMonth}) | Satuan | Budget/Target | Chip |

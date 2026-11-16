@@ -18,7 +18,8 @@
     "source": {
       "file": "COC 202610R1",
       "sheet": "BFI_ALL",
-      "catatan": "2025 = posisi Des 2025; 2026* = performa YTD Oktober 2026. Angka scene 3-4 diberikan dari sheet BFI_ALL; scene 5 masih dummy."
+      "baseline": "baseline OKR",
+      "catatan": "2025 = posisi Des 2025; 2026* = performa YTD Oktober 2026. Angka rupiah YTD (10 bulan) tidak dibandingkan langsung dengan 2025 (12 bulan): dipakai rasio atau rata-rata per bulan. Satuan M = miliar rupiah. Scene 5 masih DUMMY. Cek ulang data H-1."
     }
   },
   "delq30": {
@@ -51,6 +52,10 @@
     "better": "down",
     "chip": {
       "mode": "vsBudget"
+    },
+    "sub": {
+      "tpl": "Rp{v} M YTD",
+      "value": 780.5
     }
   },
   "woRecovery": {
@@ -62,6 +67,10 @@
     "chip": {
       "mode": "pct",
       "value": 8.6
+    },
+    "sub": {
+      "tpl": "YTD Rp{v} M",
+      "value": 212.5
     }
   },
   "lor": {
@@ -72,6 +81,10 @@
     "better": "down",
     "chip": {
       "mode": "delta"
+    },
+    "sub": {
+      "tpl": "Loss Rp{v} M YTD",
+      "value": 86.2
     }
   },
   "costVsPlan": {
@@ -79,7 +92,12 @@
     "after": 91,
     "unit": "%",
     "target": 100,
-    "better": "down"
+    "better": "down",
+    "sub": {
+      "tpl": "COC YTD Rp{v1} M vs budget Rp{v2} M",
+      "v1": 871.5,
+      "v2": 959.3
+    }
   },
   "incentiveGrowth": 18,
   "initiatives2027": [
@@ -116,57 +134,57 @@
   ],
   "timing": {
     "_catatan": "Detik pada timeline utama. Ubah juga data-start/data-duration host di index.html jika durasi scene diubah.",
-    "total": 158.71,
+    "total": 200.33,
     "scenes": [
       {
         "id": "s1",
         "start": 0,
-        "end": 9.32
+        "end": 12.69
       },
       {
         "id": "s2",
-        "start": 9.32,
-        "end": 21.64
+        "start": 12.69,
+        "end": 29.39
       },
       {
         "id": "s3",
-        "start": 21.64,
-        "end": 62.01
+        "start": 29.39,
+        "end": 86.37
       },
       {
         "id": "s4",
-        "start": 62.01,
-        "end": 83.89
+        "start": 86.37,
+        "end": 112.27
       },
       {
         "id": "s5",
-        "start": 83.89,
-        "end": 98.35
+        "start": 112.27,
+        "end": 131.72
       },
       {
         "id": "s6",
-        "start": 98.35,
-        "end": 106.75
+        "start": 131.72,
+        "end": 145.03
       },
       {
         "id": "s7",
-        "start": 106.75,
-        "end": 152.4
+        "start": 145.03,
+        "end": 190.91
       },
       {
         "id": "s8",
-        "start": 152.4,
-        "end": 158.71
+        "start": 190.91,
+        "end": 200.33
       }
     ],
     "flashAt": [
-      9.32,
-      21.64,
-      62.01,
-      83.89,
-      98.35,
-      106.75,
-      152.4
+      12.69,
+      29.39,
+      86.37,
+      112.27,
+      131.72,
+      145.03,
+      190.91
     ]
   },
   "vo": {
@@ -176,65 +194,65 @@
         "scene": 1,
         "file": "assets/vo/scene1.mp3",
         "start": 5.5,
-        "dur": 3.422,
-        "lufs": -23,
-        "gain": 0.977
+        "dur": 6.792,
+        "lufs": -23.2,
+        "gain": 0.912
       },
       {
         "scene": 2,
         "file": "assets/vo/scene2.mp3",
-        "start": 9.82,
-        "dur": 11.416,
-        "lufs": -23.2,
-        "gain": 1
+        "start": 13.19,
+        "dur": 15.804,
+        "lufs": -23.6,
+        "gain": 0.955
       },
       {
         "scene": 3,
         "file": "assets/vo/scene3.mp3",
-        "start": 22.14,
-        "dur": 39.471,
-        "lufs": -24.4,
-        "gain": 1.148
+        "start": 29.89,
+        "dur": 56.085,
+        "lufs": -27,
+        "gain": 1.413
       },
       {
         "scene": 4,
         "file": "assets/vo/scene4.mp3",
-        "start": 62.51,
-        "dur": 20.976,
-        "lufs": -25.7,
-        "gain": 1.334
+        "start": 86.87,
+        "dur": 24.999,
+        "lufs": -25.5,
+        "gain": 1.189
       },
       {
         "scene": 5,
         "file": "assets/vo/scene5.mp3",
-        "start": 84.39,
-        "dur": 13.558,
-        "lufs": -23,
-        "gain": 0.977
+        "start": 112.77,
+        "dur": 18.547,
+        "lufs": -24,
+        "gain": 1
       },
       {
         "scene": 6,
         "file": "assets/vo/scene6.mp3",
-        "start": 98.75,
-        "dur": 7.602,
-        "lufs": -24.5,
-        "gain": 1.161
+        "start": 132.12,
+        "dur": 12.513,
+        "lufs": -25,
+        "gain": 1.122
       },
       {
         "scene": 7,
         "file": "assets/vo/scene7.mp3",
-        "start": 107.25,
-        "dur": 44.748,
-        "lufs": -23.6,
-        "gain": 1.047
+        "start": 145.53,
+        "dur": 44.983,
+        "lufs": -25.7,
+        "gain": 1.216
       },
       {
         "scene": 8,
         "file": "assets/vo/scene8.mp3",
-        "start": 153.4,
-        "dur": 4.911,
-        "lufs": -23,
-        "gain": 0.977
+        "start": 191.91,
+        "dur": 8.02,
+        "lufs": -23.2,
+        "gain": 0.912
       }
     ],
     "duck": {
@@ -244,7 +262,7 @@
       "release": 0.8
     },
     "fadeIn": 0.15,
-    "fadeOut": 0.25
+    "fadeOut": 0.3
   },
   "avgKpiManager": {
     "label": "Rata-rata KPI Manager",
@@ -271,11 +289,12 @@
       "riser": {
         "file": "riser.mp3",
         "dur": 3.03,
-        "peak": 1.8
+        "peak": 1.76
       },
       "tick-run": {
-        "dur": 2,
-        "peak": 0
+        "file": "tick-run.mp3",
+        "dur": 2.142,
+        "peak": 0.44
       },
       "chime": {
         "file": "chime.mp3",
@@ -289,7 +308,7 @@
       "opening-hit": {
         "file": "opening-hit.mp3",
         "dur": 8.568,
-        "peak": 0.2
+        "peak": 0.44
       },
       "initiatives-2027-hit": {
         "file": "initiatives-2027-hit.mp3",
@@ -304,7 +323,32 @@
       "logo-swell": {
         "file": "logo-swell.mp3",
         "dur": 7.079,
-        "peak": 1.78
+        "peak": 1.8
+      },
+      "sparkle": {
+        "file": "sparkle.mp3",
+        "dur": 1.855,
+        "peak": 0.02
+      },
+      "card-swell": {
+        "file": "card-swell.mp3",
+        "dur": 3.344,
+        "peak": 0.68
+      },
+      "fanfare": {
+        "file": "fanfare.mp3",
+        "dur": 5.695,
+        "peak": 1.14
+      },
+      "timpani-roll": {
+        "file": "timpani-roll.mp3",
+        "dur": 5.042,
+        "peak": 2.12
+      },
+      "applause": {
+        "file": "applause.mp3",
+        "dur": 6.635,
+        "peak": 3.56
       }
     },
     "events": [
@@ -312,70 +356,70 @@
         "f": "riser",
         "scene": "s1",
         "t": 5,
-        "vol": 0.3,
+        "vol": 0.26,
         "note": "naik sebelum konvergensi lampu scene 1"
       },
       {
         "f": "opening-hit",
         "scene": "s1",
         "t": 5,
-        "vol": 0.32,
+        "vol": 0.34,
         "note": "impact konvergensi + teks 3 Key Initiatives"
       },
       {
         "f": "whoosh",
         "scene": "s2",
         "t": 0,
-        "vol": 0.28,
+        "vol": 0.24,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s3",
         "t": 0,
-        "vol": 0.28,
+        "vol": 0.24,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s4",
         "t": 0,
-        "vol": 0.28,
+        "vol": 0.24,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s5",
         "t": 0,
-        "vol": 0.28,
+        "vol": 0.24,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s6",
         "t": 0,
-        "vol": 0.28,
+        "vol": 0.24,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s7",
         "t": 0,
-        "vol": 0.28,
+        "vol": 0.24,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s8",
         "t": 0,
-        "vol": 0.28,
+        "vol": 0.24,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "riser",
         "scene": "s6",
         "t": "r",
-        "vol": 0.24,
+        "vol": 0.26,
         "note": "naik menuju Ready for New Challenges"
       },
       {
@@ -389,7 +433,7 @@
         "f": "tick-run",
         "scene": "s3",
         "t": "m1",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s3 kartu 1",
         "dur": 1.5
       },
@@ -397,7 +441,7 @@
         "f": "chime",
         "scene": "s3",
         "t": "m1",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s3 kartu 1",
         "off": 1.5
       },
@@ -405,7 +449,7 @@
         "f": "tick-run",
         "scene": "s3",
         "t": "m2",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s3 kartu 2",
         "dur": 1.5
       },
@@ -413,7 +457,7 @@
         "f": "chime",
         "scene": "s3",
         "t": "m2",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s3 kartu 2",
         "off": 1.5
       },
@@ -421,7 +465,7 @@
         "f": "tick-run",
         "scene": "s3",
         "t": "m3",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s3 kartu 3",
         "dur": 1.5
       },
@@ -429,7 +473,7 @@
         "f": "chime",
         "scene": "s3",
         "t": "m3",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s3 kartu 3",
         "off": 1.5
       },
@@ -437,7 +481,7 @@
         "f": "tick-run",
         "scene": "s3",
         "t": "m4",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s3 kartu 4",
         "dur": 1.5
       },
@@ -445,7 +489,7 @@
         "f": "chime",
         "scene": "s3",
         "t": "m4",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s3 kartu 4",
         "off": 1.5
       },
@@ -453,7 +497,7 @@
         "f": "tick-run",
         "scene": "s3",
         "t": "m5",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s3 kartu 5",
         "dur": 1.5
       },
@@ -461,7 +505,7 @@
         "f": "chime",
         "scene": "s3",
         "t": "m5",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s3 kartu 5",
         "off": 1.5
       },
@@ -469,7 +513,7 @@
         "f": "tick-run",
         "scene": "s4",
         "t": "m",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s4 rasio cost",
         "dur": 1.8
       },
@@ -477,7 +521,7 @@
         "f": "chime",
         "scene": "s4",
         "t": "m",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s4",
         "off": 1.9
       },
@@ -485,7 +529,7 @@
         "f": "tick-run",
         "scene": "s5",
         "t": "m",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s5 ring KPI",
         "dur": 2
       },
@@ -493,7 +537,7 @@
         "f": "chime",
         "scene": "s5",
         "t": "m",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s5 KPI",
         "off": 2.1
       },
@@ -501,7 +545,7 @@
         "f": "tick-run",
         "scene": "s5",
         "t": "im",
-        "vol": 0.12,
+        "vol": 0.1,
         "note": "counter berjalan - s5 insentif",
         "dur": 1.8
       },
@@ -509,7 +553,7 @@
         "f": "chime",
         "scene": "s5",
         "t": "im",
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "nilai akhir tercapai - s5 insentif",
         "off": 1.4
       },
@@ -517,18 +561,147 @@
         "f": "logo-swell",
         "scene": "s8",
         "t": 2.8,
-        "vol": 0.26,
+        "vol": 0.24,
         "note": "logo muncul"
       },
       {
         "f": "chime",
         "scene": "s8",
         "t": 2.4,
-        "vol": 0.2,
+        "vol": 0.14,
         "note": "tagline muncul"
+      },
+      {
+        "f": "whoosh",
+        "scene": "s2",
+        "t": "c1",
+        "vol": 0.14,
+        "note": "kartu prioritas muncul: whoosh lembut",
+        "off": -0.1
+      },
+      {
+        "f": "sparkle",
+        "scene": "s2",
+        "t": "c1",
+        "vol": 0.12,
+        "note": "kartu prioritas: sparkle kecil",
+        "off": 0.25
+      },
+      {
+        "f": "whoosh",
+        "scene": "s2",
+        "t": "c2",
+        "vol": 0.14,
+        "note": "kartu prioritas muncul: whoosh lembut",
+        "off": -0.1
+      },
+      {
+        "f": "sparkle",
+        "scene": "s2",
+        "t": "c2",
+        "vol": 0.12,
+        "note": "kartu prioritas: sparkle kecil",
+        "off": 0.25
+      },
+      {
+        "f": "whoosh",
+        "scene": "s2",
+        "t": "c3",
+        "vol": 0.14,
+        "note": "kartu prioritas muncul: whoosh lembut",
+        "off": -0.1
+      },
+      {
+        "f": "sparkle",
+        "scene": "s2",
+        "t": "c3",
+        "vol": 0.12,
+        "note": "kartu prioritas: sparkle kecil",
+        "off": 0.25
+      },
+      {
+        "f": "card-swell",
+        "scene": "s7",
+        "t": "c1",
+        "vol": 0.18,
+        "note": "kartu 2027: swell"
+      },
+      {
+        "f": "sparkle",
+        "scene": "s7",
+        "t": "c1",
+        "vol": 0.12,
+        "note": "kartu 2027: sparkle",
+        "off": 0.4
+      },
+      {
+        "f": "card-swell",
+        "scene": "s7",
+        "t": "c2",
+        "vol": 0.18,
+        "note": "kartu 2027: swell"
+      },
+      {
+        "f": "sparkle",
+        "scene": "s7",
+        "t": "c2",
+        "vol": 0.12,
+        "note": "kartu 2027: sparkle",
+        "off": 0.4
+      },
+      {
+        "f": "card-swell",
+        "scene": "s7",
+        "t": "c3",
+        "vol": 0.18,
+        "note": "kartu 2027: swell"
+      },
+      {
+        "f": "sparkle",
+        "scene": "s7",
+        "t": "c3",
+        "vol": 0.12,
+        "note": "kartu 2027: sparkle",
+        "off": 0.4
+      },
+      {
+        "f": "timpani-roll",
+        "scene": "s5",
+        "t": "sceneEnd",
+        "vol": 0.2,
+        "note": "timpani halus: build menuju S6",
+        "off": -3.8
+      },
+      {
+        "f": "fanfare",
+        "scene": "s6",
+        "t": "r",
+        "vol": 0.28,
+        "note": "fanfare brass pendek saat READY FOR NEW CHALLENGES"
+      },
+      {
+        "f": "applause",
+        "scene": "s6",
+        "t": "end",
+        "vol": 0.14,
+        "note": "tepuk tangan halus (API) di akhir S6",
+        "off": 0.4
+      },
+      {
+        "f": "applause",
+        "scene": "s8",
+        "t": "end",
+        "vol": 0.14,
+        "note": "tepuk tangan halus (API) di akhir S8",
+        "off": 0.3
       }
     ],
     "fallback": {
+      "sparkle": "chime",
+      "card-swell": "swell",
+      "fanfare": "boom",
+      "timpani-roll": "boom",
+      "applause": "swell",
       "opening-hit": "boom",
       "initiatives-2027-hit": "boom",
       "whoosh": "whoosh-a",
@@ -574,12 +747,42 @@
         "name": "logo-swell",
         "duration": 5,
         "prompt": "uplifting cinematic logo reveal swell, warm rising pad with shimmer resolving gently"
+      },
+      {
+        "name": "sparkle",
+        "duration": 1.2,
+        "prompt": "small soft magical sparkle chime, glittering twinkle, short"
+      },
+      {
+        "name": "card-swell",
+        "duration": 2.5,
+        "prompt": "soft cinematic swell rising gently, warm and elegant, short"
+      },
+      {
+        "name": "fanfare",
+        "duration": 4,
+        "prompt": "short triumphant brass fanfare, cinematic, heroic trumpets, bright"
+      },
+      {
+        "name": "timpani-roll",
+        "duration": 4,
+        "prompt": "soft orchestral timpani roll crescendo building anticipation"
+      },
+      {
+        "name": "applause",
+        "duration": 6,
+        "prompt": "gentle polite audience applause in a ballroom, soft and natural"
+      },
+      {
+        "name": "tick-run",
+        "duration": 2,
+        "prompt": "soft subtle rapid digital ticking counter, quiet clicks"
       }
     ],
     "music": {
-      "_catatan": "SATU bed kontinu assets/music/bgm.mp3. Dicoba via Music API (1 track); bila paket tidak mendukung -> stem Sound Effects API digabung acrossfade (crossfade dtk, minimal 3). Intensitas naik-turun lewat 'intensity' (kunci waktu relatif scene); ducking VO diatur di vo.duck.",
+      "_catatan": "SATU bed kontinu assets/music/bgm-main.mp3 (stem Sound Effects API + acrossfade 4 dtk; Music API tidak dipakai). Intensitas LOW-MEDIUM-HIGH lewat keyframe (relatif scene); level = pengali dasar; ducking VO diatur di vo.duck. Lantai musik tanpa VO per scene: S1 -24, S2 -22, S3-4 -20, S5 -18, S6 -15, S7 -14 LUFS.",
       "name": "bgm-main",
-      "level": 1.4,
+      "level": 1.15,
       "crossfade": 4,
       "stemSeconds": 30,
       "fadeIn": 2,
@@ -595,38 +798,58 @@
         {
           "scene": "s1",
           "t": 0,
-          "v": 0.55
+          "v": 0.3
         },
         {
           "scene": "s1",
           "t": 5,
-          "v": 0.95
+          "v": 0.46
         },
         {
           "scene": "s1",
           "t": "sceneEnd",
-          "v": 0.8
+          "v": 0.4
         },
         {
           "scene": "s2",
-          "t": 4,
-          "v": 0.72
+          "t": 2,
+          "v": 0.4
+        },
+        {
+          "scene": "s3",
+          "t": 2,
+          "v": 0.5
+        },
+        {
+          "scene": "s5",
+          "t": 2,
+          "v": 0.52
         },
         {
           "scene": "s5",
           "t": "sceneEnd",
-          "off": -9,
-          "v": 0.72
+          "off": -7,
+          "v": 0.6
         },
         {
           "scene": "s5",
           "t": "sceneEnd",
-          "v": 0.8
+          "v": 0.86
         },
         {
           "scene": "s6",
           "t": "r",
-          "v": 0.85
+          "v": 0.84
+        },
+        {
+          "scene": "s6",
+          "t": "sceneEnd",
+          "v": 0.86
+        },
+        {
+          "scene": "s7",
+          "t": "c1",
+          "v": 0.96
         },
         {
           "scene": "s7",
@@ -641,12 +864,12 @@
         {
           "scene": "s8",
           "t": 3,
-          "v": 0.7
+          "v": 0.6
         },
         {
           "scene": "s8",
           "t": "sceneEnd",
-          "v": 0.4
+          "v": 0.36
         }
       ]
     },
@@ -677,80 +900,80 @@
       "s8": 1
     },
     "dur": {
-      "s1": 9.32,
-      "s2": 12.32,
-      "s3": 40.37,
-      "s4": 21.88,
-      "s5": 14.46,
-      "s6": 8.4,
-      "s7": 45.65,
-      "s8": 6.31
+      "s1": 12.69,
+      "s2": 16.7,
+      "s3": 56.98,
+      "s4": 25.9,
+      "s5": 19.45,
+      "s6": 13.31,
+      "s7": 45.88,
+      "s8": 9.42
     },
     "cues": {
       "s1": {
         "y": 5.5,
-        "k": 7.276,
-        "end": 8.89
+        "k": 8.112,
+        "end": 10.469
       },
       "s2": {
-        "c1": 4.424,
-        "c2": 7.141,
-        "c3": 9.103,
-        "end": 11.878
+        "c1": 5.632,
+        "c2": 8.731,
+        "c3": 11.065,
+        "end": 14.478
       },
       "s3": {
-        "c1": 3.565,
-        "m1": 8.348,
-        "c2": 11.053,
-        "m2": 12.888,
-        "c3": 16.881,
-        "m3": 22.129,
-        "c4": 26.042,
-        "m4": 26.773,
-        "c5": 28.607,
-        "m5": 31.126,
-        "f": 34.133,
-        "end": 39.927
+        "c1": 4.517,
+        "m1": 10.995,
+        "c2": 13.875,
+        "m2": 15.5,
+        "c3": 19.587,
+        "m3": 26.959,
+        "c4": 36.329,
+        "m4": 36.944,
+        "c5": 42.865,
+        "m5": 46.383,
+        "f": 49.436,
+        "end": 54.742
       },
       "s4": {
-        "p": 4.227,
-        "m": 7.315,
-        "b": 10.392,
-        "mc": 13.375,
-        "end": 21.444
+        "p": 4.9,
+        "m": 7.663,
+        "b": 10.786,
+        "mc": 15.419,
+        "end": 23.673
       },
       "s5": {
-        "k": 3.913,
-        "b": 6.235,
-        "m": 7.768,
-        "i": 10.531,
-        "im": 12.075,
-        "end": 14.014
+        "k": 4.854,
+        "b": 7.64,
+        "m": 9.927,
+        "i": 12.725,
+        "im": 15.071,
+        "end": 17.218
       },
       "s6": {
         "y": 0.4,
-        "r": 4.173,
-        "end": 7.97
+        "r": 6.031,
+        "end": 11.081
       },
       "s7": {
-        "c1": 8.743,
-        "c2": 21.305,
-        "c3": 35.539,
-        "end": 45.221
+        "c1": 6.154,
+        "c2": 18.159,
+        "c3": 33.473,
+        "end": 43.643
       },
       "s8": {
-        "end": 5.876
+        "end": 7.177
       }
     },
     "script": {
       "s1": "dua ribu dua puluh enam. Three key initiatives.",
-      "s2": "Di awal tahun, kita menetapkan tiga prioritas: meningkatkan efektivitas collection, mengoptimalkan cost, dan memperkuat kapabilitas manpower.",
-      "s3": "Pertama, Collection Effectiveness. Delinquency sembilan puluh plus membaik dari satu koma empat satu persen menjadi satu koma tiga dua persen. Delinquency tiga puluh plus berada di tiga koma tujuh tiga persen, mendekati budget. Rata-rata WO Recovery per bulan naik dari sembilan belas koma enam menjadi dua puluh satu koma tiga miliar rupiah. WO In berada di bawah budget. Dan Lor membaik dari empat belas persen menjadi tujuh koma empat empat persen. Seluruh angka dua ribu dua puluh enam adalah performa sampai Oktober.",
-      "s4": "Kedua, Collection Cost Optimization. Realisasi cost sampai Oktober berada di sembilan puluh satu persen dari plan, dan cost of credit turun dari empat koma tiga dua persen menjadi tiga koma sembilan dua persen. Cost terealisasi sesuai plan, secara efektif dan efisien.",
-      "s5": "Ketiga, Manpower Capability. Rata-rata KPI manager naik dari sembilan puluh enam persen menjadi seratus empat persen. Dan insentif manager meningkat delapan belas persen.",
-      "s6": "dua ribu dua puluh enam telah kita selesaikan. Siap menghadapi tantangan dua ribu dua puluh tujuh.",
-      "s7": "Sebagai penguatan strategi dua ribu dua puluh enam, berikut ini Key Initiatives dua ribu dua puluh tujuh. Pertama, Collection Effectiveness Transformation: meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration: mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation: memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
-      "s8": "Bersama, kita melangkah menuju dua ribu dua puluh tujuh dengan optimis."
+      "s2": "Di awal tahun, kita menetapkan tiga prioritas. Meningkatkan efektivitas collection. Mengoptimalkan cost. Dan memperkuat kapabilitas manpower.",
+      "s3": "Pertama. Collection Effectiveness. Delinquency sembilan puluh plus, membaik, dari satu koma empat satu persen, menjadi satu koma tiga dua persen. Delinquency tiga puluh plus berada di tiga koma tujuh tiga persen, mendekati budget. Rata-rata WO Recovery per bulan, naik, dari sembilan belas koma enam, menjadi dua puluh satu koma tiga miliar rupiah, dengan akumulasi dua ratus dua belas koma lima miliar rupiah sampai Oktober. WO In tujuh ratus delapan puluh koma lima miliar rupiah, di bawah budget. Dan Lor, membaik, dari empat belas persen, menjadi tujuh koma empat empat persen. Seluruh angka dua ribu dua puluh enam adalah performa sampai Oktober.",
+      "s4": "Kedua. Collection Cost Optimization. Realisasi cost sampai Oktober berada di sembilan puluh satu persen dari plan, dan cost of credit turun, dari empat koma tiga dua persen, menjadi tiga koma sembilan dua persen. Cost terealisasi sesuai plan, secara efektif dan efisien.",
+      "s5": "Ketiga. Manpower Capability. Rata-rata KPI manager naik, dari sembilan puluh enam persen, menjadi seratus empat persen. Dan insentif manager, meningkat, delapan belas persen.",
+      "s6": "dua ribu dua puluh enam, telah kita selesaikan. Siap menghadapi tantangan, dua ribu dua puluh tujuh.",
+      "s7": "Dan kini. Key Initiatives dua ribu dua puluh tujuh. Pertama, Collection Effectiveness Transformation. Meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration. Mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation. Memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
+      "s8": "Bersama, kita melangkah, menuju dua ribu dua puluh tujuh."
     },
     "sources": {
       "sfx": {
@@ -759,70 +982,146 @@
         "whoosh": "elevenlabs",
         "riser": "elevenlabs",
         "chime": "elevenlabs",
-        "logo-swell": "elevenlabs"
+        "logo-swell": "elevenlabs",
+        "sparkle": "elevenlabs",
+        "card-swell": "elevenlabs",
+        "fanfare": "elevenlabs",
+        "timpani-roll": "elevenlabs",
+        "applause": "elevenlabs",
+        "tick-run": "elevenlabs"
       },
       "music": {
         "bgm-main": "elevenlabs-sound-generation-stems"
       }
     },
     "voDur": {
-      "s1": 3.422,
-      "s2": 11.416,
-      "s3": 39.471,
-      "s4": 20.976,
-      "s5": 13.558,
-      "s6": 7.602,
-      "s7": 44.748,
-      "s8": 4.911
+      "s1": 6.792,
+      "s2": 15.804,
+      "s3": 56.085,
+      "s4": 24.999,
+      "s5": 18.547,
+      "s6": 12.513,
+      "s7": 44.983,
+      "s8": 8.02
     },
     "chars": {
-      "vo": 1897
+      "vo": 2781,
+      "ttsSent": 2781
     },
     "voice": {
       "id": "I7sakys8pBZ1Z5f0UhT9",
       "name": "Putri Maharani (My Voices)",
       "model": "eleven_multilingual_v2"
     },
-    "notes": [
-      "Music API tidak tersedia di paket (HTTP 0): dilewati (--no-music-api). Bed dibuat dari stem Sound Effects API + acrossfade."
-    ],
+    "notes": [],
     "musicStems": [
       "assets/music/stems/stem01-open.mp3",
       "assets/music/stems/stem02-calm.mp3",
       "assets/music/stems/stem03-calm.mp3",
+      "assets/music/stems/stem03-calm.mp3",
+      "assets/music/stems/stem02-calm.mp3",
       "assets/music/stems/stem04-build.mp3",
       "assets/music/stems/stem05-heroic.mp3",
       "assets/music/stems/stem07-resolve.mp3"
     ],
     "musicDur": {
-      "bgm-main": 158.75
+      "bgm-main": 200.36
     },
-    "voLufsTarget": -23.2
+    "voLufsTarget": -24,
+    "consistency": {
+      "metrics": {
+        "s1": {
+          "rawDur": 5.02,
+          "lufs": -23.2,
+          "f0": 186,
+          "rate": 9.49,
+          "map": "dengan-tag"
+        },
+        "s2": {
+          "rawDur": 14.03,
+          "lufs": -23.6,
+          "f0": 222.2,
+          "rate": 10.56,
+          "map": "dengan-tag"
+        },
+        "s3": {
+          "rawDur": 54.28,
+          "lufs": -27,
+          "f0": 181.8,
+          "rate": 11.22,
+          "map": "dengan-tag"
+        },
+        "s4": {
+          "rawDur": 23.22,
+          "lufs": -25.5,
+          "f0": 190.5,
+          "rate": 11.32,
+          "map": "dengan-tag"
+        },
+        "s5": {
+          "rawDur": 16.74,
+          "lufs": -24,
+          "f0": 210.5,
+          "rate": 10.73,
+          "map": "dengan-tag"
+        },
+        "s6": {
+          "rawDur": 10.71,
+          "lufs": -25,
+          "f0": 210.5,
+          "rate": 9.76,
+          "map": "dengan-tag"
+        },
+        "s7": {
+          "rawDur": 43.18,
+          "lufs": -25.7,
+          "f0": 190.5,
+          "rate": 11.78,
+          "map": "dengan-tag"
+        },
+        "s8": {
+          "rawDur": 6.22,
+          "lufs": -23.2,
+          "f0": 195.1,
+          "rate": 9.58,
+          "map": "-"
+        }
+      },
+      "retried": [],
+      "outliersAfter": []
+    }
   },
   "voice": {
-    "_catatan": "Narator: ganti id/speed di sini lalu: node generate-audio.mjs --only=vo && node build.mjs. id kosong = skrip berhenti (tidak memilih suara sendiri). Pasca-proses: low-shelf, high-pass, de-esser, kompresor lembut (tanpa pitch shift).",
+    "_catatan": "Narator (pembacaan anugerah: berwibawa, dalam, meriah). Ganti id/speed di sini lalu: node generate-audio.mjs --only=vo && node build.mjs. id kosong = skrip berhenti. Model: eleven_multilingual_v2 saja. Pasca-proses: pitch turun <= 1 semitone (tempo tetap), EQ, de-esser, kompresor 3:1, reverb hall pendek.",
     "id": "I7sakys8pBZ1Z5f0UhT9",
     "name": "Putri Maharani (My Voices)",
-    "speed": 0.92,
-    "stability": 0.65,
-    "similarityBoost": 0.75,
-    "style": 0.1,
+    "speed": 0.85,
+    "stability": 0.35,
+    "similarityBoost": 0.8,
+    "style": 0.55,
     "speakerBoost": true,
     "post": {
       "highpassHz": 70,
-      "lowShelfDb": 2.5,
+      "lowShelfDb": 3,
       "lowShelfHz": 150,
+      "presenceDb": 1.5,
+      "presenceHz": 3000,
+      "pitchSemitones": 0.7,
       "deEsser": {
         "intensity": 0.3,
         "maxReduction": 0.5,
         "freq": 0.5
       },
       "compressor": {
-        "thresholdDb": -18,
-        "ratio": 2,
+        "thresholdDb": -20,
+        "ratio": 3,
         "attackMs": 20,
         "releaseMs": 250,
-        "makeupDb": 1.5
+        "makeupDb": 2
+      },
+      "reverb": {
+        "tailSec": 1.2,
+        "wet": 0.12
       }
     }
   },

@@ -8,18 +8,19 @@
     #s3-chips .chip { height: 60px; font-size: 26px; padding: 0 22px 0 10px; gap: 12px; }
     #s3-chips .chip .ic { width: 40px; height: 40px; }
     #s3-chips .chip .ic svg { width: 24px; height: 24px; }
-    #s3-cards { position: absolute; left: 192px; top: 334px; width: 1536px; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px 24px; }
-    .s3-card { width: 496px; height: 306px; border-radius: 26px; padding: 22px 28px; background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)), rgba(5,12,28,0.5); border: 1.5px solid rgba(255,255,255,0.14); position: relative; }
-    .s3-row { display: flex; align-items: flex-end; gap: 16px; margin-top: 6px; }
-    .s3-card .plabel { letter-spacing: 0.06em; line-height: 32px; height: 64px; }
-    .s3-yr { font-weight: 700; font-size: 28px; line-height: 34px; color: var(--mute); }
+    #s3-cards { position: absolute; left: 192px; top: 324px; width: 1536px; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px 24px; }
+    .s3-card { width: 496px; height: 314px; border-radius: 26px; padding: 18px 26px 14px; background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)), rgba(5,12,28,0.5); border: 1.5px solid rgba(255,255,255,0.14); position: relative; }
+    .s3-row { display: flex; align-items: flex-end; gap: 12px; margin-top: 4px; }
+    .s3-card .plabel { letter-spacing: 0.06em; line-height: 30px; height: 60px; white-space: pre-line; }
+    .s3-yr { font-weight: 700; font-size: 28px; line-height: 30px; color: var(--mute); }
     .s3-ya { color: var(--gold); }
-    .s3-prev { font-weight: 700; font-size: 40px; line-height: 100px; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .s3-arrow { font-size: 40px; line-height: 100px; color: var(--gold); font-weight: 800; }
-    .s3-nw { white-space: nowrap; display: flex; align-items: baseline; height: 100px; }
-    .s3-card .bignum { font-size: 92px; line-height: 100px; }
+    .s3-prev { font-weight: 700; font-size: 36px; line-height: 92px; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .s3-arrow { font-size: 38px; line-height: 92px; color: var(--gold); font-weight: 800; }
+    .s3-nw { white-space: nowrap; display: flex; align-items: baseline; height: 92px; }
+    .s3-card .bignum { font-size: 82px; line-height: 92px; }
+    .s3-sub { height: 28px; margin-top: 2px; font-weight: 600; font-size: 24px; line-height: 28px; color: rgba(255,255,255,0.72); white-space: nowrap; }
     .s3-card .unit { font-size: 36px; margin: 0 4px; }
-    .s3-d { margin-top: 8px; }
+    .s3-d { margin-top: 6px; }
     .s3-tag { font-size: 28px; letter-spacing: 0.01em; white-space: nowrap; }
   </style>
   <div id="root" data-composition-id="s3" data-width="1920" data-height="1080">
@@ -111,7 +112,11 @@
     document.querySelectorAll(".s3-card").forEach((card, i) => {
       const e = D[card.dataset.k], d = dec(e.before, e.after), t0 = C["c" + (i + 1)], tm = C["m" + (i + 1)];   // kartu muncul saat nama disebut; counter jalan saat "menjadi"
       const [u1, u2] = e.unit.includes(" ") ? e.unit.split(" ") : ["", e.unit];
-      q(".s3-lab", card).textContent = e.label;
+      q(".s3-lab", card).textContent = e.label.replace(" (", "\n(");   // keterangan dalam kurung turun ke baris kedua
+      // sub-label kecil di bawah angka utama (data.json > sub.tpl/value); kartu tanpa sub tetap menyisakan baris kosong agar sejajar
+      const sub = document.createElement("div"); sub.className = "s3-sub";
+      if (e.sub) sub.textContent = e.sub.tpl.replace("{v}", fmt(e.sub.value, dec(e.sub.value)));
+      card.insertBefore(sub, q(".s3-d", card));
       q(".s3-yb", card).textContent = M.yearBefore;
       q(".s3-ya", card).textContent = M.yearAfter;
       q(".s3-u1", card).textContent = u1; q(".s3-u2", card).textContent = u2;

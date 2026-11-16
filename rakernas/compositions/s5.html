@@ -59,7 +59,7 @@
     document.getElementById("s5-yr2").textContent = M.yearAfter + " vs " + M.yearBefore;
     q("#s5-n1").textContent = fmt(m.before, 0) + m.unit;
     q("#s5-prev1").textContent = fmt(m.before, 0) + m.unit;
-    q("#s5-d1").textContent = "▲ " + fmt(m.after - m.before, 0) + " pp";
+    q("#s5-d1").textContent = "▲ +" + fmt(m.after - m.before, 0) + " pp";
     q("#s5-n2").textContent = "+0%";
     q("#s5-cap-n").textContent = fmt(g, 0) + "%";
     if (M.showDummyMarkers) { const d = q("#s5-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }

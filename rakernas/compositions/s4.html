@@ -21,6 +21,7 @@
     .s4-p .unit { font-size: 64px; }
     .s4-tagw { margin-left: auto; align-self: center; }
     .s4-meter { position: absolute; left: 40px; right: 40px; top: 292px; }
+    #s4-sub { position: absolute; left: 520px; top: 96px; width: 780px; font-weight: 600; font-size: 34px; line-height: 44px; color: rgba(255,255,255,0.78); }
     #s4-coc { position: absolute; left: 40px; top: 452px; }
     #s4-coc .tag { font-size: 32px; letter-spacing: 0.02em; white-space: nowrap; }
     .s4-p .plabel { letter-spacing: 0.08em; }
@@ -53,6 +54,7 @@
           <div class="s4-mrow"><div class="s4-track"><div class="s4-fill" id="s4-f1b" style="background:linear-gradient(90deg,#2f80ed,#7db4ff)"></div></div></div>
           <div id="s4-target"></div>
         </div>
+        <div id="s4-sub"></div>
         <div id="s4-coc"><span class="tag" id="s4-cocchip"></span></div>
       </div>
 
@@ -73,6 +75,7 @@
     q("#s4-l1").textContent = c.label;
     q("#s4-n1").textContent = fmt(0, dc); q("#s4-u1").textContent = c.unit;
     q("#s4-tlab").textContent = "Target " + fmt(c.target, 0) + c.unit;
+    if (c.sub) q("#s4-sub").textContent = c.sub.tpl.replace("{v1}", fmt(c.sub.v1, dec(c.sub.v1))).replace("{v2}", fmt(c.sub.v2, dec(c.sub.v2)));
     const chip = q("#s4-cocchip");
     chip.textContent = coc.label + " " + fmt(coc.before, dcoc) + coc.unit + " → " + fmt(coc.after, dcoc) + coc.unit;
     chip.classList.add((coc.better === "down") === (coc.after < coc.before) ? "up" : "bad");   // hijau hanya bila membaik
@@ -94,6 +97,7 @@
     const c1 = { v: 0 };
     tl.to(c1, { v: c.after, duration: 1.8, ease: "power2.inOut", onUpdate() { q("#s4-n1").textContent = fmt(c1.v, dc); } }, MM);
     tl.fromTo("#s4-f1b", { width: "0%" }, { width: w1b + "%", duration: 1.8, ease: "power2.inOut" }, MM);
+    tl.fromTo("#s4-sub", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, MM + 0.4);
     tl.fromTo("#s4-cocchip", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, B);
 
     window.__timelines["s4"] = tl;
