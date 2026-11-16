@@ -1344,8 +1344,8 @@
   },
   "checks": {
     "latest": {
-      "revision": "e5a53372-9e9c-4018-bd98-92f530c4e589",
-      "id": "41be8605-d18e-487e-a8e5-816dcc6866ef"
+      "revision": "9ac56fc3-099a-42d9-a400-6435bf0219b1",
+      "id": "8de3f002-7a04-4690-94c2-c9cfc67bc75e"
     },
     "revisions": {
       "f6d0b3b5-5d59-4cd0-ac9e-15a6f79f614b": [
@@ -1638,6 +1638,35 @@
           "contentHash": "ef12661374e3e6583646553247667d0b3be3d32513b585b10eb67a4dfa3f3222",
           "revision": "e5a53372-9e9c-4018-bd98-92f530c4e589",
           "inputFingerprint": "3a0f2008cb3a61bd6a2d793cc78657d506943223a2fa0ab78a240ef12db5e66f",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ],
+      "9ac56fc3-099a-42d9-a400-6435bf0219b1": [
+        {
+          "id": "8de3f002-7a04-4690-94c2-c9cfc67bc75e",
+          "scope": "project",
+          "report": "/home/user/company/rakernas/.hyperframes/artifacts/checks/8de3f002-7a04-4690-94c2-c9cfc67bc75e.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 10000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1794818283346,
+          "contentHash": "ef12661374e3e6583646553247667d0b3be3d32513b585b10eb67a4dfa3f3222",
+          "revision": "9ac56fc3-099a-42d9-a400-6435bf0219b1",
+          "inputFingerprint": "1693853a3b10235e39b91d126ada97428db4c998fceeb7ddd2d985484a51199a",
           "inputScope": "local-project-files",
           "attribution": "recorded-revision"
         }
