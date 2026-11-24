@@ -1,7 +1,7 @@
 {
   "version": 1,
   "historyId": "96137e10-6530-4933-b358-56f7d114a6a5",
-  "currentRevision": "2c5d0939-15f4-4ccc-932e-a32dd54ed602",
+  "currentRevision": "ad13041b-7ae9-4af9-84a0-f0f137b821bf",
   "pendingChanges": false,
   "files": {
     "AGENTS.md": {
@@ -427,6 +427,10 @@
     "preview/rakernas-draft-v10.mp4": {
       "hash": "3298b9df1415ec2f9a13ebc33f51d6c0beac9ca041340d045346720d38a6447a",
       "content": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/32/3298b9df1415ec2f9a13ebc33f51d6c0beac9ca041340d045346720d38a6447a"
+    },
+    "AUDIO-DIAGNOSIS-v10.md": {
+      "hash": "e4cdfc4ebf1404a6f455406697af76f186f24e84bd3bb70fbd9bb99ae9e34eb1",
+      "content": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/e4/e4cdfc4ebf1404a6f455406697af76f186f24e84bd3bb70fbd9bb99ae9e34eb1"
     }
   },
   "revisions": {
@@ -1521,12 +1525,27 @@
           "after": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/ce/cea400a3bf6af8ac44d33013f3d785474355ecc8312b8cdc5cc041a9fb009caf"
         }
       }
+    },
+    "ad13041b-7ae9-4af9-84a0-f0f137b821bf": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1795497410856,
+      "endedAt": 1795497410858,
+      "files": {
+        "AUDIO-DIAGNOSIS-v10.md": {
+          "before": null,
+          "after": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/e4/e4cdfc4ebf1404a6f455406697af76f186f24e84bd3bb70fbd9bb99ae9e34eb1"
+        }
+      }
     }
   },
   "checks": {
     "latest": {
-      "revision": "f150a2db-37dd-4fe0-a7ac-a11c8818a8e5",
-      "id": "ac7436dc-98d6-4ccc-b95a-83e2b58b8cd7"
+      "revision": null,
+      "id": "6c9ac916-0105-404d-aa1d-16959f27dfea"
     },
     "revisions": {
       "f6d0b3b5-5d59-4cd0-ac9e-15a6f79f614b": [
@@ -1912,6 +1931,33 @@
         "inputFingerprint": "d92ec415253c38ff8b3f30d1c5f356d3c1e7e17edb616646f6fed03ec91f136b",
         "inputScope": "local-project-files",
         "attribution": "unversioned"
+      },
+      {
+        "id": "6c9ac916-0105-404d-aa1d-16959f27dfea",
+        "scope": "project",
+        "report": "/home/user/company/rakernas/.hyperframes/artifacts/checks/6c9ac916-0105-404d-aa1d-16959f27dfea.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 10000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1795497408575,
+        "contentHash": "3daebe50ee9cd635faef467eed6c72f8abd878f2d5979e3b12b03b2137aa2235",
+        "revision": null,
+        "inputFingerprint": "9ef11e706f0bc1c3dbebdc9f9fa22a7bdf8ce33657edacf32bc1125f2a3ca391",
+        "inputScope": "local-project-files",
+        "attribution": "inputs-changed"
       }
     ]
   },
