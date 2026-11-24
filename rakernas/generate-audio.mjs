@@ -11,7 +11,7 @@
 // Aturan: ELEVENLABS_API_KEY dibaca dari rakernas/.env (atau environment). Key tidak pernah dicetak.
 // Bila API tidak bisa dijangkau / key tidak ada / key ditolak, skrip BERHENTI dengan pesan jelas dan
 // tidak menyentuh file audio maupun data.json (tidak ada audio palsu).
-import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, mkdtempSync, rmSync, readdirSync, renameSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, mkdtempSync, rmSync, readdirSync, renameSync, copyFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -194,7 +194,8 @@ function ensureDictionary() {
   console.log(`Pronunciation dictionary dibuat: ${j.id} (${rules.map((x) => x.from + "->" + x.alias).join(", ")})`);
   return [{ pronunciation_dictionary_id: j.id, version_id: j.version_id }];
 }
-const voiceSettings = () => ({ stability: EL.stability, similarity_boost: EL.similarityBoost, style: EL.style, use_speaker_boost: EL.useSpeakerBoost, speed: EL.speed });
+const voiceSettings = (o = {}) => ({ stability: o.stability ?? EL.stability, similarity_boost: o.similarityBoost ?? EL.similarityBoost, style: o.style ?? EL.style, use_speaker_boost: o.speakerBoost ?? EL.useSpeakerBoost, speed: o.speed ?? EL.speed });
+const sceneVoice = (n) => voiceSettings(data.voice?.overrides?.["s" + n] || {});   // pengecualian per scene (data.json > voice.overrides)
 
 // ---------- uji pelafalan: node generate-audio.mjs --test-pron ----------
 // Membuat cuplikan pendek, lalu mentranskripsi balik dengan ElevenLabs Speech-to-Text untuk memeriksa apakah kata terbaca sebagai KATA (bukan dieja).
@@ -313,9 +314,9 @@ function f0Median(file) {
 const metrics = {};   // metrik konsistensi per scene
 const voDur = {}, cuesVo = {};
 let ttsChars = 0, lastMapMode = "-";
-function genScene(s, locators) {
+function genScene(s, locators, opt = {}) {
   const prev = SCENES.find((x) => x.n === s.n - 1), next = SCENES.find((x) => x.n === s.n + 1);
-  const body = { text: s.clean, model_id: EL.modelId, voice_settings: voiceSettings() };   // eleven_multilingual_v2 saja
+  const body = { text: s.clean, model_id: EL.modelId, voice_settings: opt.settings || sceneVoice(s.n) };   // eleven_multilingual_v2 saja
   if (locators.length) body.pronunciation_dictionary_locators = locators;
   // request stitching: konteks scene sebelum/sesudah agar intonasi menyambung
   if (prev) body.previous_text = prev.stripped.slice(-300);
@@ -324,10 +325,11 @@ function genScene(s, locators) {
   ttsChars += s.chars;
   if (r.netFail || r.status !== 200) return { error: `HTTP ${r.status}: ${r.netFail ? r.err : detail(r)}` };
   const j = JSON.parse(r.buf.toString("utf8"));
-  const file = `assets/vo/scene${s.n}.mp3`, rawFile = `assets/vo/raw/scene${s.n}.mp3`;
+  const file = opt.file || `assets/vo/scene${s.n}.mp3`, rawFile = opt.raw || `assets/vo/raw/scene${s.n}.mp3`;
   mkdirSync("assets/vo/raw", { recursive: true });
   writeFileSync(rawFile, Buffer.from(j.audio_base64, "base64"));
   postVo(rawFile, file);
+  if (opt.noRecord) return { ok: true, dur: ffprobeDur(file) };   // take alternatif: hanya simpan file, jangan ubah timing/cue
   const rawDur = ffprobeDur(rawFile), dur = ffprobeDur(file);
   const al = j.alignment || j.normalized_alignment, A = al.characters.join("");
   const st = al.character_start_times_seconds, en = al.character_end_times_seconds;
@@ -366,8 +368,18 @@ if (want("vo")) {
     const m = metrics[id];
     console.log(`${voDur[id].toFixed(2)} dtk (suara ${m.rawDur}), F0 ${m.f0} Hz, tempo ${m.rate} huruf/dtk, ${m.lufs} LUFS, cue [${m.map}]: ${Object.entries(cuesVo[id]).map(([k, v]) => k + "=" + v).join(" ")}`);
   }
-  // konsistensi antar scene: scene yang jelas menyimpang digenerate ulang SATU kali saja
-  const retried = [], flagged = outliers();
+  // scene 2: dua take (pengecualian satu-kali). Take A dipakai di video (= scene2.mp3), take B disimpan untuk dipilih.
+  const takeFiles = [];
+  if (SCENE_SET && SCENE_SET.includes(2) && data.voice?.takeB) {
+    const s2 = SCENES.find((x) => x.n === 2), tb = data.voice.takeB;
+    copyFileSync("assets/vo/scene2.mp3", "assets/vo/scene2-takeA.mp3"); copyFileSync("assets/vo/raw/scene2.mp3", "assets/vo/raw/scene2-takeA.mp3");
+    process.stdout.write(`VO scene 2 take B (stability ${tb.stability}, style ${tb.style}) ... `);
+    const gb = genScene(s2, locators, { settings: voiceSettings(tb), file: "assets/vo/scene2-takeB.mp3", raw: "assets/vo/raw/scene2-takeB.mp3", noRecord: true });
+    console.log(gb.error ? "gagal: " + gb.error : `${gb.dur.toFixed(2)} dtk`);
+    takeFiles.push("assets/vo/scene2-takeA.mp3", "assets/vo/scene2-takeB.mp3");
+  }
+  // konsistensi antar scene: scene yang jelas menyimpang digenerate ulang SATU kali saja (dilewati saat hanya sebagian scene digenerate)
+  const retried = [], flagged = SCENE_SET ? [] : outliers();
   if (flagged.length) console.log("\nKonsistensi: scene menyimpang -> " + flagged.map((f) => `${f.id} (F0 ${(f.f0 * 100).toFixed(0)}%, tempo ${(f.rate * 100).toFixed(0)}%, loudness ${f.lufs.toFixed(1)} LU)`).join("; "));
   for (const f of flagged) {
     const s = SCENES.find((x) => sceneId(x.n) === f.id); if (SCENE_SET && !SCENE_SET.includes(s.n)) continue;
@@ -378,7 +390,7 @@ if (want("vo")) {
     retried.push({ scene: f.id, before, after: { ...metrics[f.id] } });
     console.log(`F0 ${before.f0}->${metrics[f.id].f0}, tempo ${before.rate}->${metrics[f.id].rate}, ${before.lufs}->${metrics[f.id].lufs} LUFS`);
   }
-  const still = outliers().map((x) => x.id);
+  const still = SCENE_SET ? [] : outliers().map((x) => x.id);
   console.log("Konsistensi akhir: " + (still.length ? "masih menyimpang: " + still.join(", ") + " (tidak digenerate ulang lagi; maks. satu retry)" : "semua scene dalam rentang"));
   // timing: durasi scene = max(min animasi, lead + VO (+ekor reverb) + jeda)
   let t = 0; const scenes = [], dur = {}, lead = {}, cues = {}, script = {}, slots = [];
@@ -394,7 +406,7 @@ if (want("vo")) {
   data.vo.slots = slots;
   Object.assign(audio, { generated: true, lead, dur, voDur, cues, script,
     chars: { vo: totalChars, ttsSent: ttsChars }, voice: { id: EL.voiceId, name: EL.voiceName, model: EL.modelId },
-    consistency: { metrics, retried, outliersAfter: still } });
+    consistency: { metrics: { ...(audio.consistency?.metrics || {}), ...metrics }, retried, outliersAfter: still, takes: takeFiles } });
   equalizeVo();
   data.elevenlabs = saveEL();
   writeFileSync("data.json", JSON.stringify(data, null, 2) + "\n");
@@ -454,7 +466,7 @@ if (want("sfx")) {
 }
 
 // ---------- 3. MUSIK: SATU bed kontinu assets/music/bgm.mp3 ----------
-// Urutan: (a) Music API satu track sepanjang video; (b) bila paket tidak mendukung -> beberapa stem dari endpoint Sound Effects
+// Urutan: (a) Music API satu track sepanjang video; (b) bila gagal -> pad FFmpeg satu kunci (placeholder); stem gabungan hanya dengan --stems -> beberapa stem dari endpoint Sound Effects
 // (instrumental ambient, tiap stem <= 30 dtk) digabung dengan acrossfade >= 3 dtk (mis. 4 dtk), lalu dipotong tepat sepanjang video.
 const M = EL.music;
 if (want("music")) {
@@ -467,14 +479,14 @@ if (want("music")) {
   else {
     process.stdout.write(`Musik: Music API satu track ${need} dtk ... `);
     const SKIP_MUSIC_API = args.includes("--no-music-api");   // hemat kredit: langsung pakai stem yang sudah ada
-    const r = SKIP_MUSIC_API ? { status: 0, buf: Buffer.from("dilewati (--no-music-api)") } : api("POST", `/v1/music?output_format=${EL.outputFormat}`, { prompt: M.prompts.calm, music_length_ms: need * 1000, force_instrumental: true, model_id: "music_v1" });
+    const r = SKIP_MUSIC_API ? { status: 0, buf: Buffer.from("dilewati (--no-music-api)") } : api("POST", `/v1/music?output_format=${EL.outputFormat}`, { prompt: M.apiPrompt || M.prompts.calm, music_length_ms: need * 1000, force_instrumental: true, model_id: "music_v1" });
     if (r.status === 200) {
-      writeFileSync(outFile, r.buf); audio.sources.music[M.name] = "elevenlabs-music"; console.log("ok");
+      writeFileSync(outFile, r.buf); audio.sources.music[M.name] = "elevenlabs-music-api (satu track)"; console.log("ok");
     } else {
       console.log(`tidak tersedia (HTTP ${r.status}: ${detail(r)})`);
-      notes.push(`Music API tidak tersedia di paket (HTTP ${r.status}): ${detail(r)}. Bed dibuat dari stem Sound Effects API + acrossfade.`);
+      notes.push(`Music API tidak dipakai/gagal (HTTP ${r.status}): ${detail(r)}. Bed = pad FFmpeg satu kunci (PLACEHOLDER).`);
       const XF = M.crossfade, SEG = M.stemSeconds, step = SEG - XF;
-      const n = Math.ceil((need - XF) / step);
+      const n = args.includes("--stems") ? Math.ceil((need - XF) / step) : 0;   // stem gabungan hanya dengan --stems (kunci/tempo antar-stem tidak dijamin sama)
       // peran tiap stem menurut posisi pada timeline
       const roleAt = (t, i) => {
         if (i === 0) return "open";
@@ -502,6 +514,7 @@ if (want("music")) {
         }
         used.add(f.split("/").pop()); stems.push(f);
       }
+      if (!stems.length) stems.push("FAIL");
       if (stems[0] === "FAIL") {
         // (d) cadangan terakhir: pad sinematik sintetis FFmpeg (PLACEHOLDER)
         const T = total.toFixed(2);

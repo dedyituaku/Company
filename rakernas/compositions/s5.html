@@ -5,18 +5,18 @@
     #s5-head { position: absolute; left: 192px; top: 112px; }
     #s5-head .h1 { margin-top: 10px; }
     #s5-chips { position: absolute; left: 192px; top: 252px; display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: 16px; }
-        .s5-p { top: 466px; height: 506px; width: 744px; }
-    #s5-p1 { left: 192px; } #s5-p2 { left: 984px; }
-    #s5-ring { position: absolute; left: 30px; top: 96px; width: 350px; height: 350px; }
-    #s5-n1 { position: absolute; left: 30px; top: 214px; width: 350px; text-align: center; font-size: 78px; }
-    #s5-ya1 { position: absolute; left: 30px; top: 312px; width: 350px; text-align: center; font-weight: 700; font-size: 28px; color: #d4a537; }
-    #s5-side { position: absolute; left: 410px; top: 170px; width: 290px; }
-    .s5-prev { font-weight: 700; font-size: 40px; color: var(--mute); font-variant-numeric: tabular-nums; margin-top: 10px; }
-    #s5-big { position: absolute; left: 40px; right: 40px; top: 120px; text-align: left; }
-    #s5-n2 { font-size: 220px; color: var(--gold); }
-    #s5-up { position: absolute; right: 36px; top: 24px; width: 84px; height: 84px; color: var(--gold); }
-    #s5-yr2 { margin-top: 14px; font-weight: 700; font-size: 28px; color: #d4a537; }
-    #s5-cap { margin-top: 22px; font-weight: 700; font-size: 32px; color: #fff; line-height: 1.3; }
+    /* satu kartu tunggal: ring KPI manager (data aktual) */
+    #s5-card { position: absolute; left: 360px; top: 440px; width: 1200px; height: 500px; padding: 22px 40px; text-align: center; }
+    #s5-title { letter-spacing: 0.12em; }
+    #s5-sub { margin-top: 8px; font-weight: 700; font-size: 34px; line-height: 44px; color: #fff; }
+    #s5-sub b { color: #d4a537; font-weight: 800; }
+    #s5-ringw { position: relative; width: 250px; height: 250px; margin: 8px auto 0; }
+    #s5-ring { position: absolute; inset: 0; width: 250px; height: 250px; }
+    #s5-n { position: absolute; left: 0; right: 0; top: 68px; font-size: 78px; line-height: 110px; text-align: center; }
+    #s5-n small { font-size: 42px; color: #d4a537; margin-left: 2px; }
+    #s5-rl { margin-top: 8px; font-weight: 700; font-size: 28px; line-height: 34px; color: rgba(255,255,255,0.72); }
+    #s5-chipw { margin-top: 10px; }
+    #s5-chipw .tag { font-size: 30px; letter-spacing: 0.01em; white-space: nowrap; }
   </style>
   <div id="root" data-composition-id="s5" data-width="1920" data-height="1080">
     <div id="s5-fg">
@@ -27,65 +27,46 @@
         <div class="chip s5-chip"><span class="ic"><svg><use href="#i-bars"/></svg></span>Centralized Performance Management</div>
       </div>
 
-      <div id="s5-p1" class="panel s5-p">
-        <div class="plabel" id="s5-l1"></div>
-        <svg id="s5-ring" viewBox="0 0 380 380">
-          <circle cx="190" cy="190" r="160" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="26"/>
-          <circle id="s5-arc0" cx="190" cy="190" r="160" fill="none" stroke="#5f7392" stroke-width="26" stroke-linecap="round" transform="rotate(-90 190 190)" pathLength="1"/>
-          <circle id="s5-arc" cx="190" cy="190" r="160" fill="none" stroke="#d4a537" stroke-width="26" stroke-linecap="round" transform="rotate(-90 190 190)" pathLength="1"/>
-          <line id="s5-tick" x1="190" y1="8" x2="190" y2="44" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-        </svg>
-        <div class="bignum" id="s5-n1"></div><div class="s5-yatag s5-ya" id="s5-ya1"></div>
-        <div id="s5-side"><div class="plabel s5-yb"></div><div class="s5-prev" id="s5-prev1"></div><div style="margin-top:26px"><span class="tag up" id="s5-d1"></span></div></div>
+      <div id="s5-card" class="panel">
+        <div class="plabel" id="s5-title"></div>
+        <div id="s5-sub"></div>
+        <div id="s5-ringw">
+          <svg id="s5-ring" viewBox="0 0 270 270">
+            <circle cx="135" cy="135" r="112" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="28"/>
+            <circle id="s5-arc" cx="135" cy="135" r="112" fill="none" stroke="#d4a537" stroke-width="28" stroke-linecap="round" transform="rotate(-90 135 135)" pathLength="1"/>
+          </svg>
+          <div id="s5-n" class="bignum"></div>
+        </div>
+        <div id="s5-rl"></div>
+        <div id="s5-chipw"><span class="tag up" id="s5-chip"></span></div>
       </div>
-
-      <div id="s5-p2" class="panel s5-p">
-        <div class="plabel">Insentif Manager</div>
-        <svg id="s5-up" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 34 20 22l8 8 14-16M30 14h12v12"/></g></svg>
-        <div id="s5-big"><div class="bignum" id="s5-n2"></div><div id="s5-cap">Insentif Manager naik <span id="s5-cap-n"></span></div><div id="s5-yr2" class="s5-ya"></div></div>
-      </div>
-      <div id="s5-dummy" class="dummy" style="display:none"></div>
     </div>
   </div>
   <script>
-    const D = window.RAKERNAS_DATA, M = D.meta;
+    const D = window.RAKERNAS_DATA, M = D.meta, S = D.scene5;
+    const C = D.audio.cues.s5, DUR = D.audio.dur.s5;   // C = detik cue VO di dalam scene (data.json > audio)
     const fmt = (v, d) => v.toFixed(d).replace(".", ",");
     const q = (s) => document.querySelector(s);
-    const m = D.avgKpiManager, g = D.incentiveGrowth, RM = 120;
-    q("#s5-l1").textContent = m.label;
-    q("#s5-tick").setAttribute("transform", "rotate(" + ((m.target || 100) / RM * 360) + " 190 190)");
-    document.querySelectorAll(".s5-yb").forEach((e) => (e.textContent = M.yearBefore));
-    document.querySelectorAll(".s5-ya").forEach((e) => (e.textContent = M.yearAfter));
-    document.getElementById("s5-yr2").textContent = M.yearAfter + " vs " + M.yearBefore;
-    q("#s5-n1").textContent = fmt(m.before, 0) + m.unit;
-    q("#s5-prev1").textContent = fmt(m.before, 0) + m.unit;
-    q("#s5-d1").textContent = "▲ +" + fmt(m.after - m.before, 0) + " pp";
-    q("#s5-n2").textContent = "+0%";
-    q("#s5-cap-n").textContent = fmt(g, 0) + "%";
-    if (M.showDummyMarkers) { const d = q("#s5-dummy"); d.style.display = "block"; d.textContent = M.dummyBadgeText; }
+    // teks dari data.json > scene5 (template: {t} ambang, {y} tahun pembanding, {ya} tahun 2026*, {n} membaik, {p} persen)
+    const pct = Math.round(S.share);
+    const fill = (tpl) => tpl.replace("{t}", fmt(S.threshold, 2)).replace("{y}", M.yearBefore).replace("{ya}", M.yearAfter).replace("{n}", S.improved).replace("{p}", pct).replace("{r}", S.recorded).replace("{m}", S.missing);
+    q("#s5-title").textContent = fill(S.title);
+    q("#s5-sub").textContent = fill(S.subtitle);
+    q("#s5-rl").textContent = fill(S.ringLabel);
+    q("#s5-chip").textContent = fill(S.chip);
+    q("#s5-n").innerHTML = "0<small>%</small>";
 
-    const C = (window.RAKERNAS_DATA.audio.cues.s5), DUR = window.RAKERNAS_DATA.audio.dur.s5;  // C = detik cue VO di dalam scene (data.json > audio)
     const tl = gsap.timeline({ paused: true });
-    const MM = Math.max(C.m, C.b + 0.9), IM = Math.max(C.im, C.i + 0.8);   // M = angka KPI akhir disebut, IM = angka insentif disebut
+    const K = C.k, MM = Math.max(C.m, K + 1.6), CC = Math.max(C.c, MM + 1.2);   // kartu saat "Dari manager...", ring terisi saat angka disebut, chip saat "kini membaik"
     tl.fromTo("#s5-head", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.3);
     document.querySelectorAll(".s5-chip").forEach((el, i) =>
       tl.fromTo(el, { opacity: 0, y: 24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 1.4 + i * 0.6));
-    tl.fromTo("#s5-p1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, C.k);
     tl.fromTo("#s5-fg", { x: 14 }, { x: -14, duration: DUR, ease: "none" }, 0);
-
-    const c1 = { v: m.before };
-    tl.fromTo("#s5-arc0", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 1 - m.before / RM, duration: 0.9, ease: "power3.out" }, C.b);
-    tl.fromTo("#s5-arc", { strokeDasharray: 1, strokeDashoffset: 1 - m.before / RM }, { strokeDashoffset: 1 - m.after / RM, duration: 2.0, ease: "power2.inOut" }, MM);
-    tl.to(c1, { v: m.after, duration: 2.0, ease: "power2.inOut", onUpdate() { q("#s5-n1").textContent = fmt(c1.v, 0) + m.unit; } }, MM);
-    tl.fromTo("#s5-d1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, MM + 2.1);
-
-    // insentif: persentase saja, tanpa nominal
-    tl.fromTo("#s5-p2", { opacity: 0, y: 60 }, { opacity: 0.28, y: 0, duration: 0.9, ease: "power3.out" }, C.k + 0.8);
-    tl.to("#s5-p2", { opacity: 1, duration: 0.8, ease: "power2.out" }, C.i);
-    const c2 = { v: 0 };
-    tl.to(c2, { v: g, duration: 1.8, ease: "power3.out", onUpdate() { q("#s5-n2").textContent = "+" + fmt(c2.v, 0) + "%"; } }, IM);
-    tl.fromTo("#s5-up", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, IM);
-    tl.fromTo("#s5-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, IM + 0.6);
+    tl.fromTo("#s5-card", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, K);
+    const cnt = { v: 0 };
+    tl.fromTo("#s5-arc", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 1 - S.share / 100, duration: 2.2, ease: "power2.inOut" }, MM);
+    tl.to(cnt, { v: S.share, duration: 2.2, ease: "power2.inOut", onUpdate() { q("#s5-n").innerHTML = Math.round(cnt.v) + "<small>%</small>"; } }, MM);
+    tl.fromTo("#s5-chip", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, CC);
     window.__timelines["s5"] = tl;
   </script>
 </template>

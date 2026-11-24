@@ -16,7 +16,8 @@ const setAttrs = (id, s, dur) => {
 // root + layer sepanjang video
 html = html.replace(/(data-composition-id="main" data-start="0" )data-duration="[^"]*"/, `$1data-duration="${total}"`);
 for (const id of ["bg", "rig", "particles", "flash"]) setAttrs(id, 0, total);
-setAttrs("footnote", +(start.s3 + 0).toFixed(2), +(scenes[4].end - start.s3 - 0.4).toFixed(2));
+setAttrs("footnote", +start.s3.toFixed(2), +(scenes[3].end - start.s3 - 0.4).toFixed(2));
+setAttrs("footnote2", +start.s5.toFixed(2), +(scenes[4].end - start.s5 - 0.4).toFixed(2));
 for (const s of scenes) setAttrs(s.id, s.start, +(s.end - s.start).toFixed(2));
 
 // ---- envelope: ducking musik/SFX saat VO (kurva cosine halus, bukan on-off) ----
@@ -41,67 +42,12 @@ for (const s of d.vo.slots) {
   setTag(`vo-${s.scene}`, { "data-start": s.start, "data-duration": +(s.dur - 0.04).toFixed(3), "data-volume": s.gain ?? 1, "data-fade-in": d.vo.fadeIn ?? 0.15, "data-fade-out": d.vo.fadeOut ?? 0.25 });
 }
 
-// ---- SFX ----
-// File olahan (assets/sfx/NAMA.mp3; fade in + reverb/ekor) dipakai bila ada; selain itu placeholder sintetis (.wav) lewat sfx.fallback.
-const sfxSrc = (name) => {
-  const m = d.sfx.files[name];
-  if (m && m.file && existsSync(`assets/sfx/${m.file}`)) return { src: `assets/sfx/${m.file}`, meta: m, api: true };
-  const fb = d.sfx.fallback?.[name] || name;
-  return { src: `assets/sfx/${fb}.wav`, meta: d.sfx.files[fb], api: false };
-};
-const resolveAt = (e) => {
-  const rel = typeof e.t === "number" ? e.t : e.t === "sceneEnd" ? d.audio.dur[e.scene] : d.audio.cues[e.scene]?.[e.t];
-  if (rel == null) throw new Error(`SFX ${e.f}: cue "${e.t}" tidak ada di scene ${e.scene}`);
-  return start[e.scene] + rel + (e.off || 0);
-};
-const lanes = [];
-const sfxUsed = {};
-const sfxUnder = d.sfx.sfxUnderVo ?? 0.45;
-let sfxDucked = 0;
-const sfxTags = d.sfx.events.map((e, i) => {
-  const { src, meta, api } = sfxSrc(e.f);
-  sfxUsed[e.f] = api ? "elevenlabs" : "placeholder";
-  const at = resolveAt(e), dur = +Math.min(e.dur ?? meta.dur, total - at).toFixed(3);
-  const st = Math.max(0, +(at + 1 / 30 - meta.peak).toFixed(3));
-  let ln = lanes.findIndex((end) => end <= st); if (ln < 0) { ln = lanes.length; lanes.push(0); } lanes[ln] = st + dur;
-  const fi = 0.015, fo = +(api ? Math.min(1.5, dur * 0.5) : Math.min(0.12, dur * 0.3)).toFixed(3);
-  // SFX yang menyentuh VO diturunkan (kurva halus) supaya tidak menutup narasi
-  const overlap = voWins.some((w) => st < w.b + 0.5 && st + dur > w.a - 0.15);
-  let vol = e.vol, auto = "";
-  if (overlap) {
-    const ts = new Set([0, dur]);
-    for (let t = 0.1; t < dur; t += 0.1) ts.add(+t.toFixed(2));
-    for (const t of duckBreaks(0.15, 0.5)) { const r = +(t - st).toFixed(2); if (r > 0 && r < dur) ts.add(r); }
-    const pts = [...ts].sort((x, y) => x - y).map((t) => ({ t, v: +(e.vol * duckGain(st + t, sfxUnder, 0.15, 0.5)).toFixed(4) }));
-    auto = ` data-automation="${laneAttr(pts)}"`; vol = 1; sfxDucked++;
-  }
-  return `      <audio id="sfx-${i + 1}" class="clip" src="${src}" data-start="${st}" data-duration="${dur}" data-track-index="${8 + ln}" data-volume="${vol}" data-fade-in="${fi}" data-fade-out="${fo}"${auto}></audio>`;
-}).join("\n");
-html = html.replace(/(<!-- SFX:BEGIN[^\n]*\n)[\s\S]*?([ \t]*<!-- SFX:END -->)/, `$1${sfxTags}\n$2`);
-
-// ---- musik: SATU bed kontinu; intensitas naik-turun (kunci waktu relatif scene) x ducking VO ----
-const MU = d.elevenlabs.music;
-const kf = MU.intensity.map((k) => {
-  const sc = scenes.find((x) => x.id === k.scene), dur = sc.end - sc.start;
-  const rel = k.t === "sceneEnd" ? dur : typeof k.t === "number" ? k.t : d.audio.cues[k.scene]?.[k.t];
-  if (rel == null) throw new Error(`musik: cue "${k.t}" tidak ada di ${k.scene}`);
-  return { t: +(sc.start + rel + (k.off || 0)).toFixed(2), v: k.v };
-}).sort((x, y) => x.t - y.t);
-const inten = (t) => {
-  if (t <= kf[0].t) return kf[0].v; if (t >= kf[kf.length - 1].t) return kf[kf.length - 1].v;
-  for (let i = 1; i < kf.length; i++) if (t <= kf[i].t) { const a = kf[i - 1], b = kf[i]; return b.t === a.t ? b.v : a.v + ((b.v - a.v) * (t - a.t)) / (b.t - a.t); }
-};
-const lowGain = 10 ** ((DK.db ?? -9) / 20);
-const musicIsApi = !!d.audio.sources?.music?.[MU.name] && !/placeholder/.test(d.audio.sources.music[MU.name]) && existsSync(`assets/music/${MU.name}.mp3`);
-const musicDur = musicIsApi ? Math.min(total, d.audio.musicDur?.[MU.name] ?? total) : Math.min(total, 112);
-const tset = new Set([0, +musicDur.toFixed(2)]);
-for (let t = 1; t < musicDur; t += 1) tset.add(t);
-kf.forEach((k) => { if (k.t >= 0 && k.t <= musicDur) tset.add(k.t); });
-for (const t of duckBreaks()) if (t > 0 && t < musicDur) tset.add(+t.toFixed(2));
-const mpts = [...tset].sort((x, y) => x - y).map((t) => ({ t: +t.toFixed(2), v: +(inten(t) * duckGain(t, lowGain)).toFixed(4) }));
-const bgmTag = `      <audio id="bgm" class="clip" src="${musicIsApi ? `assets/music/${MU.name}.mp3` : "assets/music/bgm-placeholder.mp3"}" data-start="0" data-duration="${+musicDur.toFixed(2)}" data-track-index="6" data-volume="${MU.level}" data-fade-in="${MU.fadeIn}" data-fade-out="${MU.fadeOut}" data-automation="${laneAttr(mpts)}"></audio>`;
-html = html.replace(/(<!-- BGM:BEGIN[^\n]*\n)[\s\S]*?([ \t]*<!-- BGM:END -->)/, `$1${bgmTag}\n$2`);
-const low = +lowGain.toFixed(3), pts = mpts;
+// ---- musik + SFX: SATU bus yang sudah dimix (assets/mix/bus.mp3, dibuat node mix-bus.mjs) ----
+const busOk = existsSync("assets/mix/bus.mp3");
+if (!busOk) console.warn("PERINGATAN: assets/mix/bus.mp3 belum ada - jalankan: node mix-bus.mjs");
+else if (d.audio.bus && Math.abs(d.audio.bus.duration - total) > 0.05) console.warn(`PERINGATAN: bus (${d.audio.bus.duration} dtk) tidak sama dengan total video (${total} dtk) - jalankan ulang: node mix-bus.mjs`);
+html = html.replace(/(<!-- SFX:BEGIN[^\n]*\n)[\s\S]*?([ \t]*<!-- SFX:END -->)/, "$1$2");
+html = html.replace(/(<!-- BGM:BEGIN[^\n]*\n)[\s\S]*?([ \t]*<!-- BGM:END -->)/, `$1      <audio id="bus" class="clip" src="assets/mix/bus.mp3" data-start="0" data-duration="${total}" data-track-index="6" data-volume="1"></audio>\n$2`);
 writeFileSync("index.html", html);
 // scene 1: jendela tampil teks mengikuti durasi scene
 {
@@ -120,7 +66,7 @@ const VISUAL = {
   s2: "Tiga kartu prioritas muncul bergantian sesuai kata yang disebut.",
   s3: "Key Initiative 1: lima kartu KPI (Delinq 90+, 30+, WO Recovery, WO In, LOR) muncul saat namanya disebut; counter berjalan saat angka disebut; chip: amber netral untuk Budget, hijau hanya untuk yang membaik. DATA AKTUAL.",
   s4: "Key Initiative 2: satu kartu besar Realisasi Cost vs Plan (angka, bar, garis Target), lalu chip COC YTD. DATA AKTUAL.",
-  s5: "Key Initiative 3: ring KPI manager naik ke angka akhir saat disebut; lalu panel insentif. DATA DUMMY.",
+  s5: "Key Initiative 3: satu kartu ring 62% (manager dengan KPI < 2,25 pada 2025 yang membaik); chip hijau satu-satunya. DATA AKTUAL.",
   s6: "'Telah Kita Selesaikan' lalu kilatan dan 'Ready for New Challenges'.",
   s7: "Tiga kartu Key Initiatives 2027 muncul saat 'Pertama/Kedua/Ketiga'; ketiganya menyala bersama di akhir.",
   s8: "Logo dan tagline, fade out.",
@@ -161,14 +107,16 @@ ${d.meta.source.catatan}
 |-----|-----------|------------------|--------|---------------|------|
 ${kpiRows.join("\n")}
 
-Footnote layar (scene 3-5): ${d.meta.footnote}
-Scene 5 (KPI manager, insentif) masih DUMMY.
+Footnote layar (scene 3-4): ${d.meta.footnote}
+Footnote layar (scene 5): ${d.scene5.footnote.replace("{r}", d.scene5.recorded).replace("{m}", d.scene5.missing)}
+
+## Scene 5 - catatan data (sumber: ${d.scene5.source})
+Kohort: ${d.scene5.cohort} manager dengan rata-rata KPI < ${String(d.scene5.threshold).replace(".", ",")} pada Jan-Sep 2025; tercatat di 2026 = ${d.scene5.recorded}; membaik dan di atas ambang = ${d.scene5.improved}; belum membaik = ${d.scene5.notImproved}; tidak ada di data MAM 2026 = ${d.scene5.missing}. Share = ${d.scene5.improved}/${d.scene5.recorded} = ${String(d.scene5.share).replace(".", ",")}% (tampil ${Math.round(d.scene5.share)}%).
+${d.scene5.notes.map((n, i) => `${i + 1}. ${n}`).join("\n")}
 
 Catatan: durasi scene = durasi VO + lead + jeda 1 dtk (minimal sesuai animasi). Angka di naskah diambil dari data.json dan dibaca dengan kata.
 `;
 writeFileSync("speaker-notes.md", notes);
 
-const sfxApi = Object.entries(sfxUsed).filter(([, v]) => v === "elevenlabs").map(([k]) => k);
-const sfxPh = Object.entries(sfxUsed).filter(([, v]) => v === "placeholder").map(([k]) => k);
-console.log(`data.js ditulis; logo asli: ${d.meta.logoExists}; total ${total} dtk; ducking/intensitas musik ${pts.length} titik (${d.vo.duck.db ?? "?"} dB, attack ${ATT}s, release ${REL}s); ${sfxDucked} SFX diturunkan saat VO`);
-console.log(`VO: ${d.audio.generated ? "ElevenLabs" : "placeholder senyap"} | SFX API: ${sfxApi.join(", ") || "-"} | SFX placeholder: ${sfxPh.join(", ") || "-"} | Musik: bgm=${musicIsApi ? d.audio.sources.music[MU.name] : "placeholder"}`);
+console.log(`data.js ditulis; logo asli: ${d.meta.logoExists}; total ${total} dtk; bus musik+SFX: ${busOk ? `assets/mix/bus.mp3 (${d.audio.bus?.sfxKept ?? "?"} SFX, master ${d.audio.bus?.masterGainDb ?? "?"} dB)` : "BELUM ADA"}`);
+console.log(`VO: ${d.audio.generated ? "ElevenLabs" : "placeholder senyap"} | Musik: ${d.audio.sources?.music?.[d.elevenlabs.music.name] ?? "?"} | SFX: ${Object.entries(d.audio.sources?.sfx || {}).filter(([, v]) => v === "elevenlabs").length} dari API`);

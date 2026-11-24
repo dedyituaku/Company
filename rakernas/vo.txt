@@ -16,17 +16,17 @@
 
 [PRONUNCIATION]
 # Substitusi teks SEBELUM dikirim ke TTS (layar tidak berubah). Urutan: paling spesifik dulu.
-# WO dibaca per huruf bahasa Indonesia "wé-o"; NPL-WO "en-pe-el wé-o"; KPI "ka-pe-i". "Lor" tetap kata (alias lewat ElevenLabs
+# WO dibaca per huruf bahasa Indonesia "wé-o"; NPL-WO "en-pe-el wé-o"; KPI dibaca bahasa Inggris "Key-Pi-Ai". "Lor" tetap kata (alias lewat ElevenLabs
 # pronunciation dictionary: data.json > elevenlabs.pronunciation). Layar tetap WO/KPI.
 NPL-WO = en-pe-el wé-o
 WO = wé-o
-KPI = ka-pe-i
+KPI = Key-Pi-Ai
 
 [SCENE 1 | lead=5.5 | min=8]
 [[y]]{{meta.yearAfter}}. <break time="0.8s" /> [[k]]Three key initiatives.
 
 [SCENE 2 | lead=0.5 | min=7]
-Di awal tahun, <break time="0.4s" /> kita menetapkan tiga prioritas. <break time="0.7s" /> [[c1]]Meningkatkan efektivitas collection. <break time="0.5s" /> [[c2]]Mengoptimalkan cost. <break time="0.5s" /> [[c3]]Dan memperkuat kapabilitas manpower.
+Di awal tahun {{meta.yearAfter}}, kita menetapkan tiga prioritas utama. <break time="0.9s" /> [[c1]]Meningkatkan efektivitas collection. <break time="0.6s" /> [[c2]]Mengoptimalkan cost. <break time="0.6s" /> [[c3]]Dan memperkuat kapabilitas manpower.
 
 [SCENE 3 | lead=0.5 | min=12]
 Pertama. <break time="0.5s" /> Collection Effectiveness. <break time="0.8s" /> [[c1]]Delinquency sembilan puluh plus, {{dir:delq90|membaik|memburuk}}, dari {{delq90.before}} persen, <break time="0.3s" /> [[m1]]menjadi {{delq90.after}} persen. <break time="0.5s" /> [[c2]]Delinquency tiga puluh plus [[m2]]berada di {{delq30.after}} persen, mendekati budget. <break time="0.5s" /> [[c3]]Rata-rata WO Recovery per bulan, {{dir:woRecovery|turun|naik}}, dari {{woRecovery.before}}, <break time="0.3s" /> [[m3]]menjadi {{woRecovery.after}} miliar rupiah, dengan akumulasi {{woRecovery.sub.value}} miliar rupiah sampai {{txt:meta.ytdMonth}}. <break time="0.5s" /> [[c4]]WO In [[m4]]{{woIn.sub.value}} miliar rupiah, di bawah budget. <break time="0.5s" /> [[c5]]Dan Lor, {{dir:lor|membaik|memburuk}}, dari {{lor.before|d0}} persen, <break time="0.3s" /> [[m5]]menjadi {{lor.after}} persen. <break time="0.6s" /> [[f]]Seluruh angka {{meta.yearAfter}} adalah performa sampai {{txt:meta.ytdMonth}}.
@@ -35,7 +35,7 @@ Pertama. <break time="0.5s" /> Collection Effectiveness. <break time="0.8s" /> [
 Kedua. <break time="0.5s" /> Collection Cost Optimization. <break time="0.8s" /> [[p]]Realisasi cost sampai {{txt:meta.ytdMonth}} berada di [[m]]{{costVsPlan.after}} persen dari plan, <break time="0.4s" /> dan [[b]]cost of credit {{dir:cocYtd|turun|naik}}, dari {{cocYtd.before}} persen, <break time="0.3s" /> [[mc]]menjadi {{cocYtd.after}} persen. <break time="0.6s" /> Cost terealisasi sesuai plan, <break time="0.3s" /> secara efektif dan efisien.
 
 [SCENE 5 | lead=0.5 | min=12]
-Ketiga. <break time="0.5s" /> Manpower Capability. <break time="0.8s" /> [[k]]Rata-rata KPI manager {{dir:avgKpiManager|turun|naik}}, dari [[b]]{{avgKpiManager.before}} persen, <break time="0.3s" /> [[m]]menjadi {{avgKpiManager.after}} persen. <break time="0.6s" /> Dan [[i]]insentif manager, meningkat, [[im]]{{incentiveGrowth}} persen.
+Ketiga. <break time="0.5s" /> Manpower Capability. <break time="0.8s" /> [[k]]Dari manager dengan KPI di bawah {{scene5.threshold}} pada {{meta.yearBefore}}, <break time="0.4s" /> [[m]]{{scene5.improved}} manager, atau {{scene5.share|d0}} persen, <break time="0.4s" /> [[c]]kini membaik dan keluar dari zona merah. <break time="0.6s" /> Data sampai {{txt:scene5.dataUntil}}.
 
 [SCENE 6 | lead=0.4 | min=6]
 [[y]]{{meta.yearAfter}}, <break time="0.6s" /> telah kita selesaikan. <break time="1.0s" /> [[r]]Siap menghadapi tantangan, <break time="0.4s" /> {{meta.yearAfter+1}}.

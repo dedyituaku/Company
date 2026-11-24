@@ -12,14 +12,12 @@ window.RAKERNAS_DATA = {
     "tagline": "[ISI TAGLINE RAKERNAS]",
     "taglineIsDummy": true,
     "ytdMonth": "Oktober",
-    "dummyScenes": [
-      "s5"
-    ],
+    "dummyScenes": [],
     "source": {
       "file": "COC 202610R1",
       "sheet": "BFI_ALL",
       "baseline": "baseline OKR",
-      "catatan": "2025 = posisi Des 2025; 2026* = performa YTD Oktober 2026. Angka rupiah YTD (10 bulan) tidak dibandingkan langsung dengan 2025 (12 bulan): dipakai rasio atau rata-rata per bulan. Satuan M = miliar rupiah. Scene 5 masih DUMMY. Cek ulang data H-1."
+      "catatan": "2025 = posisi Des 2025; 2026* = performa YTD Oktober 2026. Angka rupiah YTD (10 bulan) tidak dibandingkan langsung dengan 2025 (12 bulan): dipakai rasio atau rata-rata per bulan. Satuan M = miliar rupiah. Scene 5: lihat scene5.source. Cek ulang data H-1."
     },
     "logoExists": true
   },
@@ -100,7 +98,6 @@ window.RAKERNAS_DATA = {
       "v2": 959.3
     }
   },
-  "incentiveGrowth": 18,
   "initiatives2027": [
     {
       "title": "Collection Effectiveness Transformation",
@@ -135,7 +132,7 @@ window.RAKERNAS_DATA = {
   ],
   "timing": {
     "_catatan": "Detik pada timeline utama. Ubah juga data-start/data-duration host di index.html jika durasi scene diubah.",
-    "total": 200.33,
+    "total": 204.04,
     "scenes": [
       {
         "id": "s1",
@@ -145,47 +142,47 @@ window.RAKERNAS_DATA = {
       {
         "id": "s2",
         "start": 12.69,
-        "end": 29.39
+        "end": 30.78
       },
       {
         "id": "s3",
-        "start": 29.39,
-        "end": 86.37
+        "start": 30.78,
+        "end": 87.76
       },
       {
         "id": "s4",
-        "start": 86.37,
-        "end": 112.27
+        "start": 87.76,
+        "end": 113.66
       },
       {
         "id": "s5",
-        "start": 112.27,
-        "end": 131.72
+        "start": 113.66,
+        "end": 135.43
       },
       {
         "id": "s6",
-        "start": 131.72,
-        "end": 145.03
+        "start": 135.43,
+        "end": 148.74
       },
       {
         "id": "s7",
-        "start": 145.03,
-        "end": 190.91
+        "start": 148.74,
+        "end": 194.62
       },
       {
         "id": "s8",
-        "start": 190.91,
-        "end": 200.33
+        "start": 194.62,
+        "end": 204.04
       }
     ],
     "flashAt": [
       12.69,
-      29.39,
-      86.37,
-      112.27,
-      131.72,
-      145.03,
-      190.91
+      30.78,
+      87.76,
+      113.66,
+      135.43,
+      148.74,
+      194.62
     ]
   },
   "vo": {
@@ -197,63 +194,63 @@ window.RAKERNAS_DATA = {
         "start": 5.5,
         "dur": 6.792,
         "lufs": -23.2,
-        "gain": 0.912
+        "gain": 0.813
       },
       {
         "scene": 2,
         "file": "assets/vo/scene2.mp3",
         "start": 13.19,
-        "dur": 15.804,
-        "lufs": -23.6,
-        "gain": 0.955
+        "dur": 17.189,
+        "lufs": -27.6,
+        "gain": 1.349
       },
       {
         "scene": 3,
         "file": "assets/vo/scene3.mp3",
-        "start": 29.89,
+        "start": 31.28,
         "dur": 56.085,
         "lufs": -27,
-        "gain": 1.413
+        "gain": 1.259
       },
       {
         "scene": 4,
         "file": "assets/vo/scene4.mp3",
-        "start": 86.87,
+        "start": 88.26,
         "dur": 24.999,
         "lufs": -25.5,
-        "gain": 1.189
+        "gain": 1.059
       },
       {
         "scene": 5,
         "file": "assets/vo/scene5.mp3",
-        "start": 112.77,
-        "dur": 18.547,
-        "lufs": -24,
-        "gain": 1
+        "start": 114.16,
+        "dur": 20.872,
+        "lufs": -24.3,
+        "gain": 0.923
       },
       {
         "scene": 6,
         "file": "assets/vo/scene6.mp3",
-        "start": 132.12,
+        "start": 135.83,
         "dur": 12.513,
         "lufs": -25,
-        "gain": 1.122
+        "gain": 1
       },
       {
         "scene": 7,
         "file": "assets/vo/scene7.mp3",
-        "start": 145.53,
+        "start": 149.24,
         "dur": 44.983,
         "lufs": -25.7,
-        "gain": 1.216
+        "gain": 1.084
       },
       {
         "scene": 8,
         "file": "assets/vo/scene8.mp3",
-        "start": 191.91,
+        "start": 195.62,
         "dur": 8.02,
         "lufs": -23.2,
-        "gain": 0.912
+        "gain": 0.813
       }
     ],
     "duck": {
@@ -264,13 +261,6 @@ window.RAKERNAS_DATA = {
     },
     "fadeIn": 0.15,
     "fadeOut": 0.3
-  },
-  "avgKpiManager": {
-    "label": "Rata-rata KPI Manager",
-    "before": 96,
-    "after": 104,
-    "unit": "%",
-    "better": "up"
   },
   "sfx": {
     "_catatan": "SFX: file API ElevenLabs (assets/sfx/NAMA.mp3, dibuat generate-audio.mjs) bila ada; kalau tidak, build.mjs memakai placeholder sintetis lewat 'fallback'. Event: scene + t (nama cue di data.audio.cues atau detik di dalam scene) + off (offset detik); puncak bunyi jatuh 1 frame setelah momen visual. vol = data-volume (dijaga rendah agar tidak menutup VO). SFX yang bertumpuk VO otomatis diturunkan (sfxUnderVo) oleh build.mjs.",
@@ -371,49 +361,49 @@ window.RAKERNAS_DATA = {
         "f": "whoosh",
         "scene": "s2",
         "t": 0,
-        "vol": 0.24,
+        "vol": 0.12,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s3",
         "t": 0,
-        "vol": 0.24,
+        "vol": 0.12,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s4",
         "t": 0,
-        "vol": 0.24,
+        "vol": 0.12,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s5",
         "t": 0,
-        "vol": 0.24,
+        "vol": 0.12,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s6",
         "t": 0,
-        "vol": 0.24,
+        "vol": 0.12,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s7",
         "t": 0,
-        "vol": 0.24,
+        "vol": 0.12,
         "note": "flash putih / transisi scene"
       },
       {
         "f": "whoosh",
         "scene": "s8",
         "t": 0,
-        "vol": 0.24,
+        "vol": 0.12,
         "note": "flash putih / transisi scene"
       },
       {
@@ -527,38 +517,6 @@ window.RAKERNAS_DATA = {
         "off": 1.9
       },
       {
-        "f": "tick-run",
-        "scene": "s5",
-        "t": "m",
-        "vol": 0.1,
-        "note": "counter berjalan - s5 ring KPI",
-        "dur": 2
-      },
-      {
-        "f": "chime",
-        "scene": "s5",
-        "t": "m",
-        "vol": 0.14,
-        "note": "nilai akhir tercapai - s5 KPI",
-        "off": 2.1
-      },
-      {
-        "f": "tick-run",
-        "scene": "s5",
-        "t": "im",
-        "vol": 0.1,
-        "note": "counter berjalan - s5 insentif",
-        "dur": 1.8
-      },
-      {
-        "f": "chime",
-        "scene": "s5",
-        "t": "im",
-        "vol": 0.14,
-        "note": "nilai akhir tercapai - s5 insentif",
-        "off": 1.4
-      },
-      {
         "f": "logo-swell",
         "scene": "s8",
         "t": 2.8,
@@ -576,7 +534,7 @@ window.RAKERNAS_DATA = {
         "f": "whoosh",
         "scene": "s2",
         "t": "c1",
-        "vol": 0.14,
+        "vol": 0.07,
         "note": "kartu prioritas muncul: whoosh lembut",
         "off": -0.1
       },
@@ -592,7 +550,7 @@ window.RAKERNAS_DATA = {
         "f": "whoosh",
         "scene": "s2",
         "t": "c2",
-        "vol": 0.14,
+        "vol": 0.07,
         "note": "kartu prioritas muncul: whoosh lembut",
         "off": -0.1
       },
@@ -608,7 +566,7 @@ window.RAKERNAS_DATA = {
         "f": "whoosh",
         "scene": "s2",
         "t": "c3",
-        "vol": 0.14,
+        "vol": 0.07,
         "note": "kartu prioritas muncul: whoosh lembut",
         "off": -0.1
       },
@@ -674,13 +632,6 @@ window.RAKERNAS_DATA = {
         "off": -3.8
       },
       {
-        "f": "fanfare",
-        "scene": "s6",
-        "t": "r",
-        "vol": 0.28,
-        "note": "fanfare brass pendek saat READY FOR NEW CHALLENGES"
-      },
-      {
         "f": "applause",
         "scene": "s6",
         "t": "end",
@@ -695,6 +646,29 @@ window.RAKERNAS_DATA = {
         "vol": 0.14,
         "note": "tepuk tangan halus (API) di akhir S8",
         "off": 0.3
+      },
+      {
+        "f": "tick-run",
+        "scene": "s5",
+        "t": "m",
+        "vol": 0.1,
+        "note": "ring terisi saat angka disebut",
+        "dur": 2
+      },
+      {
+        "f": "chime",
+        "scene": "s5",
+        "t": "m",
+        "vol": 0.14,
+        "note": "ring mencapai nilai akhir",
+        "off": 2
+      },
+      {
+        "f": "opening-hit",
+        "scene": "s7",
+        "t": 0.05,
+        "vol": 0.28,
+        "note": "hit pembuka scene 7"
       }
     ],
     "fallback": {
@@ -760,11 +734,6 @@ window.RAKERNAS_DATA = {
         "prompt": "soft cinematic swell rising gently, warm and elegant, short"
       },
       {
-        "name": "fanfare",
-        "duration": 4,
-        "prompt": "short triumphant brass fanfare, cinematic, heroic trumpets, bright"
-      },
-      {
         "name": "timpani-roll",
         "duration": 4,
         "prompt": "soft orchestral timpani roll crescendo building anticipation"
@@ -781,7 +750,7 @@ window.RAKERNAS_DATA = {
       }
     ],
     "music": {
-      "_catatan": "SATU bed kontinu assets/music/bgm-main.mp3 (stem Sound Effects API + acrossfade 4 dtk; Music API tidak dipakai). Intensitas LOW-MEDIUM-HIGH lewat keyframe (relatif scene); level = pengali dasar; ducking VO diatur di vo.duck. Lantai musik tanpa VO per scene: S1 -24, S2 -22, S3-4 -20, S5 -18, S6 -15, S7 -14 LUFS.",
+      "_catatan": "SATU bed kontinu (assets/music/bgm-main.mp3: satu track Music API, satu kunci D minor, ~95 BPM, tanpa brass; diperpanjang di klimaks lewat loop di batas bar). targets = level musik TANPA VO (LUFS akhir) per titik waktu (lantai: S1 -24, S2 -22, S3-4 -20, S5 -18, S6 -15, S7 -14; sedikit dinaikkan agar ducking tetap > -30 LUFS). mix-bus.mjs mengkalibrasi gain otomatis.",
       "name": "bgm-main",
       "level": 1.15,
       "crossfade": 4,
@@ -795,82 +764,91 @@ window.RAKERNAS_DATA = {
         "heroic": "heroic triumphant orchestral music, powerful brass and strings, building to a climax, instrumental, no vocals",
         "resolve": "calm resolving cinematic ambient pad, warm strings fading gently, hopeful, instrumental, no vocals, no drums"
       },
-      "intensity": [
+      "apiPrompt": "Cinematic corporate awards ceremony orchestral instrumental, constant tempo 95 BPM, single key D minor throughout. Starts very quietly and sparsely with a deep low drone and a soft heartbeat pulse, then warm pads and low strings enter, gentle soft timpani and subtle rhythm around 95 BPM, builds gradually and steadily with rising strings and soft timpani toward a full powerful orchestral climax in the final third, then resolves to a soft pad ending. No brass, no trumpets, no vocals, no lead melody competing with narration, no key changes, no tempo changes, smooth continuous flow, leaves space for a voice-over.",
+      "bpm": 95,
+      "targets": [
         {
           "scene": "s1",
           "t": 0,
-          "v": 0.3
-        },
-        {
-          "scene": "s1",
-          "t": 5,
-          "v": 0.46
+          "lufs": -23.5
         },
         {
           "scene": "s1",
           "t": "sceneEnd",
-          "v": 0.4
+          "lufs": -22,
+          "off": -1
         },
         {
           "scene": "s2",
-          "t": 2,
-          "v": 0.4
+          "t": 1.5,
+          "lufs": -20
+        },
+        {
+          "scene": "s2",
+          "t": "sceneEnd",
+          "lufs": -20,
+          "off": -1
         },
         {
           "scene": "s3",
-          "t": 2,
-          "v": 0.5
+          "t": 1.5,
+          "lufs": -19
+        },
+        {
+          "scene": "s4",
+          "t": "sceneEnd",
+          "lufs": -19,
+          "off": -1
         },
         {
           "scene": "s5",
-          "t": 2,
-          "v": 0.52
+          "t": 1.5,
+          "lufs": -18
         },
         {
           "scene": "s5",
           "t": "sceneEnd",
-          "off": -7,
-          "v": 0.6
+          "lufs": -18,
+          "off": -9
         },
         {
           "scene": "s5",
           "t": "sceneEnd",
-          "v": 0.86
+          "lufs": -15,
+          "off": -1
         },
         {
           "scene": "s6",
-          "t": "r",
-          "v": 0.84
+          "t": 1.5,
+          "lufs": -14.2
         },
         {
           "scene": "s6",
           "t": "sceneEnd",
-          "v": 0.86
+          "lufs": -14.2,
+          "off": -1
         },
         {
           "scene": "s7",
-          "t": "c1",
-          "v": 0.96
-        },
-        {
-          "scene": "s7",
-          "t": "c2",
-          "v": 1
+          "t": 1.5,
+          "lufs": -13.2
         },
         {
           "scene": "s7",
           "t": "sceneEnd",
-          "v": 1
+          "lufs": -13.2,
+          "off": -1
         },
         {
           "scene": "s8",
-          "t": 3,
-          "v": 0.6
+          "t": 1.5,
+          "lufs": -20
         },
         {
           "scene": "s8",
           "t": "sceneEnd",
-          "v": 0.36
+          "lufs": -23,
+          "off": -1
         }
       ]
     },
@@ -902,10 +880,10 @@ window.RAKERNAS_DATA = {
     },
     "dur": {
       "s1": 12.69,
-      "s2": 16.7,
+      "s2": 18.09,
       "s3": 56.98,
       "s4": 25.9,
-      "s5": 19.45,
+      "s5": 21.77,
       "s6": 13.31,
       "s7": 45.88,
       "s8": 9.42
@@ -917,10 +895,10 @@ window.RAKERNAS_DATA = {
         "end": 10.469
       },
       "s2": {
-        "c1": 5.632,
-        "c2": 8.731,
-        "c3": 11.065,
-        "end": 14.478
+        "c1": 6.932,
+        "c2": 10.252,
+        "c3": 12.586,
+        "end": 15.872
       },
       "s3": {
         "c1": 4.517,
@@ -944,12 +922,10 @@ window.RAKERNAS_DATA = {
         "end": 23.673
       },
       "s5": {
-        "k": 4.854,
-        "b": 7.64,
-        "m": 9.927,
-        "i": 12.725,
-        "im": 15.071,
-        "end": 17.218
+        "k": 4.227,
+        "m": 10.415,
+        "c": 13.863,
+        "end": 19.54
       },
       "s6": {
         "y": 0.4,
@@ -968,10 +944,10 @@ window.RAKERNAS_DATA = {
     },
     "script": {
       "s1": "dua ribu dua puluh enam. Three key initiatives.",
-      "s2": "Di awal tahun, kita menetapkan tiga prioritas. Meningkatkan efektivitas collection. Mengoptimalkan cost. Dan memperkuat kapabilitas manpower.",
+      "s2": "Di awal tahun dua ribu dua puluh enam, kita menetapkan tiga prioritas utama. Meningkatkan efektivitas collection. Mengoptimalkan cost. Dan memperkuat kapabilitas manpower.",
       "s3": "Pertama. Collection Effectiveness. Delinquency sembilan puluh plus, membaik, dari satu koma empat satu persen, menjadi satu koma tiga dua persen. Delinquency tiga puluh plus berada di tiga koma tujuh tiga persen, mendekati budget. Rata-rata WO Recovery per bulan, naik, dari sembilan belas koma enam, menjadi dua puluh satu koma tiga miliar rupiah, dengan akumulasi dua ratus dua belas koma lima miliar rupiah sampai Oktober. WO In tujuh ratus delapan puluh koma lima miliar rupiah, di bawah budget. Dan Lor, membaik, dari empat belas persen, menjadi tujuh koma empat empat persen. Seluruh angka dua ribu dua puluh enam adalah performa sampai Oktober.",
       "s4": "Kedua. Collection Cost Optimization. Realisasi cost sampai Oktober berada di sembilan puluh satu persen dari plan, dan cost of credit turun, dari empat koma tiga dua persen, menjadi tiga koma sembilan dua persen. Cost terealisasi sesuai plan, secara efektif dan efisien.",
-      "s5": "Ketiga. Manpower Capability. Rata-rata KPI manager naik, dari sembilan puluh enam persen, menjadi seratus empat persen. Dan insentif manager, meningkat, delapan belas persen.",
+      "s5": "Ketiga. Manpower Capability. Dari manager dengan KPI di bawah dua koma dua lima pada dua ribu dua puluh lima, tiga belas manager, atau enam puluh dua persen, kini membaik dan keluar dari zona merah. Data sampai September.",
       "s6": "dua ribu dua puluh enam, telah kita selesaikan. Siap menghadapi tantangan, dua ribu dua puluh tujuh.",
       "s7": "Dan kini. Key Initiatives dua ribu dua puluh tujuh. Pertama, Collection Effectiveness Transformation. Meningkatkan cara kita menagih, melalui scored allocation, datamart terpadu, segment turnaround, dan channel mix. Kedua, Recovery Resolution and Acceleration. Mempercepat pemulihan dan penyelesaian, melalui debt sale, eksekusi NPL-WO, legal action, dan optimalisasi channel penjualan aset. Ketiga, Collection Productivity and Capability Transformation. Memperkuat siapa yang mengeksekusi, dan seberapa efisien.",
       "s8": "Bersama, kita melangkah, menuju dua ribu dua puluh tujuh."
@@ -992,22 +968,22 @@ window.RAKERNAS_DATA = {
         "tick-run": "elevenlabs"
       },
       "music": {
-        "bgm-main": "elevenlabs-sound-generation-stems"
+        "bgm-main": "elevenlabs-music-api (satu track)"
       }
     },
     "voDur": {
       "s1": 6.792,
-      "s2": 15.804,
+      "s2": 17.189,
       "s3": 56.085,
       "s4": 24.999,
-      "s5": 18.547,
+      "s5": 20.872,
       "s6": 12.513,
       "s7": 44.983,
       "s8": 8.02
     },
     "chars": {
-      "vo": 2781,
-      "ttsSent": 2781
+      "vo": 2860,
+      "ttsSent": 811
     },
     "voice": {
       "id": "I7sakys8pBZ1Z5f0UhT9",
@@ -1026,9 +1002,9 @@ window.RAKERNAS_DATA = {
       "assets/music/stems/stem07-resolve.mp3"
     ],
     "musicDur": {
-      "bgm-main": 200.36
+      "bgm-main": 205.09
     },
-    "voLufsTarget": -24,
+    "voLufsTarget": -25,
     "consistency": {
       "metrics": {
         "s1": {
@@ -1039,10 +1015,10 @@ window.RAKERNAS_DATA = {
           "map": "dengan-tag"
         },
         "s2": {
-          "rawDur": 14.03,
-          "lufs": -23.6,
-          "f0": 222.2,
-          "rate": 10.56,
+          "rawDur": 15.41,
+          "lufs": -27.6,
+          "f0": 177.8,
+          "rate": 11.27,
           "map": "dengan-tag"
         },
         "s3": {
@@ -1060,10 +1036,10 @@ window.RAKERNAS_DATA = {
           "map": "dengan-tag"
         },
         "s5": {
-          "rawDur": 16.74,
-          "lufs": -24,
-          "f0": 210.5,
-          "rate": 10.73,
+          "rawDur": 19.07,
+          "lufs": -24.3,
+          "f0": 186,
+          "rate": 11.67,
           "map": "dengan-tag"
         },
         "s6": {
@@ -1089,7 +1065,114 @@ window.RAKERNAS_DATA = {
         }
       },
       "retried": [],
-      "outliersAfter": []
+      "outliersAfter": [],
+      "takes": [
+        "assets/vo/scene2-takeA.mp3",
+        "assets/vo/scene2-takeB.mp3"
+      ]
+    },
+    "musicFit": {
+      "loopSec": 12.77,
+      "bpm": 93.95,
+      "originalDropSec": 180
+    },
+    "bus": {
+      "duration": 204.04,
+      "sfxKept": 42,
+      "sfxDropped": [
+        "applause@s6:end"
+      ],
+      "masterGainDb": 8.2,
+      "table": [
+        {
+          "s": "s1",
+          "dur": 12.7,
+          "musikTanpaVO": -23.2,
+          "musikTermix": -27.6,
+          "musikSaatVO": -30.3,
+          "sfxSaja": -31,
+          "VO": -13.8,
+          "mix": -17.3,
+          "status": "ok"
+        },
+        {
+          "s": "s2",
+          "dur": 18.1,
+          "musikTanpaVO": -20.6,
+          "musikTermix": -28.2,
+          "musikSaatVO": -28.9,
+          "sfxSaja": -40.5,
+          "VO": -13.9,
+          "mix": -13.9,
+          "status": "ok"
+        },
+        {
+          "s": "s3",
+          "dur": 57,
+          "musikTanpaVO": -19.6,
+          "musikTermix": -27.4,
+          "musikSaatVO": -27.6,
+          "sfxSaja": -42.1,
+          "VO": -13.8,
+          "mix": -13.8,
+          "status": "ok"
+        },
+        {
+          "s": "s4",
+          "dur": 25.9,
+          "musikTanpaVO": -19.5,
+          "musikTermix": -27.3,
+          "musikSaatVO": -27.4,
+          "sfxSaja": -42.2,
+          "VO": -13.8,
+          "mix": -13.8,
+          "status": "ok"
+        },
+        {
+          "s": "s5",
+          "dur": 21.8,
+          "musikTanpaVO": -17.7,
+          "musikTermix": -25.5,
+          "musikSaatVO": -25.8,
+          "sfxSaja": -41.4,
+          "VO": -13.8,
+          "mix": -14,
+          "status": "ok"
+        },
+        {
+          "s": "s6",
+          "dur": 13.3,
+          "musikTanpaVO": -14.7,
+          "musikTermix": -22.6,
+          "musikSaatVO": -22.7,
+          "sfxSaja": -37.6,
+          "VO": -13.9,
+          "mix": -15.3,
+          "status": "ok"
+        },
+        {
+          "s": "s7",
+          "dur": 45.9,
+          "musikTanpaVO": -13.8,
+          "musikTermix": -21.7,
+          "musikSaatVO": -21.8,
+          "sfxSaja": -39.6,
+          "VO": -13.8,
+          "mix": -13.8,
+          "status": "ok"
+        },
+        {
+          "s": "s8",
+          "dur": 9.4,
+          "musikTanpaVO": -21,
+          "musikTermix": -26.3,
+          "musikSaatVO": -29.4,
+          "sfxSaja": -40.1,
+          "VO": -13.9,
+          "mix": -14.3,
+          "status": "ok"
+        }
+      ]
     }
   },
   "voice": {
@@ -1124,6 +1207,23 @@ window.RAKERNAS_DATA = {
         "tailSec": 1.2,
         "wet": 0.12
       }
+    },
+    "overrides": {
+      "s2": {
+        "stability": 0.55,
+        "similarityBoost": 0.8,
+        "style": 0.3,
+        "speed": 0.9,
+        "speakerBoost": true
+      }
+    },
+    "takeB": {
+      "scene": 2,
+      "stability": 0.6,
+      "similarityBoost": 0.8,
+      "style": 0.2,
+      "speed": 0.9,
+      "speakerBoost": true
     }
   },
   "cocYtd": {
@@ -1141,6 +1241,29 @@ window.RAKERNAS_DATA = {
       "woRecovery",
       "woIn",
       "lor"
+    ]
+  },
+  "scene5": {
+    "_catatan": "Scene 5 DATA AKTUAL. Kohort = manager dengan rata-rata KPI < threshold pada Jan-Sep 2025. share = improved/recorded. Template teks memakai {t} threshold, {y} tahun pembanding, {ya} tahun 2026*, {n} improved, {p} share dibulatkan, {r} recorded, {m} missing.",
+    "source": "Rekap KPI Incentive 202501-202610, rata-rata KPI per manager Jan-Sep",
+    "threshold": 2.25,
+    "cohort": 25,
+    "recorded": 21,
+    "improved": 13,
+    "missing": 4,
+    "notImproved": 8,
+    "share": 61.9,
+    "dataUntil": "September",
+    "title": "Manager dengan KPI < {t} pada {y}",
+    "subtitle": "Membaik dan keluar dari zona merah pada {ya}",
+    "ringLabel": "Zona merah: KPI < {t}",
+    "chip": "{n} manager atau sebesar {p}% membaik",
+    "footnote": "*Rata-rata KPI per manager, Jan-Sep 2025 vs Jan-Sep 2026. Dari {r} manager yang tercatat di 2026; {m} manager lainnya tidak ada di data MAM 2026.",
+    "notes": [
+      "Denominator: 21 manager tercatat di data 2026 (kohort awal 25 manager dengan rata-rata KPI < 2,25 pada Jan-Sep 2025); 13 membaik dan kini di atas 2,25, 8 belum membaik. 4 manager tidak ada di data MAM 2026; alasannya belum diverifikasi (cek HR).",
+      "PERINGATAN: jumlah manager dengan KPI < 2,25 secara keseluruhan NAIK dari 25 (dari 150 manager) pada 2025 menjadi 63 (dari 155 manager) pada 2026. Jangan menyatakan bahwa kelompok KPI rendah mengecil.",
+      "Satu manager hanya sedikit di atas ambang (2,258).",
+      "Rata-rata KPI nasional Jan-Sep turun dari 2,64 ke 2,37; penyebabnya belum diverifikasi."
     ]
   }
 };
