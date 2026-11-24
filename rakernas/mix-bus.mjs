@@ -19,7 +19,7 @@ const total = d.timing.total, N = Math.ceil(total * SR);
 const tmp = mkdtempSync(join(tmpdir(), "rk-bus-"));
 process.on("exit", () => { try { rmSync(tmp, { recursive: true, force: true }); } catch {} });
 const MU = d.elevenlabs.music;
-const CFG = { lowpassHz: 9000, dipDb: -3, dipBand: [2000, 4000], reverb: { rt60: 1.8, wet: 0.14, preDelay: 0.02 }, sfxUnderVo: d.sfx.sfxUnderVo ?? 0.45, maxConcurrent: 2, ...(d.mix || {}) };
+const CFG = { maxBoostDb: 0, lowpassHz: 9000, dipDb: -3, dipBand: [2000, 4000], reverb: { rt60: 1.8, wet: 0.14, preDelay: 0.02 }, sfxUnderVo: d.sfx.sfxUnderVo ?? 0.45, maxConcurrent: 2, ...(d.mix || {}) };
 
 // ---------- util ----------
 const ff = (args, opt = {}) => spawnSync("ffmpeg", ["-v", "error", ...args], { maxBuffer: 1 << 30, ...opt });
@@ -62,9 +62,9 @@ const full = decode(bgm, lp, total + 1), band = decode(bgm, `${lp},highpass=f=${
 const FI = MU.fadeIn ?? 2, FO = MU.fadeOut ?? 3;
 const sceneOf = (t) => (scenes.find((x) => t >= x.start && t < x.end) || scenes[scenes.length - 1]).id;
 const tg = MU.targets.map((k) => { const rel = k.t === "sceneEnd" ? sdur[k.scene] : typeof k.t === "number" ? k.t : d.audio.cues[k.scene]?.[k.t]; if (rel == null) throw new Error(`musik: cue ${k.t} tidak ada di ${k.scene}`); return { t: start[k.scene] + rel + (k.off || 0), lufs: k.lufs, scene: k.scene }; }).sort((a, b) => a.t - b.t);
-// level alami trek (dB RMS, jendela Hann +-4 dtk), per detik
+// level alami trek (dB RMS, jendela Hann +-2 dtk), per detik; gain dibatasi agar intro yang sangat pelan tidak dinaikkan berlebihan
 const secs = Math.ceil(total) + 1, nat = new Float32Array(secs);
-for (let s0 = 0; s0 < secs; s0++) { let e = 0, w = 0; for (let k = -4; k <= 4; k++) { const sec = Math.min(secs - 2, Math.max(0, s0 + k)), a0 = sec * SR, hw = 0.5 + 0.5 * Math.cos(Math.PI * k / 5); let p = 0; for (let i = a0; i < Math.min(full.length, a0 + SR); i += 4) p += full[i] ** 2; e += hw * p / (SR / 4); w += hw; } nat[s0] = 10 * Math.log10(e / w + 1e-10); }
+for (let s0 = 0; s0 < secs; s0++) { let e = 0, w = 0; const KW = s0 < 10 ? 0 : 2; for (let k = -KW; k <= KW; k++) { const sec = Math.min(secs - 2, Math.max(0, s0 + k)), a0 = sec * SR, hw = 0.5 + 0.5 * Math.cos(Math.PI * k / (KW + 1)); let p = 0; for (let i = a0; i < Math.min(full.length, a0 + SR); i += 4) p += full[i] ** 2; e += hw * p / (SR / 4); w += hw; } nat[s0] = 10 * Math.log10(e / w + 1e-10); }
 const natDb = (t) => { const p = Math.min(secs - 2, Math.max(0, t)), i = Math.floor(p), f = p - i; return nat[i] * (1 - f) + nat[i + 1] * f; };
 const voBus = new Float32Array(N);
 for (const sl of d.vo.slots) { const x = decode(sl.file); const o = Math.round(sl.start * SR); for (let i = 0; i < x.length && o + i < N; i++) voBus[o + i] += x[i] * (sl.gain ?? 1); }
@@ -86,11 +86,11 @@ function targetAt0(t) { const g = (k) => k.lufs; if (t <= tg[0].t) return g(tg[0
 let musicFree = new Float32Array(N), music = new Float32Array(N), G = 6, iterInfo = [];
 const envInt = new Float32Array(M1);
 for (let iter = 0; iter < 5; iter++) {
-  for (let i = 0; i < M1; i++) { const t = i / RATE; envInt[i] = 10 ** ((targetAt(t) - G - natDb(t)) / 20); }
+  for (let i = 0; i < M1; i++) { const t = i / RATE; envInt[i] = Math.min(10 ** ((targetAt(t) - G - natDb(t)) / 20), 10 ** (CFG.maxBoostDb / 20) * 10 ** ((targetAt(t) - G - Math.max(natDb(t), -42)) / 20)); }
   for (let i = 0; i < N; i++) {
     const t = i / SR, x = i < full.length ? full[i] : 0, bnd = i < band.length ? band[i] : 0;
     let g = envInt[Math.min(M1 - 1, Math.round(t * RATE))];
-    if (t < FI) g *= t / FI; if (total - t < FO) g *= Math.max(0, (total - t) / FO);
+    if (t < FI) g *= Math.sin(Math.PI / 2 * t / FI); if (total - t < FO) g *= Math.max(0, (total - t) / FO);   // fade in kurva sinus: terdengar sejak detik pertama
     musicFree[i] = x * g;
     music[i] = (x - bnd * (1 - at1k(envDip, t))) * g * at1k(envMusic, t);   // -3 dB pada 2-4 kHz saat VO + ducking
   }
@@ -102,6 +102,7 @@ for (let iter = 0; iter < 5; iter++) {
   if (worst < 0.6) break;
 }
 console.log("Kalibrasi level musik:", JSON.stringify(iterInfo));
+console.log("Intro musik (t: target LUFS / level alami dB / gain dB):", [0, 1, 2, 3, 4, 6, 8, 12].map((t) => `${t}s: ${targetAt(t).toFixed(1)} / ${natDb(t).toFixed(1)} / ${(20 * Math.log10(envInt[t * RATE])).toFixed(1)}`).join(" | "));
 
 // ---------- 2. SFX: resolusi event, level, batas serentak ----------
 const resolve = (e) => { const rel = typeof e.t === "number" ? e.t : e.t === "sceneEnd" ? sdur[e.scene] : d.audio.cues[e.scene]?.[e.t]; if (rel == null) throw new Error(`SFX ${e.f}: cue ${e.t} tidak ada di ${e.scene}`); return start[e.scene] + rel + (e.off || 0); };
@@ -167,7 +168,7 @@ for (let i = 0; i < N; i++) { L[i] = dry[i] * (1 - W) + (wet[0][i] ?? 0) * wscal
 const inter = new Float32Array(N * 2); for (let i = 0; i < N; i++) { inter[2 * i] = L[i]; inter[2 * i + 1] = R[i]; }
 const raw = join(tmp, "bus.f32"); writeFileSync(raw, Buffer.from(inter.buffer));
 mkdirSync("assets/mix", { recursive: true });
-const enc = ff(["-f", "f32le", "-ar", String(SR), "-ac", "2", "-i", raw, "-af", "alimiter=limit=0.89:attack=5:release=120", "-ar", "48000", "-b:a", "192k", "assets/mix/bus.mp3"]);
+const enc = ff(["-y", "-f", "f32le", "-ar", String(SR), "-ac", "2", "-i", raw, "-af", "alimiter=limit=0.89:attack=5:release=120", "-ar", "48000", "-b:a", "192k", "assets/mix/bus.mp3"]);
 if (enc.status !== 0) throw new Error("encode bus gagal: " + enc.stderr);
 
 // ---------- 4. laporan ----------

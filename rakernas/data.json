@@ -1071,9 +1071,9 @@
       ]
     },
     "musicFit": {
-      "loopSec": 12.77,
-      "bpm": 93.95,
-      "originalDropSec": 180
+      "loopSec": 15.27,
+      "bpm": 94.33,
+      "originalDropSec": 179
     },
     "bus": {
       "duration": 204.04,
@@ -1086,9 +1086,9 @@
         {
           "s": "s1",
           "dur": 12.7,
-          "musikTanpaVO": -23.2,
-          "musikTermix": -27.6,
-          "musikSaatVO": -30.3,
+          "musikTanpaVO": -23.1,
+          "musikTermix": -26,
+          "musikSaatVO": -31,
           "sfxSaja": -31,
           "VO": -13.8,
           "mix": -17.3,
@@ -1097,42 +1097,42 @@
         {
           "s": "s2",
           "dur": 18.1,
-          "musikTanpaVO": -20.6,
-          "musikTermix": -28.2,
-          "musikSaatVO": -28.9,
+          "musikTanpaVO": -20.5,
+          "musikTermix": -28.4,
+          "musikSaatVO": -28.4,
           "sfxSaja": -40.5,
           "VO": -13.9,
-          "mix": -13.9,
+          "mix": -13.8,
           "status": "ok"
         },
         {
           "s": "s3",
           "dur": 57,
           "musikTanpaVO": -19.6,
-          "musikTermix": -27.4,
-          "musikSaatVO": -27.6,
+          "musikTermix": -27.5,
+          "musikSaatVO": -27.5,
           "sfxSaja": -42.1,
           "VO": -13.8,
-          "mix": -13.8,
+          "mix": -13.7,
           "status": "ok"
         },
         {
           "s": "s4",
           "dur": 25.9,
-          "musikTanpaVO": -19.5,
-          "musikTermix": -27.3,
+          "musikTanpaVO": -19.4,
+          "musikTermix": -27.1,
           "musikSaatVO": -27.4,
           "sfxSaja": -42.2,
           "VO": -13.8,
-          "mix": -13.8,
+          "mix": -13.9,
           "status": "ok"
         },
         {
           "s": "s5",
           "dur": 21.8,
-          "musikTanpaVO": -17.7,
+          "musikTanpaVO": -17.6,
           "musikTermix": -25.5,
-          "musikSaatVO": -25.8,
+          "musikSaatVO": -25.5,
           "sfxSaja": -41.4,
           "VO": -13.8,
           "mix": -14,
@@ -1141,34 +1141,34 @@
         {
           "s": "s6",
           "dur": 13.3,
-          "musikTanpaVO": -14.7,
-          "musikTermix": -22.6,
-          "musikSaatVO": -22.7,
+          "musikTanpaVO": -14.6,
+          "musikTermix": -22.4,
+          "musikSaatVO": -22.8,
           "sfxSaja": -37.6,
           "VO": -13.9,
-          "mix": -15.3,
+          "mix": -15.4,
           "status": "ok"
         },
         {
           "s": "s7",
           "dur": 45.9,
-          "musikTanpaVO": -13.8,
-          "musikTermix": -21.7,
-          "musikSaatVO": -21.8,
+          "musikTanpaVO": -13.7,
+          "musikTermix": -21.6,
+          "musikSaatVO": -21.7,
           "sfxSaja": -39.6,
           "VO": -13.8,
-          "mix": -13.8,
+          "mix": -13.9,
           "status": "ok"
         },
         {
           "s": "s8",
           "dur": 9.4,
-          "musikTanpaVO": -21,
-          "musikTermix": -26.3,
-          "musikSaatVO": -29.4,
+          "musikTanpaVO": -20.9,
+          "musikTermix": -28.3,
+          "musikSaatVO": -28.6,
           "sfxSaja": -40.1,
           "VO": -13.9,
-          "mix": -14.3,
+          "mix": -14,
           "status": "ok"
         }
       ]

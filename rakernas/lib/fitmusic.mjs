@@ -22,7 +22,16 @@ export function analyzeTrack(f, bpmHint = 95) {
 }
 
 // dropTarget: detik pada timeline akhir tempat klimaks harus berakhir (mis. akhir scene 7 - 1). total: panjang minimal bed.
-export function fitMusic({ src, out, total, dropTarget, bpmHint = 95, xfade = 4, log = console.log }) {
+export function fitMusic({ src: src0, out, total, dropTarget, bpmHint = 95, xfade = 4, log = console.log }) {
+  // potong hening digital di awal trek (Music API memberi ~0,6 dtk) supaya musik terdengar sejak detik 0
+  let src = src0;
+  const sd = spawnSync("ffmpeg", ["-hide_banner", "-nostats", "-t", "5", "-i", src0, "-af", "silencedetect=n=-55dB:d=0.05", "-f", "null", "-"], { encoding: "utf8" }).stderr;
+  const m0 = /silence_start: 0[\s\S]*?silence_end: ([\d.]+)/.exec(sd);
+  if (m0 && +m0[1] > 0.05 && +m0[1] < 3) {
+    src = out.replace(/\.mp3$/, ".trim.mp3");
+    spawnSync("ffmpeg", ["-v", "error", "-y", "-ss", String(m0[1]), "-i", src0, "-ar", "44100", "-b:a", "192k", src]);
+    log(`  hening awal ${(+m0[1]).toFixed(2)} dtk dipotong`);
+  }
   const t = analyzeTrack(src, bpmHint);
   // penurunan besar terakhir: perubahan >= 10 dB antar detik pada 25% akhir trek
   let drop = null; for (let s = Math.floor(t.db.length * 0.75); s < t.db.length - 1; s++) if (t.db[s] - t.db[s + 1] >= 10) { drop = s + 1; break; }
