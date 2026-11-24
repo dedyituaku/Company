@@ -1,7 +1,7 @@
 {
   "version": 1,
   "historyId": "96137e10-6530-4933-b358-56f7d114a6a5",
-  "currentRevision": "97215527-3407-4bf4-8cfb-d54ec5f0dcec",
+  "currentRevision": "d380ca35-5083-486f-9ba1-b8ff311edb08",
   "pendingChanges": false,
   "files": {
     "AGENTS.md": {
@@ -431,10 +431,6 @@
     "AUDIO-DIAGNOSIS-v10.md": {
       "hash": "e4cdfc4ebf1404a6f455406697af76f186f24e84bd3bb70fbd9bb99ae9e34eb1",
       "content": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/e4/e4cdfc4ebf1404a6f455406697af76f186f24e84bd3bb70fbd9bb99ae9e34eb1"
-    },
-    "preview/rakernas-draft-v11.mp4": {
-      "hash": "7338b2c701bcfe951b02fc05c5869e880d9520dc2233af484134e5bc8b5bb55f",
-      "content": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/73/7338b2c701bcfe951b02fc05c5869e880d9520dc2233af484134e5bc8b5bb55f"
     },
     "assets/music/bgm-main.fit.mp3": {
       "hash": "ab32e23959545b0488e24ddec1196b669415006becd0def16bc8740d1e98a900",
@@ -1591,12 +1587,27 @@
           "after": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/73/7338b2c701bcfe951b02fc05c5869e880d9520dc2233af484134e5bc8b5bb55f"
         }
       }
+    },
+    "d380ca35-5083-486f-9ba1-b8ff311edb08": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1795500563851,
+      "endedAt": 1795500563853,
+      "files": {
+        "preview/rakernas-draft-v11.mp4": {
+          "before": "/root/.cache/hyperframes/history/96137e10-6530-4933-b358-56f7d114a6a5/blobs/73/7338b2c701bcfe951b02fc05c5869e880d9520dc2233af484134e5bc8b5bb55f",
+          "after": null
+        }
+      }
     }
   },
   "checks": {
     "latest": {
       "revision": null,
-      "id": "6c9ac916-0105-404d-aa1d-16959f27dfea"
+      "id": "08f0717c-b723-4f86-b6ee-367b8d91995c"
     },
     "revisions": {
       "f6d0b3b5-5d59-4cd0-ac9e-15a6f79f614b": [
@@ -2009,6 +2020,33 @@
         "contentHash": "3daebe50ee9cd635faef467eed6c72f8abd878f2d5979e3b12b03b2137aa2235",
         "revision": null,
         "inputFingerprint": "9ef11e706f0bc1c3dbebdc9f9fa22a7bdf8ce33657edacf32bc1125f2a3ca391",
+        "inputScope": "local-project-files",
+        "attribution": "inputs-changed"
+      },
+      {
+        "id": "08f0717c-b723-4f86-b6ee-367b8d91995c",
+        "scope": "project",
+        "report": "/home/user/company/rakernas/.hyperframes/artifacts/checks/08f0717c-b723-4f86-b6ee-367b8d91995c.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 10000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1795500561532,
+        "contentHash": "3daebe50ee9cd635faef467eed6c72f8abd878f2d5979e3b12b03b2137aa2235",
+        "revision": null,
+        "inputFingerprint": "6ae7a3bca71fb91873e169e3a032a7898b669b35da1d1b65e5d2f196da8cce46",
         "inputScope": "local-project-files",
         "attribution": "inputs-changed"
       }
